@@ -1,0 +1,23 @@
+<Application>
+	<Head>
+		<meta name="id" value="kryten"/>
+		<meta name="title" value="Kryten" version="1.0"/>
+		<meta name="author" value="Hakan Bilgin" namespace="ant"/>
+		<meta name="license" value="AGPL-3.0"/>
+		<meta name="repository" value="https://github.com/Defiant-System/kryten"/>
+		<meta name="width" value="961"/>
+		<meta name="height" value="602"/>
+		<meta name="top" value="150"/>
+		<meta name="left" value="130"/>
+		<meta name="minimize"/>
+		<meta name="maximize" value="disabled"/>
+		<meta name="resize" value="disabled"/>
+		<meta name="script" value="src/js/main.js"/>
+		<meta name="style" value="src/css/main.less"/>
+		<meta name="icons" value="src/svg/icons.svg"/>
+		<meta name="content" value="src/partials/content.htm"/>
+		<meta name="xsl" value="src/partials/templates.xsl"/>
+
+		@import "src/partials/menubar.xml"
+	</Head>
+</Application>

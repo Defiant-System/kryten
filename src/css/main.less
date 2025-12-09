@@ -1,0 +1,26 @@
+
+background: #36f radial-gradient(circle at 50% 50%, #fff5, #fff0 85%);
+
+content {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+
+	&:after {
+		content: "";
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		z-index: 1;
+		background-image: repeating-linear-gradient(90deg, #ffffff12 0, #ffffff12 1px, transparent 1px, transparent 60px),
+							repeating-linear-gradient(0deg, #ffffff12 0, #ffffff12 1px, transparent 1px, transparent 60px),
+							repeating-linear-gradient(0deg, #fff1 0, #fff1 1px, transparent 1px, transparent 15px),
+							repeating-linear-gradient(90deg, #fff1 0, #fff1 1px, transparent 1px, transparent 15px);
+		background-position: 0 0;
+		pointer-events: none;
+	}
+}

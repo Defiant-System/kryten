@@ -1,0 +1,12 @@
+<MenuBar>
+	<Menu name="Kryten">
+		<Menu name="About Kryten" shell="win -a"/>
+		<Menu type="divider"/>
+		<Menu name="Quit Kryten" shell="win -c"/>
+	</Menu>
+	<Menu name="Help">
+		<Menu name="Help" click="open-help"/>
+		<Menu type="divider"/>
+		<Menu name="License" shell="win -al"/>
+	</Menu>
+</MenuBar>
