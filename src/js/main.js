@@ -16,9 +16,13 @@ const kryten = {
 
 		// create FPS controller
 		this.fpsControl = karaqu.FpsControl({
-			fps: 2,
+			fps: 50,
 			autoplay: true,
 			callback(time, delta) {
+
+				object.rotation.x += 0.025;
+				object.rotation.y += 0.025;
+
 				renderer.render(scene, camera);
 			}
 		});
@@ -28,6 +32,8 @@ const kryten = {
 		// DEV-ONLY-END
 	},
 	dispatch(event) {
+		let Self = kryten,
+			el;
 		switch (event.type) {
 			// system events
 			case "window.init":
@@ -35,6 +41,9 @@ const kryten = {
 			// custom events
 			case "open-help":
 				karaqu.shell("fs -u '~/help/index.md'");
+				break;
+			case "set-ui-theme":
+				Self.els.content.data({ theme: event.arg });
 				break;
 		}
 	}

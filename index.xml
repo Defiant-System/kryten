@@ -1,5 +1,6 @@
 <Application>
 	<Build>
+		<task action="skip" importmap="src/js/importmap.json" folder="src/js/modules/threejs/"/>
 		<task action="skip" source="src/js/bundle.js" destination="public/js/bundle.js"/>
 	</Build>
 	<Head>

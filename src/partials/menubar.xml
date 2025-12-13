@@ -2,6 +2,12 @@
 	<Menu name="Kryten">
 		<Menu name="About Kryten" shell="win -a"/>
 		<Menu type="divider"/>
+		<Menu name="Theme&#8230;" for="app-ui-layout">
+			<Menu name="IKEA" click="set-ui-theme" arg="ikea" check-group="ui-theme" is-checked="1"/>
+			<Menu name="Blueprint" click="set-ui-theme" arg="blueprint" check-group="ui-theme"/>
+			<Menu name="3D" click="set-ui-theme" arg="3d" check-group="ui-theme"/>
+		</Menu>
+		<Menu type="divider"/>
 		<Menu name="Quit Kryten" shell="win -c"/>
 	</Menu>
 	<Menu name="Help">

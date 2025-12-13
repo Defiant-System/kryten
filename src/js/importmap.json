@@ -1,0 +1,5 @@
+{
+	"imports": {
+		"three": "./modules/threejs/build/three.module.js"
+	}
+}
