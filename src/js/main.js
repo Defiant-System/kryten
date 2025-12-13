@@ -23,7 +23,8 @@ const kryten = {
 				// object.rotation.x += 0.02;
 				// object.rotation.z += 0.015;
 
-				renderer.render(scene, camera);
+				// renderer.render(scene, camera);
+				composer.render();
 			}
 		});
 
