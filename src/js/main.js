@@ -19,9 +19,9 @@ const kryten = {
 			fps: 50,
 			autoplay: true,
 			callback(time, delta) {
-
-				object.rotation.x += 0.025;
-				object.rotation.y += 0.025;
+				object.rotation.y += 0.015;
+				// object.rotation.x += 0.02;
+				// object.rotation.z += 0.015;
 
 				renderer.render(scene, camera);
 			}
