@@ -95,6 +95,79 @@ object.add(p001);
 
 outlinePass.selectedObjects = [object];
 
+scene.add(object);
+
+
+let originalModel, edgesModel;
+
+updateModel();
+
+
+function updateModel() {
+	originalModel = object;
+	initEdgesModel();
+	// initBackgroundModel();
+	// initConditionalModel();
+}
+
+function initBackgroundModel() {
+
+}
+
+function initEdgesModel() {
+	// remove any previous model
+	if (originalModel) {
+		originalModel.parent.remove( originalModel );
+		originalModel.traverse( c => {
+			if (c.isMesh) {
+				if (Array.isArray(c.material)) {
+					c.material.forEach(m => m.dispose());
+				} else {
+					c.material.dispose();
+				}
+			}
+		} );
+	}
+
+	// store the model and add it to the scene to display
+	// behind the lines
+	edgesModel = originalModel.clone();
+	scene.add(edgesModel);
+
+	let meshes = [];
+	edgesModel.traverse(c => c.isMesh ? meshes.push(c) : void(0));
+
+	for (let key in meshes) {
+		let mesh = meshes[key];
+		let parent = mesh.parent;
+		
+		let mergeGeom = mesh.geometry.clone();
+		mergeGeom.deleteAttribute("uv");
+		mergeGeom.deleteAttribute("uv2");
+		let lineGeom = new OutsideEdgesGeometry(BufferGeometryUtils.mergeVertices(mergeGeom, 1e-3));
+		
+		let lineMat = new THREE.LineBasicMaterial({ color: 0xff0000 });
+		let line = new THREE.LineSegments(lineGeom, lineMat);
+		line.position.copy(mesh.position);
+		line.scale.copy(mesh.scale);
+		line.rotation.copy(mesh.rotation);
+		let thickLineGeom = new LineSegmentsGeometry().fromEdgesGeometry(lineGeom);
+		let thickLineMat = new LineMaterial({ color: 0xff0000, linewidth: 1 });
+		let thickLines = new LineSegments2(thickLineGeom, thickLineMat);
+		thickLines.position.copy(mesh.position);
+		thickLines.scale.copy(mesh.scale);
+		thickLines.rotation.copy(mesh.rotation);
+		parent.remove(mesh);
+		parent.add(line);
+		parent.add(thickLines);
+	}
+}
+
+function initConditionalModel() {
+
+}
+
+
 /*
 let text = `# Blender 4.1.1
 # www.blender.org
@@ -156,35 +229,3 @@ f 4/10/14 2/7/14 12/7/14 11/10/14
 let p001 = loader.parse(text);
 object.add(p001);
 */
-
-// object.scale.set(.0035, .0035, .0035);
-// object.rotateY(-Math.PI / 2);
-// object.position.set(1, 2, 0);
-
-// let object = await loader.loadAsync("~/models/windmill.obj");
-// object.scale.set(.0035, .0035, .0035);
-// object.rotateY(-Math.PI / 2);
-// object.position.set(1, 2, 0);
-
-// let object = await loader.loadAsync("~/models/C3_stool_design_bureau_ODESD2.obj");
-// object.scale.set(.005, .005, .005);
-// object.rotateX(-Math.PI / 2);
-// object.position.set(1, 2, 0);
-
-scene.add(object);
-
-
-// let geometry = new THREE.BoxGeometry(1, 1, 1);
-// let material = new THREE.MeshPhongMaterial({ color: 0x156289, emissive: 0x072534, side: THREE.DoubleSide, flatShading: true });
-// let cube = new THREE.Mesh(geometry, material);
-// cube.position.set(1, 1, 0);
-// scene.add( cube );
-
-
-// Add the ball.
-// let ballRadius = 1.5;
-// let geometry = new THREE.SphereGeometry(ballRadius, 32, 16);
-// let material = new THREE.MeshBasicMaterial({ color: 0xaa0000 });
-// let sphere = new THREE.Mesh(geometry, material);
-// sphere.position.set(1, 1, ballRadius);
-// scene.add(sphere);
