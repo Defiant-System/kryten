@@ -43,6 +43,10 @@ const kryten = {
 			case "open-help":
 				karaqu.shell("fs -u '~/help/index.md'");
 				break;
+			case "toggle-play-pause":
+				if (Self.fpsControl._stopped) Self.fpsControl.start();
+				else Self.fpsControl.stop();
+				break;
 			case "set-ui-theme":
 				Self.els.content.data({ theme: event.arg });
 				break;
