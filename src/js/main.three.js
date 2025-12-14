@@ -93,32 +93,98 @@ object.add(p001);
 // let p002 = await loader.loadAsync("~/models/pyramid/piece.002.obj");
 // object.add(p002);
 
-outlinePass.selectedObjects = [object];
+// let geometry = new THREE.CylinderGeometry(1, 1, 3, 12);
+// let material = new THREE.MeshPhongMaterial({ color: 0x156289, emissive: 0x072534, side: THREE.DoubleSide, flatShading: true });
+// let cube = new THREE.Mesh(geometry, material);
+// cube.position.set(1, 1, 0);
+// object.add(cube);
 
-scene.add(object);
+
+// Add the ball.
+// let ballRadius = 1.5;
+// let geometry = new THREE.SphereGeometry(ballRadius, 32, 16);
+// let material = new THREE.MeshBasicMaterial({ color: 0xaa0000 });
+// let sphere = new THREE.Mesh(geometry, material);
+// sphere.position.set(1, 1, ballRadius);
+// object.add(sphere);
+
+// outlinePass.selectedObjects = [object];
+// scene.add(object);
 
 
-let originalModel, edgesModel;
+let originalModel,
+	shadowModel,
+	depthModel,
+	backgroundModel,
+	edgesModel,
+	conditionalModel;
 
 updateModel();
 
 
 function updateModel() {
+	outlinePass.selectedObjects = [];
 	originalModel = object;
 	initEdgesModel();
-	// initBackgroundModel();
-	// initConditionalModel();
+	initBackgroundModel();
+	initConditionalModel();
+
+
 }
 
 function initBackgroundModel() {
-
+	if (backgroundModel) {
+		backgroundModel.parent.remove(backgroundModel);
+		shadowModel.parent.remove(shadowModel);
+		depthModel.parent.remove(depthModel);
+		backgroundModel.traverse(c => c.isMesh ? c.material.dispose() : void(0));
+		shadowModel.traverse(c => c.isMesh ? c.material.dispose() : void(0));
+		depthModel.traverse(c => c.isMesh ? c.material.dispose() : void(0));
+	}
+	if (!originalModel) return;
+	
+	backgroundModel = originalModel.clone();
+	backgroundModel.traverse(c => {
+		if (c.isMesh) {
+			c.material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+			c.material.polygonOffset = true;
+			c.material.polygonOffsetFactor = 1;
+			c.material.polygonOffsetUnits = 1;
+			c.renderOrder = 2;
+		}
+	});
+	scene.add(backgroundModel);
+	shadowModel = originalModel.clone();
+	shadowModel.traverse(c => {
+		if (c.isMesh) {
+			c.material = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1.0, opacity: .75 });
+			c.material.polygonOffset = true;
+			c.material.polygonOffsetFactor = 1;
+			c.material.polygonOffsetUnits = 1;
+			c.receiveShadow = true;
+			c.renderOrder = 2;
+		}
+	} );
+	scene.add(shadowModel);
+	depthModel = originalModel.clone();
+	depthModel.traverse(c => {
+		if (c.isMesh) {
+			c.material = new THREE.MeshBasicMaterial({ color: 0xffffff, opacity: .75 });
+			c.material.polygonOffset = true;
+			c.material.polygonOffsetFactor = 1;
+			c.material.polygonOffsetUnits = 1;
+			c.material.colorWrite = false;
+			c.renderOrder = 1;
+		}
+	} );
+	scene.add(depthModel);
 }
 
 function initEdgesModel() {
 	// remove any previous model
-	if (originalModel) {
-		originalModel.parent.remove( originalModel );
-		originalModel.traverse( c => {
+	if (edgesModel) {
+		edgesModel.parent.remove(edgesModel);
+		edgesModel.traverse(c => {
 			if (c.isMesh) {
 				if (Array.isArray(c.material)) {
 					c.material.forEach(m => m.dispose());
@@ -126,8 +192,11 @@ function initEdgesModel() {
 					c.material.dispose();
 				}
 			}
-		} );
+		});
 	}
+
+	// early out if there's no model loaded
+	if (!originalModel) return;
 
 	// store the model and add it to the scene to display
 	// behind the lines
@@ -164,7 +233,47 @@ function initEdgesModel() {
 }
 
 function initConditionalModel() {
+	// remove the original model
+	if (conditionalModel) {
+		conditionalModel.parent.remove(conditionalModel);
+		conditionalModel.traverse(c => c.isMesh ? c.material.dispose() : void(0));
+	}
 
+	conditionalModel = originalModel.clone();
+	scene.add(conditionalModel);
+	conditionalModel.visible = false;
+	// get all meshes
+	let meshes = [];
+	conditionalModel.traverse(c => c.isMesh ? meshes.push(c) : void(0));
+
+	for (let key in meshes) {
+		let mesh = meshes[key];
+		let parent = mesh.parent;
+		// Remove everything but the position attribute
+		let mergedGeom = mesh.geometry.clone();
+		for (let key in mergedGeom.attributes) {
+			if (key !== "position") {
+				mergedGeom.deleteAttribute(key);
+			}
+		}
+		// Create the conditional edges geometry and associated material
+		let lineGeom = new ConditionalEdgesGeometry(BufferGeometryUtils.mergeVertices(mergedGeom));
+		let material = new THREE.ShaderMaterial(ConditionalEdgesShader);
+		material.uniforms.diffuse.value.set(0xff0000);
+		// Create the line segments objects and replace the mesh
+		let line = new THREE.LineSegments(lineGeom, material);
+		line.position.copy(mesh.position);
+		line.scale.copy(mesh.scale);
+		line.rotation.copy(mesh.rotation);
+		let thickLineGeom = new ConditionalLineSegmentsGeometry().fromConditionalEdgesGeometry(lineGeom);
+		let thickLines = new LineSegments2(thickLineGeom, new ConditionalLineMaterial({ color: 0xff0000, linewidth: 2 }));
+		thickLines.position.copy(mesh.position);
+		thickLines.scale.copy(mesh.scale);
+		thickLines.rotation.copy(mesh.rotation);
+		parent.remove(mesh);
+		parent.add(line);
+		parent.add(thickLines);
+	}
 }
 
 

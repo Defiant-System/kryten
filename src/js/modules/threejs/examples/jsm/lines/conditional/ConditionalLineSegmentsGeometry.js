@@ -37,9 +37,6 @@ export class ConditionalLineSegmentsGeometry extends LineSegmentsGeometry {
 			),
 		);
 
-
-		console.log(this);
-
 		return this;
 
 	}

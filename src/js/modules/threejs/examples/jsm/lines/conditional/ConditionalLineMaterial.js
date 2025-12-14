@@ -274,160 +274,160 @@ const shader = {
 		`
 };
 
-var ConditionalLineMaterial = function ( parameters ) {
+class ConditionalLineMaterial extends ShaderMaterial {
 
-	ShaderMaterial.call( this, {
+	static get type() {
 
-		type: 'ConditionalLineMaterial',
+		return 'ConditionalLineMaterial';
+		
+	}
 
-		uniforms: UniformsUtils.clone( shader.uniforms ),
+	constructor(parameters) {
+		super( {
+			uniforms: shader.uniforms,
+			vertexShader: shader.vertexShader,
+			fragmentShader: shader.fragmentShader,
+		} );
 
-		vertexShader: shader.vertexShader,
-		fragmentShader: shader.fragmentShader,
+		Object.defineProperties( this, {
 
-		clipping: true // required for clipping support
+			color: {
 
-	} );
+				enumerable: true,
 
-	this.dashed = false;
+				get: function () {
 
-	Object.defineProperties( this, {
+					return this.uniforms.diffuse.value;
 
-		color: {
+				},
 
-			enumerable: true,
+				set: function ( value ) {
 
-			get: function () {
+					this.uniforms.diffuse.value = value;
 
-				return this.uniforms.diffuse.value;
-
-			},
-
-			set: function ( value ) {
-
-				this.uniforms.diffuse.value = value;
-
-			}
-
-		},
-
-		linewidth: {
-
-			enumerable: true,
-
-			get: function () {
-
-				return this.uniforms.linewidth.value;
+				}
 
 			},
 
-			set: function ( value ) {
+			linewidth: {
 
-				this.uniforms.linewidth.value = value;
+				enumerable: true,
 
-			}
+				get: function () {
 
-		},
+					return this.uniforms.linewidth.value;
 
-		dashScale: {
+				},
 
-			enumerable: true,
+				set: function ( value ) {
 
-			get: function () {
+					this.uniforms.linewidth.value = value;
 
-				return this.uniforms.dashScale.value;
-
-			},
-
-			set: function ( value ) {
-
-				this.uniforms.dashScale.value = value;
-
-			}
-
-		},
-
-		dashSize: {
-
-			enumerable: true,
-
-			get: function () {
-
-				return this.uniforms.dashSize.value;
+				}
 
 			},
 
-			set: function ( value ) {
+			dashScale: {
 
-				this.uniforms.dashSize.value = value;
+				enumerable: true,
 
-			}
+				get: function () {
 
-		},
+					return this.uniforms.dashScale.value;
 
-		gapSize: {
+				},
 
-			enumerable: true,
+				set: function ( value ) {
 
-			get: function () {
+					this.uniforms.dashScale.value = value;
 
-				return this.uniforms.gapSize.value;
-
-			},
-
-			set: function ( value ) {
-
-				this.uniforms.gapSize.value = value;
-
-			}
-
-		},
-
-		opacity: {
-
-			enumerable: true,
-
-			get: function () {
-
-				return this.uniforms.opacity.value;
+				}
 
 			},
 
-			set: function ( value ) {
+			dashSize: {
 
-				this.uniforms.opacity.value = value;
+				enumerable: true,
 
-			}
+				get: function () {
 
-		},
+					return this.uniforms.dashSize.value;
 
-		resolution: {
+				},
 
-			enumerable: true,
+				set: function ( value ) {
 
-			get: function () {
+					this.uniforms.dashSize.value = value;
 
-				return this.uniforms.resolution.value;
+				}
 
 			},
 
-			set: function ( value ) {
+			gapSize: {
 
-				this.uniforms.resolution.value.copy( value );
+				enumerable: true,
+
+				get: function () {
+
+					return this.uniforms.gapSize.value;
+
+				},
+
+				set: function ( value ) {
+
+					this.uniforms.gapSize.value = value;
+
+				}
+
+			},
+
+			opacity: {
+
+				enumerable: true,
+
+				get: function () {
+
+					return this.uniforms.opacity.value;
+
+				},
+
+				set: function ( value ) {
+
+					this.uniforms.opacity.value = value;
+
+				}
+
+			},
+
+			resolution: {
+
+				enumerable: true,
+
+				get: function () {
+
+					return this.uniforms.resolution.value;
+
+				},
+
+				set: function ( value ) {
+
+					this.uniforms.resolution.value.copy( value );
+
+				}
 
 			}
 
-		}
+		} );
 
-	} );
-
-	this.setValues( parameters );
-
-};
-
-ConditionalLineMaterial.prototype = Object.create( ShaderMaterial.prototype );
-ConditionalLineMaterial.prototype.constructor = ConditionalLineMaterial;
-
-ConditionalLineMaterial.prototype.isConditionalLineMaterial = true;
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isConditionalLineMaterial = true;
+	}
+}
 
 export { ConditionalLineMaterial };
