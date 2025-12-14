@@ -81993,14 +81993,16 @@ class ConditionalLineMaterial extends ShaderMaterial {
 	static get type() {
 
 		return 'ConditionalLineMaterial';
-		
+
 	}
 
 	constructor(parameters) {
 		super( {
-			uniforms: shader.uniforms,
+			type: 'ConditionalLineMaterial',
+			uniforms: UniformsUtils.clone( shader.uniforms ),
 			vertexShader: shader.vertexShader,
 			fragmentShader: shader.fragmentShader,
+			clipping: true // required for clipping support
 		} );
 
 		Object.defineProperties( this, {
@@ -82132,6 +82134,8 @@ class ConditionalLineMaterial extends ShaderMaterial {
 			}
 
 		} );
+
+		this.setValues( parameters );
 
 		/**
 		 * This flag can be used for type testing.
