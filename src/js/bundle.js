@@ -32,7 +32,6 @@ THREE_dispose = () => {
 module.exports = {
 	THREE,
 	THREE_dispose,
-	OrbitControls,
 
 	BufferGeometryUtils,
 	LineSegmentsGeometry,
@@ -52,4 +51,5 @@ module.exports = {
 	FXAAShader,
 
 	OBJLoader,
+	OrbitControls,
 };

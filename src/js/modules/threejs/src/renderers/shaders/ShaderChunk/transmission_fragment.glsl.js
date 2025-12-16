@@ -1,36 +1,30 @@
 export default /* glsl */`
 #ifdef USE_TRANSMISSION
 
-	material.transmission = transmission;
-	material.transmissionAlpha = 1.0;
-	material.thickness = thickness;
-	material.attenuationDistance = attenuationDistance;
-	material.attenuationColor = attenuationColor;
+	float transmissionFactor = transmission;
+	float thicknessFactor = thickness;
 
 	#ifdef USE_TRANSMISSIONMAP
 
-		material.transmission *= texture2D( transmissionMap, vTransmissionMapUv ).r;
+		transmissionFactor *= texture2D( transmissionMap, vUv ).r;
 
 	#endif
 
-	#ifdef USE_THICKNESSMAP
+	#ifdef USE_THICKNESSNMAP
 
-		material.thickness *= texture2D( thicknessMap, vThicknessMapUv ).g;
+		thicknessFactor *= texture2D( thicknessMap, vUv ).g;
 
 	#endif
 
-	vec3 pos = vWorldPosition;
+	vec3 pos = vWorldPosition.xyz / vWorldPosition.w;
 	vec3 v = normalize( cameraPosition - pos );
-	vec3 n = inverseTransformDirection( normal, viewMatrix );
+	float ior = ( 1.0 + 0.4 * reflectivity ) / ( 1.0 - 0.4 * reflectivity );
 
-	vec4 transmitted = getIBLVolumeRefraction(
-		n, v, material.roughness, material.diffuseContribution, material.specularColorBlended, material.specularF90,
-		pos, modelMatrix, viewMatrix, projectionMatrix, material.dispersion, material.ior, material.thickness,
-		material.attenuationColor, material.attenuationDistance );
+	vec3 transmission = transmissionFactor * getIBLVolumeRefraction(
+		normal, v, roughnessFactor, material.diffuseColor, totalSpecular,
+		pos, modelMatrix, viewMatrix, projectionMatrix, ior, thicknessFactor,
+		attenuationColor, attenuationDistance );
 
-	material.transmissionAlpha = mix( material.transmissionAlpha, transmitted.a, material.transmission );
-
-	totalDiffuse = mix( totalDiffuse, transmitted.rgb, material.transmission );
-
+	totalDiffuse = mix( totalDiffuse, transmission, transmissionFactor );
 #endif
 `;

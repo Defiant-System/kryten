@@ -5,6 +5,7 @@ import {
 	EquirectangularReflectionMapping,
 	EquirectangularRefractionMapping,
 	CubeUVReflectionMapping,
+	CubeUVRefractionMapping,
 
 	RepeatWrapping,
 	ClampToEdgeWrapping,
@@ -17,12 +18,11 @@ import {
 	LinearMipmapNearestFilter,
 	LinearMipmapLinearFilter
 } from '../constants.js';
-import { InstancedBufferAttribute } from '../core/InstancedBufferAttribute.js';
+import { BufferAttribute } from '../core/BufferAttribute.js';
 import { Color } from '../math/Color.js';
 import { Object3D } from '../core/Object3D.js';
 import { Group } from '../objects/Group.js';
 import { InstancedMesh } from '../objects/InstancedMesh.js';
-import { BatchedMesh } from '../objects/BatchedMesh.js';
 import { Sprite } from '../objects/Sprite.js';
 import { Points } from '../objects/Points.js';
 import { Line } from '../objects/Line.js';
@@ -48,7 +48,6 @@ import { PerspectiveCamera } from '../cameras/PerspectiveCamera.js';
 import { Scene } from '../scenes/Scene.js';
 import { CubeTexture } from '../textures/CubeTexture.js';
 import { Texture } from '../textures/Texture.js';
-import { Source } from '../textures/Source.js';
 import { DataTexture } from '../textures/DataTexture.js';
 import { ImageLoader } from './ImageLoader.js';
 import { LoadingManager } from './LoadingManager.js';
@@ -59,48 +58,16 @@ import { BufferGeometryLoader } from './BufferGeometryLoader.js';
 import { Loader } from './Loader.js';
 import { FileLoader } from './FileLoader.js';
 import * as Geometries from '../geometries/Geometries.js';
-import { getTypedArray, error, warn } from '../utils.js';
-import { Box3 } from '../math/Box3.js';
-import { Sphere } from '../math/Sphere.js';
-import { SphericalHarmonics3 } from '../math/SphericalHarmonics3.js';
+import { getTypedArray } from '../utils.js';
 
-/**
- * A loader for loading a JSON resource in the [JSON Object/Scene format](https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4).
- * The files are internally loaded via {@link FileLoader}.
- *
- * ```js
- * const loader = new THREE.ObjectLoader();
- * const obj = await loader.loadAsync( 'models/json/example.json' );
- * scene.add( obj );
- *
- * // Alternatively, to parse a previously loaded JSON structure
- * const object = await loader.parseAsync( a_json_object );
- * scene.add( object );
- * ```
- *
- * @augments Loader
- */
 class ObjectLoader extends Loader {
 
-	/**
-	 * Constructs a new object loader.
-	 *
-	 * @param {LoadingManager} [manager] - The loading manager.
-	 */
 	constructor( manager ) {
 
 		super( manager );
 
 	}
 
-	/**
-	 * Starts loading from the given URL and pass the loaded 3D object to the `onLoad()` callback.
-	 *
-	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
-	 * @param {function(Object3D)} onLoad - Executed when the loading process has been finished.
-	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
-	 * @param {onErrorCallback} onError - Executed when errors occur.
-	 */
 	load( url, onLoad, onProgress, onError ) {
 
 		const scope = this;
@@ -124,7 +91,7 @@ class ObjectLoader extends Loader {
 
 				if ( onError !== undefined ) onError( error );
 
-				error( 'ObjectLoader: Can\'t parse ' + url + '.', error.message );
+				console.error( 'THREE:ObjectLoader: Can\'t parse ' + url + '.', error.message );
 
 				return;
 
@@ -134,9 +101,7 @@ class ObjectLoader extends Loader {
 
 			if ( metadata === undefined || metadata.type === undefined || metadata.type.toLowerCase() === 'geometry' ) {
 
-				if ( onError !== undefined ) onError( new Error( 'THREE.ObjectLoader: Can\'t load ' + url ) );
-
-				error( 'ObjectLoader: Can\'t load ' + url );
+				console.error( 'THREE.ObjectLoader: Can\'t load ' + url );
 				return;
 
 			}
@@ -147,14 +112,6 @@ class ObjectLoader extends Loader {
 
 	}
 
-	/**
-	 * Async version of {@link ObjectLoader#load}.
-	 *
-	 * @async
-	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
-	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
-	 * @return {Promise<Object3D>} A Promise that resolves with the loaded 3D object.
-	 */
 	async loadAsync( url, onProgress ) {
 
 		const scope = this;
@@ -183,14 +140,6 @@ class ObjectLoader extends Loader {
 
 	}
 
-	/**
-	 * Parses the given JSON. This is used internally by {@link ObjectLoader#load}
-	 * but can also be used directly to parse a previously loaded JSON structure.
-	 *
-	 * @param {Object} json - The serialized 3D object.
-	 * @param {onLoad} onLoad - Executed when all resources (e.g. textures) have been fully loaded.
-	 * @return {Object3D} The parsed 3D object.
-	 */
 	parse( json, onLoad ) {
 
 		const animations = this.parseAnimations( json.animations );
@@ -210,7 +159,6 @@ class ObjectLoader extends Loader {
 		const skeletons = this.parseSkeletons( json.skeletons, object );
 
 		this.bindSkeletons( object, skeletons );
-		this.bindLightTargets( object );
 
 		//
 
@@ -220,7 +168,7 @@ class ObjectLoader extends Loader {
 
 			for ( const uuid in images ) {
 
-				if ( images[ uuid ].data instanceof HTMLImageElement ) {
+				if ( images[ uuid ] instanceof HTMLImageElement ) {
 
 					hasImages = true;
 					break;
@@ -237,12 +185,6 @@ class ObjectLoader extends Loader {
 
 	}
 
-	/**
-	 * Async version of {@link ObjectLoader#parse}.
-	 *
-	 * @param {Object} json - The serialized 3D object.
-	 * @return {Promise<Object3D>} A Promise that resolves with the parsed 3D object.
-	 */
 	async parseAsync( json ) {
 
 		const animations = this.parseAnimations( json.animations );
@@ -258,13 +200,10 @@ class ObjectLoader extends Loader {
 		const skeletons = this.parseSkeletons( json.skeletons, object );
 
 		this.bindSkeletons( object, skeletons );
-		this.bindLightTargets( object );
 
 		return object;
 
 	}
-
-	// internals
 
 	parseShapes( json ) {
 
@@ -336,6 +275,13 @@ class ObjectLoader extends Loader {
 					case 'InstancedBufferGeometry':
 
 						geometry = bufferGeometryLoader.parse( data );
+
+						break;
+
+					case 'Geometry':
+
+						console.error( 'THREE.ObjectLoader: The legacy Geometry type is no longer supported.' );
+
 						break;
 
 					default:
@@ -346,7 +292,7 @@ class ObjectLoader extends Loader {
 
 						} else {
 
-							warn( `ObjectLoader: Unsupported geometry type "${ data.type }"` );
+							console.warn( `THREE.ObjectLoader: Unsupported geometry type "${ data.type }"` );
 
 						}
 
@@ -355,7 +301,7 @@ class ObjectLoader extends Loader {
 				geometry.uuid = data.uuid;
 
 				if ( data.name !== undefined ) geometry.name = data.name;
-				if ( data.userData !== undefined ) geometry.userData = data.userData;
+				if ( geometry.isBufferGeometry === true && data.userData !== undefined ) geometry.userData = data.userData;
 
 				geometries[ data.uuid ] = geometry;
 
@@ -381,13 +327,39 @@ class ObjectLoader extends Loader {
 
 				const data = json[ i ];
 
-				if ( cache[ data.uuid ] === undefined ) {
+				if ( data.type === 'MultiMaterial' ) {
 
-					cache[ data.uuid ] = loader.parse( data );
+					// Deprecated
+
+					const array = [];
+
+					for ( let j = 0; j < data.materials.length; j ++ ) {
+
+						const material = data.materials[ j ];
+
+						if ( cache[ material.uuid ] === undefined ) {
+
+							cache[ material.uuid ] = loader.parse( material );
+
+						}
+
+						array.push( cache[ material.uuid ] );
+
+					}
+
+					materials[ data.uuid ] = array;
+
+				} else {
+
+					if ( cache[ data.uuid ] === undefined ) {
+
+						cache[ data.uuid ] = loader.parse( data );
+
+					}
+
+					materials[ data.uuid ] = cache[ data.uuid ];
 
 				}
-
-				materials[ data.uuid ] = cache[ data.uuid ];
 
 			}
 
@@ -489,7 +461,7 @@ class ObjectLoader extends Loader {
 
 					// load array of images e.g CubeTexture
 
-					const imageArray = [];
+					images[ image.uuid ] = [];
 
 					for ( let j = 0, jl = url.length; j < jl; j ++ ) {
 
@@ -501,13 +473,13 @@ class ObjectLoader extends Loader {
 
 							if ( deserializedImage instanceof HTMLImageElement ) {
 
-								imageArray.push( deserializedImage );
+								images[ image.uuid ].push( deserializedImage );
 
 							} else {
 
 								// special case: handle array of data textures for cube textures
 
-								imageArray.push( new DataTexture( deserializedImage.data, deserializedImage.width, deserializedImage.height ) );
+								images[ image.uuid ].push( new DataTexture( deserializedImage.data, deserializedImage.width, deserializedImage.height ) );
 
 							}
 
@@ -515,15 +487,17 @@ class ObjectLoader extends Loader {
 
 					}
 
-					images[ image.uuid ] = new Source( imageArray );
-
 				} else {
 
 					// load single image
 
 					const deserializedImage = deserializeImage( image.url );
-					images[ image.uuid ] = new Source( deserializedImage );
 
+					if ( deserializedImage !== null ) {
+
+						images[ image.uuid ] = deserializedImage;
+
+					}
 
 				}
 
@@ -586,7 +560,7 @@ class ObjectLoader extends Loader {
 
 					// load array of images e.g CubeTexture
 
-					const imageArray = [];
+					images[ image.uuid ] = [];
 
 					for ( let j = 0, jl = url.length; j < jl; j ++ ) {
 
@@ -598,13 +572,13 @@ class ObjectLoader extends Loader {
 
 							if ( deserializedImage instanceof HTMLImageElement ) {
 
-								imageArray.push( deserializedImage );
+								images[ image.uuid ].push( deserializedImage );
 
 							} else {
 
 								// special case: handle array of data textures for cube textures
 
-								imageArray.push( new DataTexture( deserializedImage.data, deserializedImage.width, deserializedImage.height ) );
+								images[ image.uuid ].push( new DataTexture( deserializedImage.data, deserializedImage.width, deserializedImage.height ) );
 
 							}
 
@@ -612,14 +586,17 @@ class ObjectLoader extends Loader {
 
 					}
 
-					images[ image.uuid ] = new Source( imageArray );
-
 				} else {
 
 					// load single image
 
 					const deserializedImage = await deserializeImage( image.url );
-					images[ image.uuid ] = new Source( deserializedImage );
+
+					if ( deserializedImage !== null ) {
+
+						images[ image.uuid ] = deserializedImage;
+
+					}
 
 				}
 
@@ -637,7 +614,7 @@ class ObjectLoader extends Loader {
 
 			if ( typeof value === 'number' ) return value;
 
-			warn( 'ObjectLoader.parseTexture: Constant should be in numeric form.', value );
+			console.warn( 'THREE.ObjectLoader.parseTexture: Constant should be in numeric form.', value );
 
 			return type[ value ];
 
@@ -653,24 +630,22 @@ class ObjectLoader extends Loader {
 
 				if ( data.image === undefined ) {
 
-					warn( 'ObjectLoader: No "image" specified for', data.uuid );
+					console.warn( 'THREE.ObjectLoader: No "image" specified for', data.uuid );
 
 				}
 
 				if ( images[ data.image ] === undefined ) {
 
-					warn( 'ObjectLoader: Undefined image', data.image );
+					console.warn( 'THREE.ObjectLoader: Undefined image', data.image );
 
 				}
 
-				const source = images[ data.image ];
-				const image = source.data;
-
 				let texture;
+				const image = images[ data.image ];
 
 				if ( Array.isArray( image ) ) {
 
-					texture = new CubeTexture();
+					texture = new CubeTexture( image );
 
 					if ( image.length === 6 ) texture.needsUpdate = true;
 
@@ -678,11 +653,11 @@ class ObjectLoader extends Loader {
 
 					if ( image && image.data ) {
 
-						texture = new DataTexture();
+						texture = new DataTexture( image.data, image.width, image.height );
 
 					} else {
 
-						texture = new Texture();
+						texture = new Texture( image );
 
 					}
 
@@ -690,14 +665,11 @@ class ObjectLoader extends Loader {
 
 				}
 
-				texture.source = source;
-
 				texture.uuid = data.uuid;
 
 				if ( data.name !== undefined ) texture.name = data.name;
 
 				if ( data.mapping !== undefined ) texture.mapping = parseConstant( data.mapping, TEXTURE_MAPPING );
-				if ( data.channel !== undefined ) texture.channel = data.channel;
 
 				if ( data.offset !== undefined ) texture.offset.fromArray( data.offset );
 				if ( data.repeat !== undefined ) texture.repeat.fromArray( data.repeat );
@@ -712,9 +684,8 @@ class ObjectLoader extends Loader {
 				}
 
 				if ( data.format !== undefined ) texture.format = data.format;
-				if ( data.internalFormat !== undefined ) texture.internalFormat = data.internalFormat;
 				if ( data.type !== undefined ) texture.type = data.type;
-				if ( data.colorSpace !== undefined ) texture.colorSpace = data.colorSpace;
+				if ( data.encoding !== undefined ) texture.encoding = data.encoding;
 
 				if ( data.minFilter !== undefined ) texture.minFilter = parseConstant( data.minFilter, TEXTURE_FILTER );
 				if ( data.magFilter !== undefined ) texture.magFilter = parseConstant( data.magFilter, TEXTURE_FILTER );
@@ -722,12 +693,8 @@ class ObjectLoader extends Loader {
 
 				if ( data.flipY !== undefined ) texture.flipY = data.flipY;
 
-				if ( data.generateMipmaps !== undefined ) texture.generateMipmaps = data.generateMipmaps;
 				if ( data.premultiplyAlpha !== undefined ) texture.premultiplyAlpha = data.premultiplyAlpha;
 				if ( data.unpackAlignment !== undefined ) texture.unpackAlignment = data.unpackAlignment;
-				if ( data.compareFunction !== undefined ) texture.compareFunction = data.compareFunction;
-
-				if ( data.userData !== undefined ) texture.userData = data.userData;
 
 				textures[ data.uuid ] = texture;
 
@@ -747,7 +714,7 @@ class ObjectLoader extends Loader {
 
 			if ( geometries[ name ] === undefined ) {
 
-				warn( 'ObjectLoader: Undefined geometry', name );
+				console.warn( 'THREE.ObjectLoader: Undefined geometry', name );
 
 			}
 
@@ -769,7 +736,7 @@ class ObjectLoader extends Loader {
 
 					if ( materials[ uuid ] === undefined ) {
 
-						warn( 'ObjectLoader: Undefined material', uuid );
+						console.warn( 'THREE.ObjectLoader: Undefined material', uuid );
 
 					}
 
@@ -783,7 +750,7 @@ class ObjectLoader extends Loader {
 
 			if ( materials[ name ] === undefined ) {
 
-				warn( 'ObjectLoader: Undefined material', name );
+				console.warn( 'THREE.ObjectLoader: Undefined material', name );
 
 			}
 
@@ -795,7 +762,7 @@ class ObjectLoader extends Loader {
 
 			if ( textures[ uuid ] === undefined ) {
 
-				warn( 'ObjectLoader: Undefined texture', uuid );
+				console.warn( 'THREE.ObjectLoader: Undefined texture', uuid );
 
 			}
 
@@ -825,11 +792,7 @@ class ObjectLoader extends Loader {
 
 				}
 
-				if ( data.environment !== undefined ) {
-
-					object.environment = getTexture( data.environment );
-
-				}
+				if ( data.environment !== undefined ) object.environment = getTexture( data.environment );
 
 				if ( data.fog !== undefined ) {
 
@@ -843,20 +806,7 @@ class ObjectLoader extends Loader {
 
 					}
 
-					if ( data.fog.name !== '' ) {
-
-						object.fog.name = data.fog.name;
-
-					}
-
 				}
-
-				if ( data.backgroundBlurriness !== undefined ) object.backgroundBlurriness = data.backgroundBlurriness;
-				if ( data.backgroundIntensity !== undefined ) object.backgroundIntensity = data.backgroundIntensity;
-				if ( data.backgroundRotation !== undefined ) object.backgroundRotation.fromArray( data.backgroundRotation );
-
-				if ( data.environmentIntensity !== undefined ) object.environmentIntensity = data.environmentIntensity;
-				if ( data.environmentRotation !== undefined ) object.environmentRotation.fromArray( data.environmentRotation );
 
 				break;
 
@@ -890,7 +840,6 @@ class ObjectLoader extends Loader {
 			case 'DirectionalLight':
 
 				object = new DirectionalLight( data.color, data.intensity );
-				object.target = data.target || '';
 
 				break;
 
@@ -909,7 +858,6 @@ class ObjectLoader extends Loader {
 			case 'SpotLight':
 
 				object = new SpotLight( data.color, data.intensity, data.distance, data.angle, data.penumbra, data.decay );
-				object.target = data.target || '';
 
 				break;
 
@@ -921,8 +869,7 @@ class ObjectLoader extends Loader {
 
 			case 'LightProbe':
 
-				const sh = new SphericalHarmonics3().fromArray( data.sh );
-				object = new LightProbe( sh, data.intensity );
+				object = new LightProbe().fromJSON( data );
 
 				break;
 
@@ -957,83 +904,8 @@ class ObjectLoader extends Loader {
 				const instanceColor = data.instanceColor;
 
 				object = new InstancedMesh( geometry, material, count );
-				object.instanceMatrix = new InstancedBufferAttribute( new Float32Array( instanceMatrix.array ), 16 );
-				if ( instanceColor !== undefined ) object.instanceColor = new InstancedBufferAttribute( new Float32Array( instanceColor.array ), instanceColor.itemSize );
-
-				break;
-
-			case 'BatchedMesh':
-
-				geometry = getGeometry( data.geometry );
-				material = getMaterial( data.material );
-
-				object = new BatchedMesh( data.maxInstanceCount, data.maxVertexCount, data.maxIndexCount, material );
-				object.geometry = geometry;
-				object.perObjectFrustumCulled = data.perObjectFrustumCulled;
-				object.sortObjects = data.sortObjects;
-
-				object._drawRanges = data.drawRanges;
-				object._reservedRanges = data.reservedRanges;
-
-				object._geometryInfo = data.geometryInfo.map( info => {
-
-					let box = null;
-					let sphere = null;
-					if ( info.boundingBox !== undefined ) {
-
-						box = new Box3().fromJSON( info.boundingBox );
-
-					}
-
-					if ( info.boundingSphere !== undefined ) {
-
-						sphere = new Sphere().fromJSON( info.boundingSphere );
-
-					}
-
-					return {
-						...info,
-						boundingBox: box,
-						boundingSphere: sphere
-					};
-
-				} );
-				object._instanceInfo = data.instanceInfo;
-
-				object._availableInstanceIds = data._availableInstanceIds;
-				object._availableGeometryIds = data._availableGeometryIds;
-
-				object._nextIndexStart = data.nextIndexStart;
-				object._nextVertexStart = data.nextVertexStart;
-				object._geometryCount = data.geometryCount;
-
-				object._maxInstanceCount = data.maxInstanceCount;
-				object._maxVertexCount = data.maxVertexCount;
-				object._maxIndexCount = data.maxIndexCount;
-
-				object._geometryInitialized = data.geometryInitialized;
-
-				object._matricesTexture = getTexture( data.matricesTexture.uuid );
-
-				object._indirectTexture = getTexture( data.indirectTexture.uuid );
-
-				if ( data.colorsTexture !== undefined ) {
-
-					object._colorsTexture = getTexture( data.colorsTexture.uuid );
-
-				}
-
-				if ( data.boundingSphere !== undefined ) {
-
-					object.boundingSphere = new Sphere().fromJSON( data.boundingSphere );
-
-				}
-
-				if ( data.boundingBox !== undefined ) {
-
-					object.boundingBox = new Box3().fromJSON( data.boundingBox );
-
-				}
+				object.instanceMatrix = new BufferAttribute( new Float32Array( instanceMatrix.array ), 16 );
+				if ( instanceColor !== undefined ) object.instanceColor = new BufferAttribute( new Float32Array( instanceColor.array ), instanceColor.itemSize );
 
 				break;
 
@@ -1112,14 +984,11 @@ class ObjectLoader extends Loader {
 
 		}
 
-		if ( data.up !== undefined ) object.up.fromArray( data.up );
-
 		if ( data.castShadow !== undefined ) object.castShadow = data.castShadow;
 		if ( data.receiveShadow !== undefined ) object.receiveShadow = data.receiveShadow;
 
 		if ( data.shadow ) {
 
-			if ( data.shadow.intensity !== undefined ) object.shadow.intensity = data.shadow.intensity;
 			if ( data.shadow.bias !== undefined ) object.shadow.bias = data.shadow.bias;
 			if ( data.shadow.normalBias !== undefined ) object.shadow.normalBias = data.shadow.normalBias;
 			if ( data.shadow.radius !== undefined ) object.shadow.radius = data.shadow.radius;
@@ -1173,7 +1042,7 @@ class ObjectLoader extends Loader {
 
 				if ( child !== undefined ) {
 
-					object.addLevel( child, level.distance, level.hysteresis );
+					object.addLevel( child, level.distance );
 
 				}
 
@@ -1197,7 +1066,7 @@ class ObjectLoader extends Loader {
 
 				if ( skeleton === undefined ) {
 
-					warn( 'ObjectLoader: No skeleton found with UUID:', child.skeleton );
+					console.warn( 'THREE.ObjectLoader: No skeleton found with UUID:', child.skeleton );
 
 				} else {
 
@@ -1211,29 +1080,12 @@ class ObjectLoader extends Loader {
 
 	}
 
-	bindLightTargets( object ) {
+	/* DEPRECATED */
 
-		object.traverse( function ( child ) {
+	setTexturePath( value ) {
 
-			if ( child.isDirectionalLight || child.isSpotLight ) {
-
-				const uuid = child.target;
-
-				const target = object.getObjectByProperty( 'uuid', uuid );
-
-				if ( target !== undefined ) {
-
-					child.target = target;
-
-				} else {
-
-					child.target = new Object3D();
-
-				}
-
-			}
-
-		} );
+		console.warn( 'THREE.ObjectLoader: .setTexturePath() has been renamed to .setResourcePath().' );
+		return this.setResourcePath( value );
 
 	}
 
@@ -1245,7 +1097,8 @@ const TEXTURE_MAPPING = {
 	CubeRefractionMapping: CubeRefractionMapping,
 	EquirectangularReflectionMapping: EquirectangularReflectionMapping,
 	EquirectangularRefractionMapping: EquirectangularRefractionMapping,
-	CubeUVReflectionMapping: CubeUVReflectionMapping
+	CubeUVReflectionMapping: CubeUVReflectionMapping,
+	CubeUVRefractionMapping: CubeUVRefractionMapping
 };
 
 const TEXTURE_WRAPPING = {
