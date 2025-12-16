@@ -2,6 +2,7 @@ import {
 	ShaderMaterial,
 	UniformsLib,
 	UniformsUtils,
+	Color,
 	Vector2
 } from '../../../../build/three.module.js';
 /**
@@ -36,7 +37,7 @@ const shader = {
 	] ),
 
 	vertexShader:
-		/* glsl */`
+	/* glsl */`
 		#include <common>
 		#include <color_pars_vertex>
 		#include <fog_pars_vertex>
@@ -215,7 +216,7 @@ const shader = {
 		`,
 
 	fragmentShader:
-		/* glsl */`
+	/* glsl */`
 		uniform vec3 diffuse;
 		uniform float opacity;
 
@@ -276,20 +277,22 @@ const shader = {
 
 class ConditionalLineMaterial extends ShaderMaterial {
 
-	static get type() {
+	constructor( parameters ) {
 
-		return 'ConditionalLineMaterial';
-
-	}
-
-	constructor(parameters) {
 		super( {
+
 			type: 'ConditionalLineMaterial',
+
 			uniforms: UniformsUtils.clone( shader.uniforms ),
+
 			vertexShader: shader.vertexShader,
 			fragmentShader: shader.fragmentShader,
+
 			clipping: true // required for clipping support
+
 		} );
+
+		this.dashed = false;
 
 		Object.defineProperties( this, {
 
@@ -423,15 +426,10 @@ class ConditionalLineMaterial extends ShaderMaterial {
 
 		this.setValues( parameters );
 
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isConditionalLineMaterial = true;
 	}
+
 }
+
+ConditionalLineMaterial.prototype.isConditionalLineMaterial = true;
 
 export { ConditionalLineMaterial };

@@ -110,26 +110,18 @@ let object = new THREE.Group()
 // object.add(p002);
 
 
-let cylinder = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 3, 9));
-cylinder.geometry.computeBoundingBox();
-cylinder.castShadow = true;
-object.add(cylinder);
+// let cylinder = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 3, 12));
+// cylinder.geometry.computeBoundingBox();
+// cylinder.castShadow = true;
+// object.add(cylinder);
+
+let torus = new THREE.Mesh( new THREE.TorusGeometry( 2, .75, 9, 20 ) );
+torus.geometry.computeBoundingBox();
+torus.castShadow = true;
+torus.rotation.y += Math.PI * .55;
+object.add(torus);
 
 
-// let geometry = new THREE.CylinderGeometry(1, 1, 3, 12);
-// let material = new THREE.MeshPhongMaterial({ color: 0x156289, emissive: 0x072534, side: THREE.DoubleSide, flatShading: true });
-// let cube = new THREE.Mesh(geometry, material);
-// cube.position.set(1, 1, 0);
-// object.add(cube);
-
-
-// Add the ball.
-// let ballRadius = 1.5;
-// let geometry = new THREE.SphereGeometry(ballRadius, 32, 16);
-// let material = new THREE.MeshBasicMaterial({ color: 0xaa0000 });
-// let sphere = new THREE.Mesh(geometry, material);
-// sphere.position.set(1, 1, ballRadius);
-// object.add(sphere);
 
 // outlinePass.selectedObjects = [object];
 // scene.add(object);
@@ -149,7 +141,7 @@ function updateModel() {
 	outlinePass.selectedObjects = [];
 	originalModel = object;
 	initEdgesModel();
-	initBackgroundModel();
+	// initBackgroundModel();
 	initConditionalModel();
 
 	// scene.remove(object);
@@ -165,50 +157,51 @@ function initBackgroundModel() {
 		depthModel.traverse(c => c.isMesh ? c.material.dispose() : void(0));
 	}
 	if (!originalModel) return;
+
+	// shadowModel = originalModel.clone();
+	// shadowModel.visible = false;
+	// shadowModel.traverse(c => {
+	// 	if (c.isMesh) {
+	// 		c.material = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1.0 });
+	// 		c.material.polygonOffset = true;
+	// 		c.material.polygonOffsetFactor = 1;
+	// 		c.material.polygonOffsetUnits = 1;
+	// 		c.receiveShadow = true;
+	// 		// c.material.transparent = true;
+	// 		// c.material.opacity = .25;
+	// 		c.renderOrder = 2;
+	// 	}
+	// } );
+	// scene.add(shadowModel);
 	
 	backgroundModel = originalModel.clone();
 	backgroundModel.visible = true;
 	backgroundModel.traverse(c => {
 		if (c.isMesh) {
-			c.material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+			c.material = new THREE.MeshBasicMaterial({ color: 0x6eb7e3 });
 			c.material.polygonOffset = true;
 			c.material.polygonOffsetFactor = 1;
 			c.material.polygonOffsetUnits = 1;
 			c.material.transparent = true;
-			c.material.opacity = .25;
+			c.material.opacity = .95;
 			c.renderOrder = 2;
 		}
 	});
 	scene.add(backgroundModel);
 
-	shadowModel = originalModel.clone();
-	shadowModel.visible = false;
-	shadowModel.traverse(c => {
-		if (c.isMesh) {
-			c.material = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1.0 });
-			c.material.polygonOffset = true;
-			c.material.polygonOffsetFactor = 1;
-			c.material.polygonOffsetUnits = 1;
-			c.receiveShadow = true;
-			c.material.transparent = true;
-			c.material.opacity = .25;
-			c.renderOrder = 2;
-		}
-	} );
-	scene.add(shadowModel);
-
-	depthModel = originalModel.clone();
-	depthModel.traverse(c => {
-		if (c.isMesh) {
-			c.material = new THREE.MeshBasicMaterial({ color: 0xffffff });
-			c.material.polygonOffset = true;
-			c.material.polygonOffsetFactor = 1;
-			c.material.polygonOffsetUnits = 1;
-			c.material.colorWrite = false;
-			c.renderOrder = 1;
-		}
-	} );
-	scene.add(depthModel);
+	// depthModel = originalModel.clone();
+	// depthModel.visible = true;
+	// depthModel.traverse(c => {
+	// 	if (c.isMesh) {
+	// 		c.material = new THREE.MeshBasicMaterial({ color: 0x389fd9 });
+	// 		c.material.polygonOffset = true;
+	// 		c.material.polygonOffsetFactor = 1;
+	// 		c.material.polygonOffsetUnits = 1;
+	// 		c.material.colorWrite = false;
+	// 		c.renderOrder = 1;
+	// 	}
+	// } );
+	// scene.add(depthModel);
 }
 
 function initEdgesModel() {
@@ -237,7 +230,7 @@ function initEdgesModel() {
 	let meshes = [];
 	edgesModel.traverse(c => c.isMesh ? meshes.push(c) : void(0));
 
-	let threshold = 40;
+	let threshold = 15;
 
 	for (let key in meshes) {
 		let mesh = meshes[key];
@@ -286,9 +279,7 @@ function initConditionalModel() {
 		// Remove everything but the position attribute
 		let mergedGeom = mesh.geometry.clone();
 		for (let key in mergedGeom.attributes) {
-			if (key !== "position") {
-				mergedGeom.deleteAttribute(key);
-			}
+			if (key !== "position") mergedGeom.deleteAttribute(key);
 		}
 		// Create the conditional edges geometry and associated material
 		let lineGeom = new ConditionalEdgesGeometry(BufferGeometryUtils.mergeVertices(mergedGeom));
