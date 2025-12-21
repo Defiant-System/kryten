@@ -6,6 +6,7 @@ import { LineSegmentsGeometry } from "./modules/threejs/examples/jsm/lines/LineS
 import { LineSegments2 } from "./modules/threejs/examples/jsm/lines/LineSegments2.js";
 import { LineMaterial } from "./modules/threejs/examples/jsm/lines/LineMaterial.js";
 
+import { ColoredShadowMaterial } from "./modules/conditional-lines/ColoredShadowMaterial.js";
 import { ConditionalEdgesGeometry } from "./modules/conditional-lines/ConditionalEdgesGeometry.js";
 import { OutsideEdgesGeometry } from "./modules/conditional-lines/OutsideEdgesGeometry.js";
 import { ConditionalEdgesShader } from "./modules/conditional-lines/ConditionalEdgesShader.js";
@@ -38,6 +39,7 @@ module.exports = {
 	LineSegments2,
 	LineMaterial,
 
+	ColoredShadowMaterial,
 	ConditionalEdgesGeometry,
 	OutsideEdgesGeometry,
 	ConditionalEdgesShader,

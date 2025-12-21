@@ -9,6 +9,7 @@ let {
 	LineSegments2,
 	LineMaterial,
 
+	ColoredShadowMaterial,
 	ConditionalEdgesGeometry,
 	OutsideEdgesGeometry,
 	ConditionalEdgesShader,
@@ -45,6 +46,7 @@ let camera = new THREE.PerspectiveCamera(60, ratio, 0.1, 1000);
 camera.position.set(1, 2, 6);
 renderer.setSize(width, height);
 
+let edgesThreshold = 10;
 
 	var parameters = { 
 			minFilter: THREE.LinearFilter,
@@ -91,7 +93,7 @@ let shadowCam = dirLight.shadow.camera;
 shadowCam.left = shadowCam.bottom = -1;
 shadowCam.right = shadowCam.top = 1;
 scene.add(dirLight);
-scene.add(new THREE.AmbientLight(0xffffff, 1.0));
+// scene.add(new THREE.AmbientLight(0xffffff, 1.0));
 
 // let ambientLight = new THREE.AmbientLight(0xffffff, .75);
 // scene.add(ambientLight);
@@ -115,10 +117,10 @@ let object = new THREE.Group()
 // cylinder.castShadow = true;
 // object.add(cylinder);
 
-let torus = new THREE.Mesh( new THREE.TorusGeometry( 2, .75, 9, 20 ) );
+let torus = new THREE.Mesh( new THREE.TorusGeometry( 1.75, .65, 16, 30 ) );
 torus.geometry.computeBoundingBox();
 torus.castShadow = true;
-torus.rotation.y += Math.PI * .55;
+torus.rotation.y += Math.PI * .35;
 object.add(torus);
 
 
@@ -141,8 +143,10 @@ function updateModel() {
 	outlinePass.selectedObjects = [];
 	originalModel = object;
 	initEdgesModel();
-	// initBackgroundModel();
+	initBackgroundModel();
 	initConditionalModel();
+
+	// scene.remove(object);
 }
 
 function initBackgroundModel() {
@@ -156,36 +160,37 @@ function initBackgroundModel() {
 	}
 	if (!originalModel) return;
 
-	// shadowModel = originalModel.clone();
-	// shadowModel.visible = false;
-	// shadowModel.traverse(c => {
-	// 	if (c.isMesh) {
-	// 		c.material = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1.0 });
-	// 		c.material.polygonOffset = true;
-	// 		c.material.polygonOffsetFactor = 1;
-	// 		c.material.polygonOffsetUnits = 1;
-	// 		c.receiveShadow = true;
-	// 		// c.material.transparent = true;
-	// 		// c.material.opacity = .25;
-	// 		c.renderOrder = 2;
-	// 	}
-	// } );
-	// scene.add(shadowModel);
-	
-	backgroundModel = originalModel.clone();
-	backgroundModel.visible = true;
-	backgroundModel.traverse(c => {
+	shadowModel = originalModel.clone();
+	shadowModel.visible = true;
+	shadowModel.traverse(c => {
 		if (c.isMesh) {
-			c.material = new THREE.MeshBasicMaterial({ color: 0x6eb7e3 });
+			c.material = new ColoredShadowMaterial({ color: 0x4394e1, shininess: 1.0 });
 			c.material.polygonOffset = true;
 			c.material.polygonOffsetFactor = 1;
 			c.material.polygonOffsetUnits = 1;
-			c.material.transparent = true;
-			c.material.opacity = .95;
+			c.receiveShadow = true;
+			c.material.transparent = false;
+			// c.material.opacity = .5;
+			c.material.shadowColor.set( 0x2374c1 );
 			c.renderOrder = 2;
 		}
-	});
-	scene.add(backgroundModel);
+	} );
+	scene.add(shadowModel);
+	
+	// backgroundModel = originalModel.clone();
+	// backgroundModel.visible = false;
+	// backgroundModel.traverse(c => {
+	// 	if (c.isMesh) {
+	// 		c.material = new THREE.MeshBasicMaterial({ color: 0x4394e1 });
+	// 		c.material.polygonOffset = true;
+	// 		c.material.polygonOffsetFactor = 1;
+	// 		c.material.polygonOffsetUnits = 1;
+	// 		c.material.transparent = true;
+	// 		c.material.opacity = .95;
+	// 		c.renderOrder = 2;
+	// 	}
+	// });
+	// scene.add(backgroundModel);
 
 	// depthModel = originalModel.clone();
 	// depthModel.visible = true;
@@ -220,20 +225,17 @@ function initEdgesModel() {
 	// early out if there's no model loaded
 	if (!originalModel) return;
 
-	// store the model and add it to the scene to display
-	// behind the lines
+	// store the model and add it to the scene to display behind the lines
 	edgesModel = originalModel.clone();
 	scene.add(edgesModel);
 
 	let meshes = [];
 	edgesModel.traverse(c => c.isMesh ? meshes.push(c) : void(0));
 
-	let threshold = 15;
-
 	for (let key in meshes) {
 		let mesh = meshes[key];
 		let parent = mesh.parent;
-		let lineGeom = new THREE.EdgesGeometry(mesh.geometry, threshold);
+		let lineGeom = new THREE.EdgesGeometry(mesh.geometry, edgesThreshold);
 
 		// let mergeGeom = mesh.geometry.clone();
 		// mergeGeom.deleteAttribute("uv");
@@ -246,7 +248,7 @@ function initEdgesModel() {
 		line.scale.copy(mesh.scale);
 		line.rotation.copy(mesh.rotation);
 		let thickLineGeom = new LineSegmentsGeometry().fromEdgesGeometry(lineGeom);
-		let thickLineMat = new LineMaterial({ color: 0xffffff, linewidth: 1 });
+		let thickLineMat = new LineMaterial({ color: 0xeeeeff, linewidth: 1.5 });
 		let thickLines = new LineSegments2(thickLineGeom, thickLineMat);
 		thickLines.position.copy(mesh.position);
 		thickLines.scale.copy(mesh.scale);
@@ -289,7 +291,7 @@ function initConditionalModel() {
 		line.scale.copy(mesh.scale);
 		line.rotation.copy(mesh.rotation);
 		let thickLineGeom = new ConditionalLineSegmentsGeometry().fromConditionalEdgesGeometry(lineGeom);
-		let thickLines = new LineSegments2(thickLineGeom, new ConditionalLineMaterial({ color: 0xffffff, linewidth: 1 }));
+		let thickLines = new LineSegments2(thickLineGeom, new ConditionalLineMaterial({ color: 0xffffff, linewidth: 2 }));
 		thickLines.position.copy(mesh.position);
 		thickLines.scale.copy(mesh.scale);
 		thickLines.rotation.copy(mesh.rotation);
