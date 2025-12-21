@@ -60,6 +60,31 @@ content {
 								repeating-linear-gradient(90deg, var(--c2) 0, var(--c2) 1px, transparent 1px, transparent 15px);
 			background-position: 0 0;
 		}
+
+		.showcase {
+			.outlines {
+				position: absolute;
+				top: 17px;
+				left: 17px;
+				width: 930px;
+				height: 570px;
+				border: 1px solid #fff;
+
+				&:before {
+					content: "";
+					position: absolute;
+					top: -7px;
+					left: -7px;
+					right: -7px;
+					bottom: -7px;
+					border: 2px solid #fff;
+				}
+			}
+
+			canvas {
+				filter: hue-rotate(-7deg) saturate(1.025) brightness(0.95);
+			}
+		}
 	}
 
 	.showcase {
@@ -67,7 +92,7 @@ content {
 		z-index: 2;
 
 		canvas {
-			filter: hue-rotate(-7deg) saturate(1.025) brightness(0.95);
+
 		}
 	}
 }

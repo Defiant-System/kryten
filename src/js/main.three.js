@@ -66,10 +66,10 @@ let edgesThreshold = 10;
 	composer.addPass(outlinePass);
 
 	outlinePass.edgeStrength = 2;
-	outlinePass.edgeThickness = .5;
-	outlinePass.edgeGlow = .5,
-	outlinePass.visibleEdgeColor.set("#666");
-	outlinePass.hiddenEdgeColor.set("#025");
+	outlinePass.edgeThickness = 1.5;
+	outlinePass.edgeGlow = 2.5,
+	outlinePass.visibleEdgeColor.set("#f66");
+	outlinePass.hiddenEdgeColor.set("#f25");
 
 	let effectFXAA = new ShaderPass(FXAAShader);
 	composer.addPass(effectFXAA);
@@ -140,7 +140,7 @@ updateModel();
 
 
 function updateModel() {
-	outlinePass.selectedObjects = [];
+	outlinePass.selectedObjects = [object];
 	originalModel = object;
 	initEdgesModel();
 	initBackgroundModel();
