@@ -2,7 +2,7 @@ import {
 	BufferGeometry,
 	Vector3,
 	BufferAttribute
-} from '../../../../build/three.module.js';
+} from '../threejs/build/three.module.js';
 
 const vec = new Vector3();
 export class OutsideEdgesGeometry extends BufferGeometry {

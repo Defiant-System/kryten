@@ -3,7 +3,7 @@ import {
 	Vector3,
 	BufferAttribute,
 	Triangle
-} from '../../../../build/three.module.js';
+} from '../threejs/build/three.module.js';
 
 const vec0 = new Vector3();
 const vec1 = new Vector3();

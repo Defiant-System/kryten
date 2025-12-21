@@ -143,8 +143,6 @@ function updateModel() {
 	initEdgesModel();
 	// initBackgroundModel();
 	initConditionalModel();
-
-	// scene.remove(object);
 }
 
 function initBackgroundModel() {
@@ -268,7 +266,7 @@ function initConditionalModel() {
 
 	conditionalModel = originalModel.clone();
 	scene.add(conditionalModel);
-	conditionalModel.visible = false;
+	conditionalModel.visible = true;
 	// get all meshes
 	let meshes = [];
 	conditionalModel.traverse(c => c.isMesh ? meshes.push(c) : void(0));
@@ -291,7 +289,7 @@ function initConditionalModel() {
 		line.scale.copy(mesh.scale);
 		line.rotation.copy(mesh.rotation);
 		let thickLineGeom = new ConditionalLineSegmentsGeometry().fromConditionalEdgesGeometry(lineGeom);
-		let thickLines = new LineSegments2(thickLineGeom, new ConditionalLineMaterial({ color: 0xffffff, linewidth: 2 }));
+		let thickLines = new LineSegments2(thickLineGeom, new ConditionalLineMaterial({ color: 0xffffff, linewidth: 1 }));
 		thickLines.position.copy(mesh.position);
 		thickLines.scale.copy(mesh.scale);
 		thickLines.rotation.copy(mesh.rotation);

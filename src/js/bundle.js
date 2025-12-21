@@ -6,11 +6,11 @@ import { LineSegmentsGeometry } from "./modules/threejs/examples/jsm/lines/LineS
 import { LineSegments2 } from "./modules/threejs/examples/jsm/lines/LineSegments2.js";
 import { LineMaterial } from "./modules/threejs/examples/jsm/lines/LineMaterial.js";
 
-import { ConditionalEdgesGeometry } from "./modules/threejs/examples/jsm/lines/conditional/ConditionalEdgesGeometry.js";
-import { OutsideEdgesGeometry } from "./modules/threejs/examples/jsm/lines/conditional/OutsideEdgesGeometry.js";
-import { ConditionalEdgesShader } from "./modules/threejs/examples/jsm/lines/conditional/ConditionalEdgesShader.js";
-import { ConditionalLineSegmentsGeometry } from "./modules/threejs/examples/jsm/lines/conditional/ConditionalLineSegmentsGeometry.js";
-import { ConditionalLineMaterial } from "./modules/threejs/examples/jsm/lines/conditional/ConditionalLineMaterial.js";
+import { ConditionalEdgesGeometry } from "./modules/conditional-lines/ConditionalEdgesGeometry.js";
+import { OutsideEdgesGeometry } from "./modules/conditional-lines/OutsideEdgesGeometry.js";
+import { ConditionalEdgesShader } from "./modules/conditional-lines/ConditionalEdgesShader.js";
+import { ConditionalLineSegmentsGeometry } from "./modules/conditional-lines/ConditionalLineSegmentsGeometry.js";
+import { ConditionalLineMaterial } from "./modules/conditional-lines/ConditionalLineMaterial.js";
 
 import { EffectComposer } from './modules/threejs/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from './modules/threejs/examples/jsm/postprocessing/RenderPass.js';
