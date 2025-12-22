@@ -248,7 +248,7 @@ function initEdgesModel() {
 		line.scale.copy(mesh.scale);
 		line.rotation.copy(mesh.rotation);
 		let thickLineGeom = new LineSegmentsGeometry().fromEdgesGeometry(lineGeom);
-		let thickLineMat = new LineMaterial({ color: 0xeeeeff, linewidth: 1.5 });
+		let thickLineMat = new LineMaterial({ color: 0xffffff, linewidth: 1.5 });
 		let thickLines = new LineSegments2(thickLineGeom, thickLineMat);
 		thickLines.position.copy(mesh.position);
 		thickLines.scale.copy(mesh.scale);
