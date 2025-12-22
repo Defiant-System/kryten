@@ -16,11 +16,11 @@ let {
 	ConditionalLineSegmentsGeometry,
 	ConditionalLineMaterial,
 
-	EffectComposer,
-	RenderPass,
-	ShaderPass,
-	OutlinePass,
-	FXAAShader,
+	// EffectComposer,
+	// RenderPass,
+	// ShaderPass,
+	// OutlinePass,
+	// FXAAShader,
 
 	OBJLoader,
 } = await window.fetch("~/js/bundle.js");
@@ -48,31 +48,31 @@ renderer.setSize(width, height);
 
 let edgesThreshold = 10;
 
-	var parameters = { 
-			minFilter: THREE.LinearFilter,
-			magFilter: THREE.LinearFilter,
-			format: THREE.RGBAFormat,
-			type: THREE.HalfFloatType,
-			stencilBuffer: false,
-			samples: 4,
-		};
-	// postprocessing
-	var renderTarget = new THREE.WebGLRenderTarget(width , height, parameters);
-	let composer = new EffectComposer(renderer, renderTarget);
-	let renderPass = new RenderPass(scene, camera);
-	composer.addPass(renderPass);
+	// var parameters = { 
+	// 		minFilter: THREE.LinearFilter,
+	// 		magFilter: THREE.LinearFilter,
+	// 		format: THREE.RGBAFormat,
+	// 		type: THREE.HalfFloatType,
+	// 		stencilBuffer: false,
+	// 		samples: 4,
+	// 	};
+	// // postprocessing
+	// var renderTarget = new THREE.WebGLRenderTarget(width , height, parameters);
+	// let composer = new EffectComposer(renderer, renderTarget);
+	// let renderPass = new RenderPass(scene, camera);
+	// composer.addPass(renderPass);
 
-	let outlinePass = new OutlinePass(new THREE.Vector2(width, height), scene, camera);
-	composer.addPass(outlinePass);
+	// let outlinePass = new OutlinePass(new THREE.Vector2(width, height), scene, camera);
+	// composer.addPass(outlinePass);
 
-	outlinePass.edgeStrength = 2;
-	outlinePass.edgeThickness = 1.5;
-	outlinePass.edgeGlow = 2.5,
-	outlinePass.visibleEdgeColor.set("#f66");
-	outlinePass.hiddenEdgeColor.set("#f25");
+	// outlinePass.edgeStrength = 2;
+	// outlinePass.edgeThickness = 1.5;
+	// outlinePass.edgeGlow = 2.5,
+	// outlinePass.visibleEdgeColor.set("#f66");
+	// outlinePass.hiddenEdgeColor.set("#f25");
 
-	let effectFXAA = new ShaderPass(FXAAShader);
-	composer.addPass(effectFXAA);
+	// let effectFXAA = new ShaderPass(FXAAShader);
+	// composer.addPass(effectFXAA);
 
 
 let orbit = new OrbitControls(camera, renderer.domElement);
@@ -103,8 +103,12 @@ scene.add(dirLight);
 // scene.add(pointLight);
 
 
+
+
+
 let loader = new OBJLoader();
-let object = new THREE.Group()
+let object = new THREE.Group();
+let OG = new THREE.Group();
 
 // let p001 = await loader.loadAsync("~/models/pyramid/piece.001.obj");
 // object.add(p001);
@@ -124,9 +128,22 @@ torus.rotation.y += Math.PI * .35;
 object.add(torus);
 
 
+// Floor
+let floor = new THREE.Mesh(
+	new THREE.PlaneGeometry(),
+	new THREE.ShadowMaterial({ color: 0xff0000, opacity: 0.2, transparent: false })
+);
+floor.rotation.x = - Math.PI / 2;
+floor.scale.setScalar(20);
+floor.receiveShadow = true;
+// floor.visible = true;
+floor.position.y = object.children[0].geometry.boundingBox.min.y + 1;
+scene.add(floor);
 
 // outlinePass.selectedObjects = [object];
 // scene.add(object);
+
+scene.add(OG);
 
 
 let originalModel,
@@ -140,13 +157,14 @@ updateModel();
 
 
 function updateModel() {
-	outlinePass.selectedObjects = [object];
+	// outlinePass.selectedObjects = [object];
 	originalModel = object;
 	initEdgesModel();
 	initBackgroundModel();
 	initConditionalModel();
 
 	// scene.remove(object);
+	// console.log(scene);
 }
 
 function initBackgroundModel() {
@@ -175,7 +193,7 @@ function initBackgroundModel() {
 			c.renderOrder = 2;
 		}
 	} );
-	scene.add(shadowModel);
+	OG.add(shadowModel);
 	
 	// backgroundModel = originalModel.clone();
 	// backgroundModel.visible = false;
@@ -227,7 +245,7 @@ function initEdgesModel() {
 
 	// store the model and add it to the scene to display behind the lines
 	edgesModel = originalModel.clone();
-	scene.add(edgesModel);
+	OG.add(edgesModel);
 
 	let meshes = [];
 	edgesModel.traverse(c => c.isMesh ? meshes.push(c) : void(0));
@@ -236,12 +254,6 @@ function initEdgesModel() {
 		let mesh = meshes[key];
 		let parent = mesh.parent;
 		let lineGeom = new THREE.EdgesGeometry(mesh.geometry, edgesThreshold);
-
-		// let mergeGeom = mesh.geometry.clone();
-		// mergeGeom.deleteAttribute("uv");
-		// mergeGeom.deleteAttribute("uv2");
-		// let lineGeom = new OutsideEdgesGeometry(BufferGeometryUtils.mergeVertices(mergeGeom, 1e-3));
-		
 		let lineMat = new THREE.LineBasicMaterial({ color: 0xffffff });
 		let line = new THREE.LineSegments(lineGeom, lineMat);
 		line.position.copy(mesh.position);
@@ -267,7 +279,7 @@ function initConditionalModel() {
 	}
 
 	conditionalModel = originalModel.clone();
-	scene.add(conditionalModel);
+	OG.add(conditionalModel);
 	conditionalModel.visible = true;
 	// get all meshes
 	let meshes = [];
