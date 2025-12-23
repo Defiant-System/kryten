@@ -16,12 +16,6 @@ let {
 	ConditionalLineSegmentsGeometry,
 	ConditionalLineMaterial,
 
-	// EffectComposer,
-	// RenderPass,
-	// ShaderPass,
-	// OutlinePass,
-	// FXAAShader,
-
 	OBJLoader,
 } = await window.fetch("~/js/bundle.js");
 
@@ -32,9 +26,12 @@ let renderer = new THREE.WebGLRenderer({
 		// preserveDrawingBuffer: true,
 	});
 renderer.setPixelRatio(window.devicePixelRatio);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 // renderer.outputEncoding = THREE.sRGBEncoding;
 
 
+let edgesThreshold = 10;
 let scene = new THREE.Scene();
 let width = window.innerWidth;
 let height = window.innerHeight;
@@ -43,36 +40,8 @@ let camera = new THREE.PerspectiveCamera(60, ratio, 0.1, 1000);
 
 // scene.background = new THREE.Color(0xeeeeee);
 
-camera.position.set(1, 2, 6);
+camera.position.set(.65, 1.25, 1.5);
 renderer.setSize(width, height);
-
-let edgesThreshold = 10;
-
-	// var parameters = { 
-	// 		minFilter: THREE.LinearFilter,
-	// 		magFilter: THREE.LinearFilter,
-	// 		format: THREE.RGBAFormat,
-	// 		type: THREE.HalfFloatType,
-	// 		stencilBuffer: false,
-	// 		samples: 4,
-	// 	};
-	// // postprocessing
-	// var renderTarget = new THREE.WebGLRenderTarget(width , height, parameters);
-	// let composer = new EffectComposer(renderer, renderTarget);
-	// let renderPass = new RenderPass(scene, camera);
-	// composer.addPass(renderPass);
-
-	// let outlinePass = new OutlinePass(new THREE.Vector2(width, height), scene, camera);
-	// composer.addPass(outlinePass);
-
-	// outlinePass.edgeStrength = 2;
-	// outlinePass.edgeThickness = 1.5;
-	// outlinePass.edgeGlow = 2.5,
-	// outlinePass.visibleEdgeColor.set("#f66");
-	// outlinePass.hiddenEdgeColor.set("#f25");
-
-	// let effectFXAA = new ShaderPass(FXAAShader);
-	// composer.addPass(effectFXAA);
 
 
 let orbit = new OrbitControls(camera, renderer.domElement);
@@ -80,10 +49,9 @@ orbit.enableZoom = false;
 // orbit.target = new THREE.Vector3(0, 0, 0);
 
 
-
 // Lights
 let dirLight = new THREE.DirectionalLight(0xffffff, 1.0);
-dirLight.position.set(5, 10, 5);
+dirLight.position.set(7, 6, -1);
 dirLight.castShadow = true;
 dirLight.shadow.bias = -1e-10;
 dirLight.shadow.mapSize.width = 1024;
@@ -93,22 +61,13 @@ let shadowCam = dirLight.shadow.camera;
 shadowCam.left = shadowCam.bottom = -1;
 shadowCam.right = shadowCam.top = 1;
 scene.add(dirLight);
-// scene.add(new THREE.AmbientLight(0xffffff, 1.0));
-
-// let ambientLight = new THREE.AmbientLight(0xffffff, .75);
-// scene.add(ambientLight);
-
-// let pointLight = new THREE.DirectionalLight(0xffffff, 2);
-// pointLight.position.set(15, 15, 15);
-// scene.add(pointLight);
-
-
-
 
 
 let loader = new OBJLoader();
 let object = new THREE.Group();
 let OG = new THREE.Group();
+
+OG.castShadow = true;
 
 // let p001 = await loader.loadAsync("~/models/pyramid/piece.001.obj");
 // object.add(p001);
@@ -121,7 +80,7 @@ let OG = new THREE.Group();
 // cylinder.castShadow = true;
 // object.add(cylinder);
 
-let torus = new THREE.Mesh( new THREE.TorusGeometry( 1.75, .65, 16, 30 ) );
+let torus = new THREE.Mesh( new THREE.TorusGeometry( .35, .15, 9, 20 ) );
 torus.geometry.computeBoundingBox();
 torus.castShadow = true;
 torus.rotation.y += Math.PI * .35;
@@ -131,18 +90,14 @@ object.add(torus);
 // Floor
 let floor = new THREE.Mesh(
 	new THREE.PlaneGeometry(),
-	new THREE.ShadowMaterial({ color: 0xff0000, opacity: 0.2, transparent: false })
+	new THREE.ShadowMaterial({ color: 0x2374c1, opacity: 0.2, transparent: true })
 );
 floor.rotation.x = - Math.PI / 2;
 floor.scale.setScalar(20);
 floor.receiveShadow = true;
-// floor.visible = true;
-floor.position.y = object.children[0].geometry.boundingBox.min.y + 1;
+floor.position.y = object.children[0].geometry.boundingBox.min.y - .025;
+
 scene.add(floor);
-
-// outlinePass.selectedObjects = [object];
-// scene.add(object);
-
 scene.add(OG);
 
 
@@ -157,7 +112,6 @@ updateModel();
 
 
 function updateModel() {
-	// outlinePass.selectedObjects = [object];
 	originalModel = object;
 	initEdgesModel();
 	initBackgroundModel();
@@ -196,25 +150,26 @@ function initBackgroundModel() {
 	OG.add(shadowModel);
 	
 	// backgroundModel = originalModel.clone();
-	// backgroundModel.visible = false;
+	// // backgroundModel.visible = false;
 	// backgroundModel.traverse(c => {
 	// 	if (c.isMesh) {
 	// 		c.material = new THREE.MeshBasicMaterial({ color: 0x4394e1 });
 	// 		c.material.polygonOffset = true;
 	// 		c.material.polygonOffsetFactor = 1;
 	// 		c.material.polygonOffsetUnits = 1;
-	// 		c.material.transparent = true;
-	// 		c.material.opacity = .95;
+	// 		// c.material.transparent = true;
+	// 		// c.material.opacity = .95;
+	// 		c.receiveShadow = true;
 	// 		c.renderOrder = 2;
 	// 	}
 	// });
-	// scene.add(backgroundModel);
+	// OG.add(backgroundModel);
 
 	// depthModel = originalModel.clone();
-	// depthModel.visible = true;
+	// // depthModel.visible = false;
 	// depthModel.traverse(c => {
 	// 	if (c.isMesh) {
-	// 		c.material = new THREE.MeshBasicMaterial({ color: 0x389fd9 });
+	// 		c.material = new THREE.MeshBasicMaterial({ color: 0xffffff });
 	// 		c.material.polygonOffset = true;
 	// 		c.material.polygonOffsetFactor = 1;
 	// 		c.material.polygonOffsetUnits = 1;
@@ -222,7 +177,7 @@ function initBackgroundModel() {
 	// 		c.renderOrder = 1;
 	// 	}
 	// } );
-	// scene.add(depthModel);
+	// OG.add(depthModel);
 }
 
 function initEdgesModel() {

@@ -13,14 +13,7 @@ import { ConditionalEdgesShader } from "./modules/conditional-lines/ConditionalE
 import { ConditionalLineSegmentsGeometry } from "./modules/conditional-lines/ConditionalLineSegmentsGeometry.js";
 import { ConditionalLineMaterial } from "./modules/conditional-lines/ConditionalLineMaterial.js";
 
-import { EffectComposer } from './modules/threejs/examples/jsm/postprocessing/EffectComposer.js';
-import { RenderPass } from './modules/threejs/examples/jsm/postprocessing/RenderPass.js';
-import { ShaderPass } from './modules/threejs/examples/jsm/postprocessing/ShaderPass.js';
-import { OutlinePass } from './modules/threejs/examples/jsm/postprocessing/OutlinePass.js';
-import { FXAAShader } from './modules/threejs/examples/jsm/shaders/FXAAShader.js';
-
 import { OBJLoader } from "./modules/threejs/examples/jsm/loaders/OBJLoader.js";
-
 import { OrbitControls } from "./modules/threejs/examples/jsm/controls/OrbitControls.js";
 
 
@@ -45,12 +38,6 @@ module.exports = {
 	ConditionalEdgesShader,
 	ConditionalLineSegmentsGeometry,
 	ConditionalLineMaterial,
-
-	EffectComposer,
-	RenderPass,
-	ShaderPass,
-	OutlinePass,
-	FXAAShader,
 
 	OBJLoader,
 	OrbitControls,
