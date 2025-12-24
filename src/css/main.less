@@ -53,6 +53,21 @@ content {
 			height: 578px;
 			border: 2px solid #bbb;
 			border-radius: 11px;
+
+			.details {
+				position: absolute;
+				bottom: 0;
+				right: 0;
+				width: 260px;
+				height: 110px;
+				border-top: 1px solid #bbb;
+				border-left: 1px solid #bbb;
+				border-top-left-radius: 7px;
+			}
+
+			h2 {
+				color: #444;
+			}
 		}
 	}
 
@@ -84,6 +99,7 @@ content {
 				left: 17px;
 				width: 930px;
 				height: 570px;
+				// z-index: 2;
 				border: 1px solid #fff;
 
 				&:before {
@@ -94,6 +110,20 @@ content {
 					right: -7px;
 					bottom: -7px;
 					border: 2px solid #fff;
+				}
+
+				.details {
+					position: absolute;
+					bottom: 0;
+					right: 0;
+					width: 260px;
+					height: 110px;
+					border-top: 1px solid #fff;
+					border-left: 1px solid #fff;
+				}
+
+				h2 {
+					color: #fff;
 				}
 			}
 
@@ -107,8 +137,30 @@ content {
 		position: absolute;
 		z-index: 2;
 
-		canvas {
+		.outlines {
+			h2 {
+				position: absolute;
+				top: 11px;
+				right: 11px;
+				text-align: right;
+				font-family: FuturaPress;
+				font-size: 30px;
+			}
+		}
 
+		canvas {
+			position: relative;
+			z-index: 2;
 		}
 	}
 }
+
+
+@font-face {
+	font-family: "FuturaPress";
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url(~/fonts/FuturaPress-Press.woff2) format("woff2");
+}
+

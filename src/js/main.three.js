@@ -6,8 +6,8 @@ let Three = {
 	dispatch(event) {
 		switch (event.type) {
 			case "update-color-theme":
-				// dirLight.color.set(0xff0000); // event.data.shadowColor
-				// floor.material.color.set(0xff0000); // event.data.shadowColor
+				// dirLight.color.set(0xff0000); // event.data.lightColor
+				floor.material.color.set(event.data.floorColor);
 				theme = event.data;
 				updateModel();
 				break;
@@ -116,7 +116,7 @@ object.add(torus);
 // Floor
 let floor = new THREE.Mesh(
 	new THREE.PlaneGeometry(),
-	new THREE.ShadowMaterial({ color: theme.floorColor, opacity: 0.2, transparent: true })
+	new THREE.ShadowMaterial({ color: theme.floorColor, opacity: 0.25, transparent: true })
 );
 floor.rotation.x = - Math.PI / 2;
 floor.scale.setScalar(20);
