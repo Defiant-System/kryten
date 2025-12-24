@@ -1,4 +1,20 @@
 
+let Three = {
+	init() {
+
+	},
+	dispatch(event) {
+		switch (event.type) {
+			case "update-color-theme":
+				// dirLight.color.set(0xff0000); // event.data.shadowColor
+				// floor.material.color.set(0xff0000); // event.data.shadowColor
+				theme = event.data;
+				updateModel();
+				break;
+		}
+	}
+};
+
 // import libs
 let {
 	THREE,
@@ -48,9 +64,19 @@ let orbit = new OrbitControls(camera, renderer.domElement);
 orbit.enableZoom = false;
 // orbit.target = new THREE.Vector3(0, 0, 0);
 
+let theme = {
+		lightColor: 0xffffff,
+		floorColor: 0x999999,
+		materialShadowHigh: 0xcccccc,
+		materialShadowLow: 0xaaaaaa,
+		edgesColor: 0x777777,
+		edgesLine: 1,
+		conditionalEdgesColor: 0x333333,
+		conditionalEdgesLine: 1,
+	};
 
 // Lights
-let dirLight = new THREE.DirectionalLight(0xffffff, 1.0);
+let dirLight = new THREE.DirectionalLight(theme.lightColor, 1.0);
 dirLight.position.set(7, 6, -1);
 dirLight.castShadow = true;
 dirLight.shadow.bias = -1e-10;
@@ -80,7 +106,7 @@ OG.castShadow = true;
 // cylinder.castShadow = true;
 // object.add(cylinder);
 
-let torus = new THREE.Mesh( new THREE.TorusGeometry( .35, .15, 9, 20 ) );
+let torus = new THREE.Mesh(new THREE.TorusGeometry(.35, .15, 9, 20));
 torus.geometry.computeBoundingBox();
 torus.castShadow = true;
 torus.rotation.y += Math.PI * .35;
@@ -90,7 +116,7 @@ object.add(torus);
 // Floor
 let floor = new THREE.Mesh(
 	new THREE.PlaneGeometry(),
-	new THREE.ShadowMaterial({ color: 0x2374c1, opacity: 0.2, transparent: true })
+	new THREE.ShadowMaterial({ color: theme.floorColor, opacity: 0.2, transparent: true })
 );
 floor.rotation.x = - Math.PI / 2;
 floor.scale.setScalar(20);
@@ -136,14 +162,14 @@ function initBackgroundModel() {
 	shadowModel.visible = true;
 	shadowModel.traverse(c => {
 		if (c.isMesh) {
-			c.material = new ColoredShadowMaterial({ color: 0x4394e1, shininess: 1.0 });
+			c.material = new ColoredShadowMaterial({ color: theme.materialShadowHigh, shininess: 1.0 });
 			c.material.polygonOffset = true;
 			c.material.polygonOffsetFactor = 1;
 			c.material.polygonOffsetUnits = 1;
 			c.receiveShadow = true;
 			c.material.transparent = false;
 			// c.material.opacity = .5;
-			c.material.shadowColor.set( 0x2374c1 );
+			c.material.shadowColor.set(theme.materialShadowLow);
 			c.renderOrder = 2;
 		}
 	} );
@@ -153,7 +179,7 @@ function initBackgroundModel() {
 	// // backgroundModel.visible = false;
 	// backgroundModel.traverse(c => {
 	// 	if (c.isMesh) {
-	// 		c.material = new THREE.MeshBasicMaterial({ color: 0x4394e1 });
+	// 		c.material = new THREE.MeshBasicMaterial({ color: theme.materialShadowHigh });
 	// 		c.material.polygonOffset = true;
 	// 		c.material.polygonOffsetFactor = 1;
 	// 		c.material.polygonOffsetUnits = 1;
@@ -186,11 +212,8 @@ function initEdgesModel() {
 		edgesModel.parent.remove(edgesModel);
 		edgesModel.traverse(c => {
 			if (c.isMesh) {
-				if (Array.isArray(c.material)) {
-					c.material.forEach(m => m.dispose());
-				} else {
-					c.material.dispose();
-				}
+				if (Array.isArray(c.material)) c.material.forEach(m => m.dispose());
+				else c.material.dispose();
 			}
 		});
 	}
@@ -209,13 +232,13 @@ function initEdgesModel() {
 		let mesh = meshes[key];
 		let parent = mesh.parent;
 		let lineGeom = new THREE.EdgesGeometry(mesh.geometry, edgesThreshold);
-		let lineMat = new THREE.LineBasicMaterial({ color: 0xffffff });
+		let lineMat = new THREE.LineBasicMaterial({ color: theme.edgesColor });
 		let line = new THREE.LineSegments(lineGeom, lineMat);
 		line.position.copy(mesh.position);
 		line.scale.copy(mesh.scale);
 		line.rotation.copy(mesh.rotation);
 		let thickLineGeom = new LineSegmentsGeometry().fromEdgesGeometry(lineGeom);
-		let thickLineMat = new LineMaterial({ color: 0xffffff, linewidth: 1.5 });
+		let thickLineMat = new LineMaterial({ color: theme.edgesColor, linewidth: theme.edgesLine });
 		let thickLines = new LineSegments2(thickLineGeom, thickLineMat);
 		thickLines.position.copy(mesh.position);
 		thickLines.scale.copy(mesh.scale);
@@ -251,14 +274,14 @@ function initConditionalModel() {
 		// Create the conditional edges geometry and associated material
 		let lineGeom = new ConditionalEdgesGeometry(BufferGeometryUtils.mergeVertices(mergedGeom));
 		let material = new THREE.ShaderMaterial(ConditionalEdgesShader);
-		material.uniforms.diffuse.value.set(0xffffff);
+		material.uniforms.diffuse.value.set(theme.conditionalEdgesColor);
 		// Create the line segments objects and replace the mesh
 		let line = new THREE.LineSegments(lineGeom, material);
 		line.position.copy(mesh.position);
 		line.scale.copy(mesh.scale);
 		line.rotation.copy(mesh.rotation);
 		let thickLineGeom = new ConditionalLineSegmentsGeometry().fromConditionalEdgesGeometry(lineGeom);
-		let thickLines = new LineSegments2(thickLineGeom, new ConditionalLineMaterial({ color: 0xffffff, linewidth: 2 }));
+		let thickLines = new LineSegments2(thickLineGeom, new ConditionalLineMaterial({ color: theme.conditionalEdgesColor, linewidth: theme.conditionalEdgesLine }));
 		thickLines.position.copy(mesh.position);
 		thickLines.scale.copy(mesh.scale);
 		thickLines.rotation.copy(mesh.rotation);

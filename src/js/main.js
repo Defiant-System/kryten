@@ -34,6 +34,7 @@ const kryten = {
 	},
 	dispatch(event) {
 		let Self = kryten,
+			data,
 			el;
 		switch (event.type) {
 			// system events
@@ -49,6 +50,25 @@ const kryten = {
 				break;
 			case "set-ui-theme":
 				Self.els.content.data({ theme: event.arg });
+				// prepare to update three.js
+				data = {
+					lightColor: null,
+					floorColor: null,
+					materialShadowHigh: null,
+					materialShadowLow: null,
+					edgesColor: null,
+					edgesLine: null,
+					conditionalEdgesColor: null,
+					conditionalEdgesLine: null,
+				};
+				// get theme values
+				Object.keys(data).map(key => {
+					let value = Self.els.content.cssProp(`--${key}`);
+					if (value == +value) value = +value;
+					data[key] = value;
+				});
+
+				Three.dispatch({ type: "update-color-theme", data });
 				break;
 		}
 	}
