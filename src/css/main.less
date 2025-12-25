@@ -42,22 +42,8 @@ content {
 		}
 	}
 
-	&[data-theme="3d"] {
-		background: #eee radial-gradient(circle at 50% 50%, #fff, #fff 9%, #eee 95%);
-
-		&:after {
-			--c1: #0000000a;
-			--c2: #00000007;
-			background-image: repeating-linear-gradient(90deg, var(--c1) 0, var(--c1) 1px, transparent 1px, transparent 60px),
-								repeating-linear-gradient(0deg, var(--c1) 0, var(--c1) 1px, transparent 1px, transparent 60px),
-								repeating-linear-gradient(0deg, var(--c2) 0, var(--c2) 1px, transparent 1px, transparent 15px),
-								repeating-linear-gradient(90deg, var(--c2) 0, var(--c2) 1px, transparent 1px, transparent 15px);
-			background-position: 0 0;
-		}
-	}
-
 	&[data-theme="ikea"] {
-		background: #ddd radial-gradient(circle at 50% 50%, #eee, #eee 9%, #ddd 95%);
+		background: #e2e2e2 radial-gradient(circle at 50% 50%, #f7f7f7, #f7f7f7 9%, #e2e2e2 95%);
 		--lightColor: #ffffff;
 		--floorColor: #999999;
 		--materialShadowHigh: #ffffff;
@@ -152,6 +138,28 @@ content {
 			canvas {
 				filter: hue-rotate(-7deg) saturate(1.025) brightness(0.95);
 			}
+		}
+	}
+
+	&[data-theme="3d"] {
+		background: #eee radial-gradient(circle at 50% 50%, #fff, #fff 9%, #eee 95%);
+		--lightColor: #ffffff;
+		--floorColor: #999999;
+		--materialShadowHigh: #ffffff;
+		--materialShadowLow: #eeeeee;
+		--edgesColor: #777777;
+		--edgesLine: 1;
+		--conditionalEdgesColor: #333333;
+		--conditionalEdgesLine: 1;
+
+		&:after {
+			--c1: #0000000a;
+			--c2: #00000007;
+			background-image: repeating-linear-gradient(90deg, var(--c1) 0, var(--c1) 1px, transparent 1px, transparent 60px),
+								repeating-linear-gradient(0deg, var(--c1) 0, var(--c1) 1px, transparent 1px, transparent 60px),
+								repeating-linear-gradient(0deg, var(--c2) 0, var(--c2) 1px, transparent 1px, transparent 15px),
+								repeating-linear-gradient(90deg, var(--c2) 0, var(--c2) 1px, transparent 1px, transparent 15px);
+			background-position: 0 0;
 		}
 	}
 }
