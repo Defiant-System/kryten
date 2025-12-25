@@ -5,7 +5,7 @@
 		<Menu name="Theme&#8230;" for="app-ui-layout">
 			<Menu name="IKEA" click="set-ui-theme" arg="ikea" check-group="ui-theme" is-checked="1"/>
 			<Menu name="Blueprint" click="set-ui-theme" arg="blueprint" check-group="ui-theme"/>
-			<Menu name="3D" click="set-ui-theme" arg="3d" check-group="ui-theme"/>
+			<Menu name="Antique" click="set-ui-theme" arg="antique" check-group="ui-theme"/>
 			<Menu type="divider"/>
 			<Menu name="Play/Pause" click="toggle-play-pause"/>
 		</Menu>
