@@ -149,7 +149,7 @@ let Viewport = (() => {
 					Self.dispatch({ type: "init-conditional-model" });
 					// update floor
 					floor.material.color.set(theme.floorColor);
-					floor.material.opacity = .25;
+					floor.material.opacity = .2;
 					floor.position.y = originalModel.children[0].geometry.boundingBox.min.y - .025;
 					break;
 				case "init-edges-model":

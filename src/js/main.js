@@ -18,8 +18,6 @@ const kryten = {
 
 		Viewport.init(this);
 		
-
-
 		// DEV-ONLY-START
 		Test.init(this);
 		// DEV-ONLY-END
