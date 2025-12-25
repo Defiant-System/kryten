@@ -65,7 +65,7 @@ let Viewport = (() => {
 					scene = new THREE.Scene();
 					// camera
 					camera = new THREE.PerspectiveCamera(60, ratio, 0.1, 1000);
-					camera.position.set(.65, 1.25, 1.5);
+					camera.position.set(.65, .75, 1.5);
 					// orbit controls
 					orbit = new OrbitControls(camera, renderer.domElement);
 					orbit.enableZoom = false;

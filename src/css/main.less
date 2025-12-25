@@ -9,17 +9,6 @@ content {
 	bottom: 0;
 	border-radius: inherit;
 
-	&:after {
-		content: "";
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		z-index: 1;
-		pointer-events: none;
-	}
-
 	.showcase {
 		position: absolute;
 		z-index: 2;
@@ -32,11 +21,10 @@ content {
 				position: absolute;
 				top: 11px;
 				right: 11px;
-				text-align: right;
-				font-family: "Noto IKEA";
-				font-weight: 700;
-				font-size: 30px;
-				letter-spacing: .5px;
+				width: 100px;
+				height: 40px;
+				font-size: 0;
+				background: url(~/icons/icon-logo.png) 50% 50%/contain no-repeat;
 			}
 
 			.details {
@@ -101,10 +89,10 @@ content {
 		--floorColor: #999999;
 		--materialShadowHigh: #ffffff;
 		--materialShadowLow: #eeeeee;
-		--edgesColor: #777777;
-		--edgesLine: 1;
+		--edgesColor: #999999;
+		--edgesLine: .5;
 		--conditionalEdgesColor: #333333;
-		--conditionalEdgesLine: 1;
+		--conditionalEdgesLine: 1.25;
 		
 		.outlines {
 			position: absolute;
@@ -137,10 +125,18 @@ content {
 		--edgesLine: 1.5;
 		--conditionalEdgesColor: #ffffff;
 		--conditionalEdgesLine: 2;
+		--c1: #ffffff0e;
+		--c2: #ffffff0a;
 
 		&:after {
-			--c1: #ffffff0e;
-			--c2: #ffffff0a;
+			content: "";
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			z-index: 1;
+			pointer-events: none;
 			background-image: repeating-linear-gradient(90deg, var(--c1) 0, var(--c1) 1px, transparent 1px, transparent 60px),
 								repeating-linear-gradient(0deg, var(--c1) 0, var(--c1) 1px, transparent 1px, transparent 60px),
 								repeating-linear-gradient(0deg, var(--c2) 0, var(--c2) 1px, transparent 1px, transparent 15px),
@@ -199,16 +195,6 @@ content {
 		--edgesLine: 1;
 		--conditionalEdgesColor: #752303;
 		--conditionalEdgesLine: 1;
-
-		&:after {
-			--c1: #0000000a;
-			--c2: #00000007;
-			background-image: repeating-linear-gradient(90deg, var(--c1) 0, var(--c1) 1px, transparent 1px, transparent 60px),
-								repeating-linear-gradient(0deg, var(--c1) 0, var(--c1) 1px, transparent 1px, transparent 60px),
-								repeating-linear-gradient(0deg, var(--c2) 0, var(--c2) 1px, transparent 1px, transparent 15px),
-								repeating-linear-gradient(90deg, var(--c2) 0, var(--c2) 1px, transparent 1px, transparent 15px);
-			background-position: 0 0;
-		}
 
 		.showcase {
 			.outlines {
