@@ -1,5 +1,5 @@
 
-@import "./main.three.js";
+@import "./areas/viewport.js";
 @import "./modules/test.js"
 
 
@@ -10,23 +10,15 @@ const kryten = {
 			content: window.find("content"),
 			showcase: window.find(".showcase"),
 		};
-		// add renderer canvas to window body
-		this.els.showcase.append(renderer.domElement);
 
+		// init all sub-objects
+		Object.keys(this)
+			.filter(i => typeof this[i].init === "function")
+			.map(i => this[i].init(this));
 
-		// create FPS controller
-		this.fpsControl = karaqu.FpsControl({
-			fps: 50,
-			autoplay: true,
-			callback(time, delta) {
-				OG.rotation.y += 0.005;
-				// OG.rotation.x += 0.02;
-				// OG.rotation.z += 0.015;
+		Viewport.init(this);
+		
 
-				renderer.render(scene, camera);
-				// composer.render();
-			}
-		});
 
 		// DEV-ONLY-START
 		Test.init(this);
@@ -50,25 +42,8 @@ const kryten = {
 				break;
 			case "set-ui-theme":
 				Self.els.content.data({ theme: event.arg });
-				// prepare to update three.js
-				data = {
-					lightColor: null,
-					floorColor: null,
-					materialShadowHigh: null,
-					materialShadowLow: null,
-					edgesColor: null,
-					edgesLine: null,
-					conditionalEdgesColor: null,
-					conditionalEdgesLine: null,
-				};
-				// get theme values
-				Object.keys(data).map(key => {
-					let value = Self.els.content.cssProp(`--${key}`);
-					if (value == +value) value = +value;
-					data[key] = value;
-				});
-
-				Three.dispatch({ type: "update-color-theme", data });
+				
+				Viewport.dispatch({ type: "refresh-theme-values", update: true });
 				break;
 		}
 	}

@@ -20,6 +20,28 @@ content {
 		pointer-events: none;
 	}
 
+	.showcase {
+		position: absolute;
+		z-index: 2;
+
+		.outlines {
+			h2 {
+				position: absolute;
+				top: 11px;
+				right: 11px;
+				text-align: right;
+				font-family: FuturaPress;
+				font-size: 30px;
+				letter-spacing: .5px;
+			}
+		}
+
+		canvas {
+			position: relative;
+			z-index: 2;
+		}
+	}
+
 	&[data-theme="3d"] {
 		background: #eee radial-gradient(circle at 50% 50%, #fff, #fff 9%, #eee 95%);
 
@@ -38,8 +60,8 @@ content {
 		background: #ddd radial-gradient(circle at 50% 50%, #eee, #eee 9%, #ddd 95%);
 		--lightColor: #ffffff;
 		--floorColor: #999999;
-		--materialShadowHigh: #cccccc;
-		--materialShadowLow: #aaaaaa;
+		--materialShadowHigh: #ffffff;
+		--materialShadowLow: #eeeeee;
 		--edgesColor: #777777;
 		--edgesLine: 1;
 		--conditionalEdgesColor: #333333;
@@ -130,27 +152,6 @@ content {
 			canvas {
 				filter: hue-rotate(-7deg) saturate(1.025) brightness(0.95);
 			}
-		}
-	}
-
-	.showcase {
-		position: absolute;
-		z-index: 2;
-
-		.outlines {
-			h2 {
-				position: absolute;
-				top: 11px;
-				right: 11px;
-				text-align: right;
-				font-family: FuturaPress;
-				font-size: 30px;
-			}
-		}
-
-		canvas {
-			position: relative;
-			z-index: 2;
 		}
 	}
 }
