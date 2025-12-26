@@ -1,0 +1,13 @@
+<Data>
+	<Meta>
+		<i id="name" value="Torusknot Geometry"/>
+		<i id="steps" value="10"/>
+	</Meta>
+	<Timeline>
+
+	</Timeline>
+	<Pieces>
+		<i id="floor"><![CDATA[]]></i>
+		<i id="001"><![CDATA[]]></i>
+	</Pieces>
+</Data>

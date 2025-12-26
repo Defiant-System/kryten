@@ -111,11 +111,17 @@ let Viewport = (() => {
 					});
 					break;
 				case "load-object-model":
-					let torus = new THREE.Mesh(new THREE.TorusGeometry(.35, .15, 9, 20));
-					torus.geometry.computeBoundingBox();
-					torus.castShadow = true;
-					torus.rotation.y += Math.PI * .35;
-					originalModel.add(torus);
+					// let torus = new THREE.Mesh(new THREE.TorusGeometry(.35, .15, 9, 20));
+					// torus.geometry.computeBoundingBox();
+					// torus.castShadow = true;
+					// torus.rotation.y += Math.PI * .35;
+					// originalModel.add(torus);
+
+					let knot = new THREE.Mesh(new THREE.TorusKnotGeometry(.35, .125, 80, 16));
+					knot.geometry.computeBoundingBox();
+					knot.castShadow = true;
+					knot.rotation.y += Math.PI * .35;
+					originalModel.add(knot);
 					break;
 				case "update-color-theme":
 					// dirLight.color.set(0xff0000); // event.data.lightColor

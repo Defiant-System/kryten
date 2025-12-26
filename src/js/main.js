@@ -1,5 +1,6 @@
 
 @import "./areas/viewport.js";
+@import "./classes/file.js"
 @import "./modules/test.js"
 
 
@@ -26,11 +27,19 @@ const kryten = {
 		let Self = kryten,
 			data,
 			el;
+		// console.log(event);
 		switch (event.type) {
 			// system events
 			case "window.init":
 				break;
 			// custom events
+			case "load-sample":
+				// open application local sample file
+				Self.openLocal(`~/samples/${event.name}`)
+					.then(fsFile => {
+						Self.File = new File(fsFile);
+					});
+				break;
 			case "open-help":
 				karaqu.shell("fs -u '~/help/index.md'");
 				break;
@@ -44,6 +53,31 @@ const kryten = {
 				Viewport.dispatch({ type: "refresh-theme-values", update: true });
 				break;
 		}
+	},
+	openLocal(url) {
+		let parts = url.slice(url.lastIndexOf("/") + 1),
+			[ name, kind ] = parts.split("."),
+			file = new karaqu.File({ name, kind });
+		// return promise
+		return new Promise((resolve, reject) => {
+			// fetch image and transform it to a "fake" file
+			fetch(url)
+				.then(resp => resp.blob())
+				.then(blob => {
+					let reader = new FileReader();
+					reader.addEventListener("load", () => {
+						// file info blob
+						file.blob = blob;
+						file.size = blob.size;
+						// this will then display a text file
+						file.data = $.xmlFromString(reader.result).documentElement;
+						resolve(file);
+					}, false);
+					// get file contents
+					reader.readAsText(blob);
+				})
+				.catch(err => reject(err));
+		});
 	}
 };
 
