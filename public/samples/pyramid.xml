@@ -3,9 +3,7 @@
 		<i id="name" value="Pyramid Puzzel"/>
 		<i id="steps" value="10"/>
 	</Meta>
-	<Timeline>
-
-	</Timeline>
+	<Steps />
 	<Pieces>
 		<i id="floor"><![CDATA[]]></i>
 		<i id="001"><![CDATA[# Blender 4.1.1

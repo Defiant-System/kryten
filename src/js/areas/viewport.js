@@ -45,14 +45,17 @@ let Viewport = (() => {
 
 			this.dispatch({ type: "refresh-theme-values" });
 			this.dispatch({ type: "init-viewport" });
-			this.dispatch({ type: "load-object-model" });
-			this.dispatch({ type: "update-models" });
+			// this.dispatch({ type: "load-object-model" });
+
+			// this.dispatch({ type: "update-models" });
 			this.dispatch({ type: "init-player" });
 		},
 		dispatch(event) {
 			let Self = vp,
 				APP = Self.APP,
-				meshes;
+				x, y, z,
+				meshes,
+				item;
 			switch (event.type) {
 				case "init-viewport":
 					// renderer setup
@@ -100,7 +103,7 @@ let Viewport = (() => {
 					// create FPS controller
 					Self.fpsControl = karaqu.FpsControl({
 						fps: 50,
-						autoplay: true,
+						// autoplay: true,
 						callback(time, delta) {
 							objectGroup.rotation.y += 0.005;
 							// objectGroup.rotation.x += 0.02;
@@ -110,18 +113,22 @@ let Viewport = (() => {
 						}
 					});
 					break;
-				case "load-object-model":
-					// let torus = new THREE.Mesh(new THREE.TorusGeometry(.35, .15, 9, 20));
-					// torus.geometry.computeBoundingBox();
-					// torus.castShadow = true;
-					// torus.rotation.y += Math.PI * .35;
-					// originalModel.add(torus);
-
-					let knot = new THREE.Mesh(new THREE.TorusKnotGeometry(.35, .125, 80, 16));
-					knot.geometry.computeBoundingBox();
-					knot.castShadow = true;
-					knot.rotation.y += Math.PI * .35;
-					originalModel.add(knot);
+				case "reset-geometry-groups":
+					originalModel.children.map(c => c.parent.remove(c));
+					objectGroup.children.map(c => c.parent.remove(c));
+					break;
+				case "insert-basic-geometry":
+					// loop values
+					item = new THREE.Mesh(new THREE[event.geo.name](...event.geo.args));
+					item.geometry.computeBoundingBox();
+					item.castShadow = true;
+					// rotation in relation to the camera
+					[x, y, z] = event.geo.rotation;
+					item.rotation.x += Math.PI * x;
+					item.rotation.y += Math.PI * y;
+					item.rotation.z += Math.PI * z;
+					// add item to original model
+					originalModel.add(item);
 					break;
 				case "update-color-theme":
 					// dirLight.color.set(0xff0000); // event.data.lightColor

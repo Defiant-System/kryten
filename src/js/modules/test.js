@@ -5,7 +5,7 @@ let Test = {
 		// setTimeout(() => APP.dispatch({ type: "set-ui-theme", arg: "blueprint" }), 1500);
 
 		// setTimeout(() => Viewport.fpsControl.start(), 500);
-		setTimeout(() => Viewport.fpsControl.stop(), 6000);
+		// setTimeout(() => Viewport.fpsControl.stop(), 6000);
 
 	}
 };

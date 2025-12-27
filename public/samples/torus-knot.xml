@@ -1,6 +1,6 @@
 <Data>
 	<Meta>
-		<i id="name" value="Torus"/>
+		<i id="name" value="Torusknot"/>
 		<i id="description"><![CDATA[Byrå med 2 lådor, vitbets. 54 x 66 x 113 cm]]></i>
 		<i id="assembly" value="7"/>
 		<i id="steps" value="21"/>
@@ -11,6 +11,6 @@
 	<Steps />
 	<Pieces>
 		<i id="floor"><![CDATA[]]></i>
-		<i id="001" type="geometry" name="TorusGeometry" args="[0.35, 0.15, 9, 20]" rotation="[0,0,0]"/>
+		<i id="001" type="geometry" name="TorusKnotGeometry" args="[0.35,0.125,80,16]" rotation="[0,0.35,0]"/>
 	</Pieces>
 </Data>
