@@ -43,14 +43,17 @@ const kryten = {
 			case "open-help":
 				karaqu.shell("fs -u '~/help/index.md'");
 				break;
+			// proxy events to viewport
 			case "toggle-play-pause":
 				if (Viewport.fpsControl._stopped) Viewport.fpsControl.start();
 				else Viewport.fpsControl.stop();
 				break;
 			case "set-ui-theme":
 				Self.els.content.data({ theme: event.arg });
-				
 				Viewport.dispatch({ type: "refresh-theme-values", update: true });
+				break;
+			case "change-edges-threshold":
+				Viewport.dispatch(event);
 				break;
 		}
 	},

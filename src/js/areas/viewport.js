@@ -19,7 +19,7 @@ let {
 
 let Viewport = (() => {
 
-	let edgesThreshold = 40,
+	let edgesThreshold = 10,
 		width = window.innerWidth,
 		height = window.innerHeight,
 		ratio = width / height,
@@ -113,6 +113,10 @@ let Viewport = (() => {
 						}
 					});
 					break;
+				case "change-edges-threshold":
+					edgesThreshold = event.arg;
+					Self.dispatch({ type: "init-edges-model" });
+					break;
 				case "reset-camera":
 					camera.position.set(...event.position);
 					camera.lookAt(...event.lookAt);
@@ -181,30 +185,6 @@ let Viewport = (() => {
 					}
 					break;
 				case "init-edges-model":
-					if (shadowModel) {
-						shadowModel.parent.remove(shadowModel);
-						shadowModel.traverse(c => {
-							if (!c.isMesh) return;
-							if (Array.isArray(c.material)) c.material.forEach(m => m.dispose());
-							else c.material.dispose();
-						});
-					}
-					shadowModel = originalModel.clone();
-					shadowModel.visible = true;
-					shadowModel.traverse(c => {
-						if (!c.isMesh) return;
-						c.material = new ColoredShadowMaterial({ color: theme.materialShadowHigh, shininess: 1.0 });
-						c.material.polygonOffset = true;
-						c.material.polygonOffsetFactor = 1;
-						c.material.polygonOffsetUnits = 1;
-						c.receiveShadow = true;
-						c.material.transparent = false;
-						c.material.shadowColor.set(theme.materialShadowLow);
-						c.renderOrder = 2;
-					});
-					objectGroup.add(shadowModel);
-					break;
-				case "init-background-model":
 					if (edgesModel) {
 						edgesModel.parent.remove(edgesModel);
 						edgesModel.traverse(c => {
@@ -238,6 +218,30 @@ let Viewport = (() => {
 						parent.add(line);
 						parent.add(thickLines);
 					}
+					break;
+				case "init-background-model":
+					if (shadowModel) {
+						shadowModel.parent.remove(shadowModel);
+						shadowModel.traverse(c => {
+							if (!c.isMesh) return;
+							if (Array.isArray(c.material)) c.material.forEach(m => m.dispose());
+							else c.material.dispose();
+						});
+					}
+					shadowModel = originalModel.clone();
+					shadowModel.visible = true;
+					shadowModel.traverse(c => {
+						if (!c.isMesh) return;
+						c.material = new ColoredShadowMaterial({ color: theme.materialShadowHigh, shininess: 1.0 });
+						c.material.polygonOffset = true;
+						c.material.polygonOffsetFactor = 1;
+						c.material.polygonOffsetUnits = 1;
+						c.receiveShadow = true;
+						c.material.transparent = false;
+						c.material.shadowColor.set(theme.materialShadowLow);
+						c.renderOrder = 2;
+					});
+					objectGroup.add(shadowModel);
 					break;
 				case "init-conditional-model":
 					if (conditionalModel) {
