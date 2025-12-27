@@ -19,7 +19,7 @@ let {
 
 let Viewport = (() => {
 
-	let edgesThreshold = 10,
+	let edgesThreshold = 40,
 		width = window.innerWidth,
 		height = window.innerHeight,
 		ratio = width / height,
@@ -105,13 +105,19 @@ let Viewport = (() => {
 						fps: 50,
 						// autoplay: true,
 						callback(time, delta) {
-							objectGroup.rotation.y += 0.005;
+							objectGroup.rotation.y -= 0.005;
 							// objectGroup.rotation.x += 0.02;
 							// objectGroup.rotation.z += 0.015;
 
 							renderer.render(scene, camera);
 						}
 					});
+					break;
+				case "reset-camera":
+					camera.position.set(...event.position);
+					camera.lookAt(...event.lookAt);
+					camera.updateProjectionMatrix();
+					shadowCam.updateProjectionMatrix();
 					break;
 				case "reset-geometry-groups":
 					objectGroup.children.map(c => c.parent.remove(c));
@@ -130,6 +136,10 @@ let Viewport = (() => {
 					item.rotation.y += Math.PI * y;
 					item.rotation.z += Math.PI * z;
 					// add item to original model
+					originalModel.add(item);
+					break;
+				case "insert-OBJ-geometry":
+					item = loader.parse(event.geo.str);
 					originalModel.add(item);
 					break;
 				case "update-color-theme":
@@ -158,14 +168,17 @@ let Viewport = (() => {
 					if (event.update) Self.dispatch({ type: "update-models" });
 					break;
 				case "update-models":
+					if (!originalModel.children.length) return;
 					// init models
 					Self.dispatch({ type: "init-edges-model" });
 					Self.dispatch({ type: "init-background-model" });
 					Self.dispatch({ type: "init-conditional-model" });
-					// update floor
-					floor.material.color.set(theme.floorColor);
-					floor.material.opacity = .2;
-					floor.position.y = originalModel.children[0].geometry.boundingBox.min.y - .025;
+					if (originalModel.children[0].geometry) {
+						// update floor
+						floor.material.color.set(theme.floorColor);
+						floor.material.opacity = .2;
+						floor.position.y = originalModel.children[0].geometry.boundingBox.min.y - .025;
+					}
 					break;
 				case "init-edges-model":
 					if (shadowModel) {

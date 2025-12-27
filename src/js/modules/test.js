@@ -7,7 +7,7 @@ let Test = {
 		// setTimeout(() => APP.dispatch({ type: "load-sample", arg: "torus.xml" }), 1000);
 
 		// setTimeout(() => Viewport.fpsControl.start(), 500);
-		// setTimeout(() => Viewport.fpsControl.stop(), 6000);
+		setTimeout(() => Viewport.fpsControl.stop(), 3000);
 
 	}
 };

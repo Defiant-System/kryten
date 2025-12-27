@@ -27,17 +27,32 @@ class File {
 		});
 
 		// auto insert basic geometries
-		this._file.data.selectNodes(`./Pieces/*[@type="geometry"]`).map(xGeo => {
-			let geo = {
-				name: xGeo.getAttribute("name"),
-				args: JSON.parse(xGeo.getAttribute("args")),
-				rotation: JSON.parse(xGeo.getAttribute("rotation")),
-			};
-			Viewport.dispatch({ type: "insert-basic-geometry", geo });
+		this._file.data.selectNodes(`./Pieces/*`).map(xPiece => {
+			let type = xPiece.getAttribute("type"),
+				geo = {};
+			switch (type) {
+				case "basic":
+					// basic THREE build-in geometries
+					geo.name = xPiece.getAttribute("name");
+					geo.args = JSON.parse(xPiece.getAttribute("args"));
+					geo.rotation = JSON.parse(xPiece.getAttribute("rotation"));
+					break;
+				default:
+					type = "OBJ";
+					geo.str = xPiece.textContent;
+			}
+			Viewport.dispatch({ type: `insert-${type}-geometry`, geo });
 		});
 
 		// update viewport & start player
 		Viewport.dispatch({ type: "update-models" });
+
+		// update camera
+		let xCamera = this._file.data.selectSingleNode(`./Meta/*[@id="camera"]`),
+			position = JSON.parse(xCamera.getAttribute("position")),
+			lookAt = JSON.parse(xCamera.getAttribute("lookAt"));
+		Viewport.dispatch({ type: "reset-camera", position, lookAt});
+
 		Viewport.fpsControl.start();
 	}
 

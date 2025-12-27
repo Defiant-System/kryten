@@ -1,11 +1,15 @@
 <Data>
 	<Meta>
 		<i id="name" value="Pyramid Puzzel"/>
-		<i id="steps" value="10"/>
+		<i id="description"><![CDATA[Pyramid puzzel consisting of 11 pieces.]]></i>
+		<i id="assembly" value="7"/>
+		<i id="steps" value="21"/>
+		<i id="parts" value="13"/>
+		<i id="camera" position="[0.65,0.75,1.5]" lookAt="[0,0,0]"/>
+		<i id="light" position="[7,6,-1]" color="#fff"/>
 	</Meta>
 	<Steps />
 	<Pieces>
-		<i id="floor"><![CDATA[]]></i>
 		<i id="001"><![CDATA[# Blender 4.1.1
 # www.blender.org
 mtllib piece.001.mtl
