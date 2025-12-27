@@ -144,6 +144,11 @@ let Viewport = (() => {
 					break;
 				case "insert-OBJ-geometry":
 					item = loader.parse(event.geo.str);
+					item.traverse(c => {
+						if (!c.isMesh) return;
+						c.geometry.computeBoundingBox();
+						c.castShadow = true;
+					});
 					originalModel.add(item);
 					break;
 				case "update-color-theme":
@@ -177,11 +182,15 @@ let Viewport = (() => {
 					Self.dispatch({ type: "init-edges-model" });
 					Self.dispatch({ type: "init-background-model" });
 					Self.dispatch({ type: "init-conditional-model" });
-					if (originalModel.children[0].geometry) {
+					
+					let firstGeo = originalModel.children[0].isMesh
+									? originalModel.children[0]
+									: originalModel.children[0].children[0];
+					if (firstGeo.geometry) {
 						// update floor
 						floor.material.color.set(theme.floorColor);
 						floor.material.opacity = .2;
-						floor.position.y = originalModel.children[0].geometry.boundingBox.min.y - .025;
+						floor.position.y = firstGeo.geometry.boundingBox.min.y - .025;
 					}
 					break;
 				case "init-edges-model":
