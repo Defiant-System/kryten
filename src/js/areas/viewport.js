@@ -114,8 +114,34 @@ let Viewport = (() => {
 					});
 					break;
 				case "reset-geometry-groups":
-					originalModel.children.map(c => c.parent.remove(c));
+					if (edgesModel) {
+						edgesModel.parent.remove(edgesModel);
+						edgesModel.traverse(c => {
+							if (!c.isMesh) return;
+							if (Array.isArray(c.material)) c.material.forEach(m => m.dispose());
+							else c.material.dispose();
+						});
+					}
+					if (conditionalModel) {
+						conditionalModel.parent.remove(conditionalModel);
+						conditionalModel.traverse(c => {
+							if (!c.isMesh) return;
+							if (Array.isArray(c.material)) c.material.forEach(m => m.dispose());
+							else c.material.dispose();
+						});
+					}
+					if (shadowModel) {
+						shadowModel.parent.remove(shadowModel);
+						shadowModel.traverse(c => {
+							if (!c.isMesh) return;
+							if (Array.isArray(c.material)) c.material.forEach(m => m.dispose());
+							else c.material.dispose();
+						});
+					}
 					objectGroup.children.map(c => c.parent.remove(c));
+					objectGroup.traverse(c => c.isMesh ? c.material.dispose() : void(0));
+					originalModel.children.map(c => c.parent.remove(c));
+					originalModel.traverse(c => c.isMesh ? c.material.dispose() : void(0));
 					break;
 				case "insert-basic-geometry":
 					// loop values
@@ -182,15 +208,6 @@ let Viewport = (() => {
 					objectGroup.add(shadowModel);
 					break;
 				case "init-background-model":
-					// remove any previous model
-					if (edgesModel) {
-						edgesModel.parent.remove(edgesModel);
-						edgesModel.traverse(c => {
-							if (!c.isMesh) return;
-							if (Array.isArray(c.material)) c.material.forEach(m => m.dispose());
-							else c.material.dispose();
-						});
-					}
 					// store the model and add it to the scene to display behind the lines
 					edgesModel = originalModel.clone();
 					objectGroup.add(edgesModel);
@@ -218,11 +235,6 @@ let Viewport = (() => {
 					}
 					break;
 				case "init-conditional-model":
-					// remove the original model
-					if (conditionalModel) {
-						conditionalModel.parent.remove(conditionalModel);
-						conditionalModel.traverse(c => c.isMesh ? c.material.dispose() : void(0));
-					}
 					conditionalModel = originalModel.clone();
 					objectGroup.add(conditionalModel);
 					conditionalModel.visible = true;

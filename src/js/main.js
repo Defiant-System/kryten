@@ -35,7 +35,7 @@ const kryten = {
 			// custom events
 			case "load-sample":
 				// open application local sample file
-				Self.openLocal(`~/samples/${event.name}`)
+				Self.openLocal(`~/samples/${event.name || event.arg}`)
 					.then(fsFile => {
 						Self.File = new File(fsFile);
 					});

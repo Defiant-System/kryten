@@ -41,16 +41,6 @@ class File {
 		Viewport.fpsControl.start();
 	}
 
-	dispatch(event) {
-		let APP = kryten,
-			spawn = event.spawn,
-			str;
-		switch (event.type) {
-			case "reset-sheet-names":
-				break;
-		}
-	}
-
 	get base() {
 		return this._file.base;
 	}
