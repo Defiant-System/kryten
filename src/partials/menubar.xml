@@ -4,9 +4,13 @@
 		<Menu type="divider"/>
 		<Menu name="Settings&#8230;" for="app-ui-layout">
 			<Menu name="Sample files&#8230;">
+				<Menu name="Lack" click="load-sample" arg="lack.xml"/>
+				<Menu name="Monkey" click="load-sample" arg="monkey.xml"/>
 				<Menu name="Torus" click="load-sample" arg="torus.xml"/>
 				<Menu name="Torus Knot" click="load-sample" arg="torus-knot.xml"/>
+				<Menu name="Pyramid" click="load-sample" arg="pyramid.xml"/>
 			</Menu>
+			<Menu type="divider"/>
 			<Menu name="IKEA" click="set-ui-theme" arg="ikea" check-group="ui-theme" is-checked="1"/>
 			<Menu name="Blueprint" click="set-ui-theme" arg="blueprint" check-group="ui-theme"/>
 			<Menu name="Antique" click="set-ui-theme" arg="antique" check-group="ui-theme"/>

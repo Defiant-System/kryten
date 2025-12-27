@@ -182,12 +182,11 @@ let Viewport = (() => {
 					Self.dispatch({ type: "init-edges-model" });
 					Self.dispatch({ type: "init-background-model" });
 					Self.dispatch({ type: "init-conditional-model" });
-					
+					// update floor
 					let firstGeo = originalModel.children[0].isMesh
 									? originalModel.children[0]
 									: originalModel.children[0].children[0];
 					if (firstGeo.geometry) {
-						// update floor
 						floor.material.color.set(theme.floorColor);
 						floor.material.opacity = .2;
 						floor.position.y = firstGeo.geometry.boundingBox.min.y - .025;
@@ -195,7 +194,7 @@ let Viewport = (() => {
 					break;
 				case "init-edges-model":
 					if (edgesModel) {
-						edgesModel.parent.remove(edgesModel);
+						// edgesModel.parent.remove(edgesModel);
 						edgesModel.traverse(c => {
 							if (!c.isMesh) return;
 							if (Array.isArray(c.material)) c.material.forEach(m => m.dispose());
@@ -254,7 +253,7 @@ let Viewport = (() => {
 					break;
 				case "init-conditional-model":
 					if (conditionalModel) {
-						conditionalModel.parent.remove(conditionalModel);
+						// conditionalModel.parent.remove(conditionalModel);
 						conditionalModel.traverse(c => {
 							if (!c.isMesh) return;
 							if (Array.isArray(c.material)) c.material.forEach(m => m.dispose());
