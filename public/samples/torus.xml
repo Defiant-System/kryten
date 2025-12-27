@@ -10,6 +10,8 @@
 	</Meta>
 	<Steps />
 	<Pieces>
-		<i id="001" type="basic" name="TorusGeometry" args="[0.35, 0.15, 9, 20]" rotation="[0,0,0]"/>
+		<i id="001" type="basic" name="TorusGeometry" args="[0.35, 0.15, 9, 20]" position="[-0.85,0,0]" rotation="[0,0,0]"/>
+		<i id="001" type="basic" name="DodecahedronGeometry" args="[0.35, 0]" position="[0,0,0]" rotation="[0,0,0]"/>
+		<i id="001" type="basic" name="CylinderGeometry" args="[0.35, 0.35, 0.6, 8]" position="[0.85,0,0]" rotation="[0,0,0]"/>
 	</Pieces>
 </Data>

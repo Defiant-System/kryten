@@ -5,7 +5,7 @@
 		<i id="assembly" value="7"/>
 		<i id="steps" value="21"/>
 		<i id="parts" value="13"/>
-		<i id="camera" position="[0,10,20]" lookAt="[0,0,0]"/>
+		<i id="camera" position="[0,10,15]" lookAt="[0,3,0]"/>
 		<i id="light" position="[7,6,-1]" color="#fff"/>
 	</Meta>
 	<Steps />

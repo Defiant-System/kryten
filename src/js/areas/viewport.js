@@ -19,7 +19,7 @@ let {
 
 let Viewport = (() => {
 
-	let edgesThreshold = 10,
+	let edgesThreshold = 40,
 		width = window.innerWidth,
 		height = window.innerHeight,
 		ratio = width / height,
@@ -134,6 +134,7 @@ let Viewport = (() => {
 					item = new THREE.Mesh(new THREE[event.geo.name](...event.geo.args));
 					item.geometry.computeBoundingBox();
 					item.castShadow = true;
+					item.position.set(...event.geo.position);
 					// rotation in relation to the camera
 					[x, y, z] = event.geo.rotation;
 					item.rotation.x += Math.PI * x;
@@ -194,7 +195,7 @@ let Viewport = (() => {
 					break;
 				case "init-edges-model":
 					if (edgesModel) {
-						// edgesModel.parent.remove(edgesModel);
+						if (edgesModel.parent) edgesModel.parent.remove(edgesModel);
 						edgesModel.traverse(c => {
 							if (!c.isMesh) return;
 							if (Array.isArray(c.material)) c.material.forEach(m => m.dispose());
@@ -229,7 +230,7 @@ let Viewport = (() => {
 					break;
 				case "init-background-model":
 					if (shadowModel) {
-						shadowModel.parent.remove(shadowModel);
+						if (shadowModel.parent) shadowModel.parent.remove(shadowModel);
 						shadowModel.traverse(c => {
 							if (!c.isMesh) return;
 							if (Array.isArray(c.material)) c.material.forEach(m => m.dispose());
@@ -253,7 +254,7 @@ let Viewport = (() => {
 					break;
 				case "init-conditional-model":
 					if (conditionalModel) {
-						// conditionalModel.parent.remove(conditionalModel);
+						if (conditionalModel.parent) conditionalModel.parent.remove(conditionalModel);
 						conditionalModel.traverse(c => {
 							if (!c.isMesh) return;
 							if (Array.isArray(c.material)) c.material.forEach(m => m.dispose());

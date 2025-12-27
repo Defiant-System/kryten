@@ -35,6 +35,7 @@ class File {
 					// basic THREE build-in geometries
 					geo.name = xPiece.getAttribute("name");
 					geo.args = JSON.parse(xPiece.getAttribute("args"));
+					geo.position = JSON.parse(xPiece.getAttribute("position"));
 					geo.rotation = JSON.parse(xPiece.getAttribute("rotation"));
 					break;
 				default:
