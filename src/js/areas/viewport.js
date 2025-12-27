@@ -114,30 +114,6 @@ let Viewport = (() => {
 					});
 					break;
 				case "reset-geometry-groups":
-					if (edgesModel) {
-						edgesModel.parent.remove(edgesModel);
-						edgesModel.traverse(c => {
-							if (!c.isMesh) return;
-							if (Array.isArray(c.material)) c.material.forEach(m => m.dispose());
-							else c.material.dispose();
-						});
-					}
-					if (conditionalModel) {
-						conditionalModel.parent.remove(conditionalModel);
-						conditionalModel.traverse(c => {
-							if (!c.isMesh) return;
-							if (Array.isArray(c.material)) c.material.forEach(m => m.dispose());
-							else c.material.dispose();
-						});
-					}
-					if (shadowModel) {
-						shadowModel.parent.remove(shadowModel);
-						shadowModel.traverse(c => {
-							if (!c.isMesh) return;
-							if (Array.isArray(c.material)) c.material.forEach(m => m.dispose());
-							else c.material.dispose();
-						});
-					}
 					objectGroup.children.map(c => c.parent.remove(c));
 					objectGroup.traverse(c => c.isMesh ? c.material.dispose() : void(0));
 					originalModel.children.map(c => c.parent.remove(c));
@@ -192,6 +168,14 @@ let Viewport = (() => {
 					floor.position.y = originalModel.children[0].geometry.boundingBox.min.y - .025;
 					break;
 				case "init-edges-model":
+					if (shadowModel) {
+						shadowModel.parent.remove(shadowModel);
+						shadowModel.traverse(c => {
+							if (!c.isMesh) return;
+							if (Array.isArray(c.material)) c.material.forEach(m => m.dispose());
+							else c.material.dispose();
+						});
+					}
 					shadowModel = originalModel.clone();
 					shadowModel.visible = true;
 					shadowModel.traverse(c => {
@@ -208,6 +192,14 @@ let Viewport = (() => {
 					objectGroup.add(shadowModel);
 					break;
 				case "init-background-model":
+					if (edgesModel) {
+						edgesModel.parent.remove(edgesModel);
+						edgesModel.traverse(c => {
+							if (!c.isMesh) return;
+							if (Array.isArray(c.material)) c.material.forEach(m => m.dispose());
+							else c.material.dispose();
+						});
+					}
 					// store the model and add it to the scene to display behind the lines
 					edgesModel = originalModel.clone();
 					objectGroup.add(edgesModel);
@@ -235,6 +227,14 @@ let Viewport = (() => {
 					}
 					break;
 				case "init-conditional-model":
+					if (conditionalModel) {
+						conditionalModel.parent.remove(conditionalModel);
+						conditionalModel.traverse(c => {
+							if (!c.isMesh) return;
+							if (Array.isArray(c.material)) c.material.forEach(m => m.dispose());
+							else c.material.dispose();
+						});
+					}
 					conditionalModel = originalModel.clone();
 					objectGroup.add(conditionalModel);
 					conditionalModel.visible = true;
