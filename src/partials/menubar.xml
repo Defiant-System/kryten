@@ -11,7 +11,7 @@
 				<Menu name="Pyramid" click="load-sample" arg="pyramid.xml"/>
 			</Menu>
 			<Menu type="divider"/>
-			<Menu name="IKEA" click="set-ui-theme" arg="ikea" check-group="ui-theme" is-checked="1"/>
+			<Menu name="IKEA" click="set-ui-theme" arg="ikea" check-group="ui-theme"/>
 			<Menu name="Blueprint" click="set-ui-theme" arg="blueprint" check-group="ui-theme"/>
 			<Menu name="Antique" click="set-ui-theme" arg="antique" check-group="ui-theme"/>
 			<Menu type="divider"/>

@@ -26,6 +26,7 @@ const kryten = {
 	dispatch(event) {
 		let Self = kryten,
 			data,
+			value,
 			el;
 		// console.log(event);
 		switch (event.type) {
@@ -44,6 +45,13 @@ const kryten = {
 				karaqu.shell("fs -u '~/help/index.md'");
 				break;
 			// proxy events to viewport
+			case "before-contextmenu:app-ui-layout":
+				// reset "select theme" menu options
+				window.bluePrint.selectNodes(`//Menu[@click="set-ui-theme"]`).map(xMenu => xMenu.removeAttribute("is-checked"));
+				// update active "select theme" menu option
+				value = Self.els.content.data("theme");
+				window.bluePrint.selectSingleNode(`//Menu[@click="set-ui-theme"][@arg="${value}"]`).setAttribute("is-checked", "1");
+				break;
 			case "toggle-play-pause":
 				if (Viewport.fpsControl._stopped) Viewport.fpsControl.start();
 				else Viewport.fpsControl.stop();

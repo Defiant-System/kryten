@@ -8,10 +8,15 @@
 		<i id="camera" position="[0.65,0.75,1.5]" lookAt="[0,0,0]"/>
 		<i id="light" position="[7,6,-1]" color="#fff"/>
 	</Meta>
-	<Steps />
+	<Steps>
+		<Event piece="001" start="2" duration="3">
+			<Start position="[0,0,0]"/>
+			<End position="[0,1,0]"/>
+		</Event>
+	</Steps>
 	<Pieces>
-		<i id="001" type="basic" name="TorusGeometry" args="[0.35, 0.15, 9, 20]" position="[-0.85,0,0]" rotation="[0,0,0]"/>
-		<i id="001" type="basic" name="DodecahedronGeometry" args="[0.35, 0]" position="[0,0,0]" rotation="[0,0,0]"/>
-		<i id="001" type="basic" name="CylinderGeometry" args="[0.35, 0.35, 0.6, 8]" position="[0.85,0,0]" rotation="[0,0,0]"/>
+		<i id="001" type="basic" name="TorusGeometry" args="[0.35, 0.15, 9, 20]" position="[0,0,0]" rotation="[0,0,0]"/>
+		<i id="002" type="basic" name="DodecahedronGeometry" args="[0.35, 0]" position="[-0.9,0,0]" rotation="[0,0,0]"/>
+		<i id="003" type="basic" name="CylinderGeometry" args="[0.35, 0.35, 0.6, 8]" position="[0.9,0,0]" rotation="[0,0,0]"/>
 	</Pieces>
 </Data>
