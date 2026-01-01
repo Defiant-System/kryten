@@ -51,7 +51,7 @@ let Viewport = (() => {
 		floor,
 		orbit,
 		// postprocessing
-		postprocess = false,
+		postprocess = 0,
 		param = { 
 			minFilter: THREE.LinearFilter,
 			magFilter: THREE.LinearFilter,
@@ -65,7 +65,6 @@ let Viewport = (() => {
 		renderPass,
 		outlinePass,
 		effectFXAA;
-
 
 
 	let vp = {
@@ -123,6 +122,7 @@ let Viewport = (() => {
 					// outlinePass.edgeGlow = 0.0,
 					outlinePass.visibleEdgeColor.set('#ff3300');
 					outlinePass.hiddenEdgeColor.set('#002255');
+					// outlinePass.selectedObjects = [objectGroup];
 					effectFXAA = new ShaderPass(FXAAShader);
 					composer.addPass(effectFXAA);
 					*/
@@ -148,6 +148,8 @@ let Viewport = (() => {
 						fps: 50,
 						// autoplay: true,
 						callback(time, delta) {
+							// let item = scene.getObjectByName("Cube.025");
+							// item.rotation.y -= 0.005;
 							objectGroup.rotation.y -= 0.005;
 							// objectGroup.rotation.x += 0.02;
 							// objectGroup.rotation.z += 0.015;
@@ -181,13 +183,16 @@ let Viewport = (() => {
 					});
 					// update models if requeired
 					objectGroup.traverse(c => {
-						if (c.type === "LineSegments") {
-							c.material.color = new THREE.Color(theme.edgesColor);
+						// if (!c.isMesh) return;
+						switch (c.type) {
+							case "LineSegments":
+								c.material.color = new THREE.Color(theme.edgesColor);
+								break;
+							case "Mesh":
+								c.material.color = new THREE.Color(theme.materialShadowHigh);
+								c.material.shadowColor = new THREE.Color(theme.materialShadowLow);
+								break;
 						}
-						if (!c.isMesh) return;
-						
-						c.material.color = new THREE.Color(theme.materialShadowHigh);
-						c.material.shadowColor = new THREE.Color(theme.materialShadowLow);
 					});
 					break;
 				case "insert-basic-geometry":
@@ -217,18 +222,22 @@ let Viewport = (() => {
 					// return console.log(originalModel);
 					originalModel.traverse(c => {
 						if (!c.isMesh) return;
+						let oGroup = new THREE.Group();
 						// shadow material
 						let sGeo = c.geometry.clone();
 						let sMesh = new THREE.Mesh(sGeo, mtlShadow);
 						sMesh.receiveShadow = true;
 						sMesh.castShadow = true;
-						objectGroup.add(sMesh);
-
+						oGroup.add(sMesh);
 						// outlines
 						let lGeo = sGeo.clone().toIndexed(false);
 						let lMesh = new THREE.Mesh(lGeo);
 						let lObj = new OutlineMesh(lMesh, mtlLine);
-						objectGroup.add(lObj);
+						oGroup.add(lObj);
+						// name of piece as group name
+						oGroup.name = c.name;
+						// insert in to scene
+						objectGroup.add(oGroup);
 					});
 					// update floor
 					let firstGeo = originalModel.children[0].isMesh
@@ -239,6 +248,9 @@ let Viewport = (() => {
 						floor.material.opacity = .2;
 						floor.position.y = firstGeo.geometry.boundingBox.min.y - .025;
 					}
+					break;
+				case "test-piece":
+					item = scene.getObjectByName(event.arg);
 					break;
 			}
 		}
