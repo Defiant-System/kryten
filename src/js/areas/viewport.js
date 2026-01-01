@@ -26,7 +26,7 @@ let Viewport = (() => {
 		height = window.innerHeight,
 		ratio = width / height,
 		loader = new OBJLoader(),
-		mtlLine = new OutlineMaterial(180, true, "#888"),
+		mtlLine = new OutlineMaterial(20, true, "#888"),
 		mtlShadow = new ColoredShadowMaterial({
 			color: 0xffffff,
 			shadowColor: 0xdddddd,
@@ -112,7 +112,7 @@ let Viewport = (() => {
 					shadowCam.right = shadowCam.top = 1;
 					scene.add(dirLight);
 					
-					// postprocessing
+					/* postprocessing
 					composer = new EffectComposer(renderer, renderTarget);
 					renderPass = new RenderPass(scene, camera);
 					composer.addPass(renderPass);
@@ -125,6 +125,7 @@ let Viewport = (() => {
 					outlinePass.hiddenEdgeColor.set('#002255');
 					effectFXAA = new ShaderPass(FXAAShader);
 					composer.addPass(effectFXAA);
+					*/
 
 					// floor setup
 					floor = new THREE.Mesh(
@@ -171,8 +172,6 @@ let Viewport = (() => {
 						materialShadowLow: null,
 						edgesColor: null,
 						edgesLine: null,
-						conditionalEdgesColor: null,
-						conditionalEdgesLine: null,
 					};
 					// get theme values
 					Object.keys(theme).map(key => {
@@ -181,7 +180,15 @@ let Viewport = (() => {
 						theme[key] = value;
 					});
 					// update models if requeired
-					if (event.update) Self.dispatch({ type: "update-models" });
+					objectGroup.traverse(c => {
+						if (c.type === "LineSegments") {
+							c.material.color = new THREE.Color(theme.edgesColor);
+						}
+						if (!c.isMesh) return;
+						
+						c.material.color = new THREE.Color(theme.materialShadowHigh);
+						c.material.shadowColor = new THREE.Color(theme.materialShadowLow);
+					});
 					break;
 				case "insert-basic-geometry":
 					// loop values
@@ -203,8 +210,6 @@ let Viewport = (() => {
 					item.traverse(c => {
 						if (!c.isMesh) return;
 						c.geometry.computeBoundingBox();
-						c.receiveShadow = true;
-						c.castShadow = true;
 					});
 					originalModel.add(item);
 					break;
@@ -215,6 +220,8 @@ let Viewport = (() => {
 						// shadow material
 						let sGeo = c.geometry.clone();
 						let sMesh = new THREE.Mesh(sGeo, mtlShadow);
+						sMesh.receiveShadow = true;
+						sMesh.castShadow = true;
 						objectGroup.add(sMesh);
 
 						// outlines

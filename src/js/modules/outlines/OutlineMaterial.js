@@ -112,4 +112,8 @@ export class OutlineMaterial extends ShaderMaterial {
 	get color() {
 		return this.uniforms.uColor.value;
 	}
+
+	set color(v) {
+		this.uniforms.uColor.value = v;
+	}
 }

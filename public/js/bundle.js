@@ -50359,6 +50359,10 @@ class OutlineMaterial extends ShaderMaterial {
 	get color() {
 		return this.uniforms.uColor.value;
 	}
+
+	set color(v) {
+		this.uniforms.uColor.value = v;
+	}
 }
 
 const NULL_VECTOR = new Vector3();
@@ -50523,32 +50527,31 @@ class OutlineMesh extends LineSegments {
 }
 
 class ColoredShadowMaterial extends ShaderMaterial {
-
 	get color() {
-
 		return this.uniforms.diffuse.value;
+	}
 
+	set color(v) {
+		this.uniforms.diffuse.value = v;
 	}
 
 	get shadowColor() {
-
 		return this.uniforms.shadowColor.value;
+	}
 
+	set shadowColor(v) {
+		this.uniforms.shadowColor.value = v;
+	}
+
+	get shininess() {
+		return this.uniforms.shininess.value;
 	}
 
 	set shininess( v ) {
-
 		this.uniforms.shininess.value = v;
-
-	}
-	get shininess() {
-
-		return this.uniforms.shininess.value;
-
 	}
 
 	constructor( options ) {
-
 		super( {
 			uniforms: UniformsUtils.merge( [
 				ShaderLib.phong.uniforms,
@@ -50655,49 +50658,33 @@ class ColoredShadowMaterial extends ShaderMaterial {
 					#include <aomap_fragment>
 					vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;
 					#include <envmap_fragment>
-
 					gl_FragColor = vec4( outgoingLight, diffuseColor.a );
 					#include <tonemapping_fragment>
 					#include <encodings_fragment>
 					#include <fog_fragment>
 					#include <premultiplied_alpha_fragment>
 					#include <dithering_fragment>
-
 					gl_FragColor.rgb = mix(
 						shadowColor.rgb,
 						diffuse.rgb,
 						min( gl_FragColor.r, 1.0 )
 					);
-
 				}
-
 			`,
-
 		} );
-
 		Object.defineProperties( this, {
 			opacity: {
-
 				set( v ) {
-
 					this.uniforms.opacity.value = v;
-
 				},
-
 				get() {
-
 					return this.uniforms.opacity.value;
-
 				}
-
 			}
 		} );
-
 		this.setValues( options );
 		this.lights = true;
-
 	}
-
 }
 
 /**
