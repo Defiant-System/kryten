@@ -26,7 +26,7 @@ let Viewport = (() => {
 		height = window.innerHeight,
 		ratio = width / height,
 		loader = new OBJLoader(),
-		mtlLine = new OutlineMaterial(70, true, "#888"),
+		mtlLine = new OutlineMaterial(180, true, "#888"),
 		mtlShadow = new ColoredShadowMaterial({
 			color: 0xffffff,
 			shadowColor: 0xdddddd,
@@ -49,7 +49,24 @@ let Viewport = (() => {
 		dirLight,
 		shadowCam,
 		floor,
-		orbit;
+		orbit,
+		// postprocessing
+		postprocess = false,
+		param = { 
+			minFilter: THREE.LinearFilter,
+			magFilter: THREE.LinearFilter,
+			format: THREE.RGBAFormat,
+			type: THREE.HalfFloatType,
+			stencilBuffer: false,
+			samples: 4,
+		},
+		renderTarget = new THREE.WebGLRenderTarget(width, height, param),
+		composer,
+		renderPass,
+		outlinePass,
+		effectFXAA;
+
+
 
 	let vp = {
 		init(APP) {
@@ -94,6 +111,21 @@ let Viewport = (() => {
 					shadowCam.left = shadowCam.bottom = -1;
 					shadowCam.right = shadowCam.top = 1;
 					scene.add(dirLight);
+					
+					// postprocessing
+					composer = new EffectComposer(renderer, renderTarget);
+					renderPass = new RenderPass(scene, camera);
+					composer.addPass(renderPass);
+					outlinePass = new OutlinePass(new THREE.Vector2(width, height), scene, camera);
+					composer.addPass(outlinePass);
+					outlinePass.edgeStrength = 5.0,
+					outlinePass.edgeThickness = 0.5;
+					// outlinePass.edgeGlow = 0.0,
+					outlinePass.visibleEdgeColor.set('#ff3300');
+					outlinePass.hiddenEdgeColor.set('#002255');
+					effectFXAA = new ShaderPass(FXAAShader);
+					composer.addPass(effectFXAA);
+
 					// floor setup
 					floor = new THREE.Mesh(
 						new THREE.PlaneGeometry(),
@@ -119,7 +151,8 @@ let Viewport = (() => {
 							// objectGroup.rotation.x += 0.02;
 							// objectGroup.rotation.z += 0.015;
 
-							renderer.render(scene, camera);
+							if (postprocess) composer.render();
+							else renderer.render(scene, camera);
 						}
 					});
 					break;
