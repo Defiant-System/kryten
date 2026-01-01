@@ -10,6 +10,6 @@
 	</Meta>
 	<Steps />
 	<Pieces>
-		<i id="001" type="basic" name="TorusKnotGeometry" args="[0.35,0.125,80,16]" rotation="[0,0.35,0]"/>
+		<i id="001" type="basic" name="TorusKnotGeometry" args="[0.35,0.125,50,12]" position="[0,0,0]" rotation="[0,0.35,0]"/>
 	</Pieces>
 </Data>

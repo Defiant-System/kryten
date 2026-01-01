@@ -2,28 +2,41 @@
 // import libs
 let {
 	THREE,
-	OrbitControls, //
-	BufferGeometryUtils,
-	LineSegmentsGeometry,
-	LineSegments2,
-	LineMaterial, //
+	THREE_dispose,
+
+	ToIndexed,
+	OutlineMaterial,
+	OutlineMesh,
 	ColoredShadowMaterial,
-	ConditionalEdgesGeometry,
-	OutsideEdgesGeometry,
-	ConditionalEdgesShader,
-	ConditionalLineSegmentsGeometry,
-	ConditionalLineMaterial, //
+
+	EffectComposer,
+	RenderPass,
+	ShaderPass,
+	OutlinePass,
+	FXAAShader,
+
 	OBJLoader,
+	OrbitControls,
 } = await window.fetch("~/js/bundle.js");
 
 
 let Viewport = (() => {
 
-	let edgesThreshold = 40,
-		width = window.innerWidth,
+	let width = window.innerWidth,
 		height = window.innerHeight,
 		ratio = width / height,
 		loader = new OBJLoader(),
+		mtlLine = new OutlineMaterial(70, true, "#888"),
+		mtlShadow = new ColoredShadowMaterial({
+			color: 0xffffff,
+			shadowColor: 0xdddddd,
+			// shininess: 1.0,
+			// transparent: true,
+			// opacity: 0.95,
+			polygonOffset: true,
+			polygonOffsetFactor: 1,
+			polygonOffsetUnits: 1,
+		}),
 		originalModel = new THREE.Group(),
 		objectGroup = new THREE.Group(),
 		shadowModel,
@@ -45,9 +58,6 @@ let Viewport = (() => {
 
 			this.dispatch({ type: "refresh-theme-values" });
 			this.dispatch({ type: "init-viewport" });
-			// this.dispatch({ type: "load-object-model" });
-
-			// this.dispatch({ type: "update-models" });
 			this.dispatch({ type: "init-player" });
 		},
 		dispatch(event) {
@@ -73,8 +83,8 @@ let Viewport = (() => {
 					orbit = new OrbitControls(camera, renderer.domElement);
 					orbit.enableZoom = false;
 					// lights setup
-					dirLight = new THREE.DirectionalLight(theme.lightColor, 1.0);
-					dirLight.position.set(7, 6, -1);
+					dirLight = new THREE.DirectionalLight(0xffffff, 1.0);
+					dirLight.position.set(5, 10, 5);
 					dirLight.castShadow = true;
 					dirLight.shadow.bias = -1e-10;
 					dirLight.shadow.mapSize.width = 1024;
@@ -113,48 +123,11 @@ let Viewport = (() => {
 						}
 					});
 					break;
-				case "change-edges-threshold":
-					edgesThreshold = event.arg;
-					Self.dispatch({ type: "init-edges-model" });
-					break;
 				case "reset-camera":
 					camera.position.set(...event.position);
 					camera.lookAt(...event.lookAt);
 					camera.updateProjectionMatrix();
 					shadowCam.updateProjectionMatrix();
-					break;
-				case "reset-geometry-groups":
-					objectGroup.children.map(c => c.parent.remove(c));
-					objectGroup.traverse(c => c.isMesh ? c.material.dispose() : void(0));
-					originalModel.children.map(c => c.parent.remove(c));
-					originalModel.traverse(c => c.isMesh ? c.material.dispose() : void(0));
-					break;
-				case "insert-basic-geometry":
-					// loop values
-					item = new THREE.Mesh(new THREE[event.geo.name](...event.geo.args));
-					item.geometry.computeBoundingBox();
-					item.castShadow = true;
-					item.position.set(...event.geo.position);
-					// rotation in relation to the camera
-					[x, y, z] = event.geo.rotation;
-					item.rotation.x += Math.PI * x;
-					item.rotation.y += Math.PI * y;
-					item.rotation.z += Math.PI * z;
-					// add item to original model
-					originalModel.add(item);
-					break;
-				case "insert-OBJ-geometry":
-					item = loader.parse(event.geo.str);
-					item.traverse(c => {
-						if (!c.isMesh) return;
-						c.geometry.computeBoundingBox();
-						c.castShadow = true;
-					});
-					originalModel.add(item);
-					break;
-				case "update-color-theme":
-					// dirLight.color.set(0xff0000); // event.data.lightColor
-					floor.material.color.set(theme.floorColor);
 					break;
 				case "refresh-theme-values":
 					// prepare to update three.js
@@ -177,12 +150,46 @@ let Viewport = (() => {
 					// update models if requeired
 					if (event.update) Self.dispatch({ type: "update-models" });
 					break;
+				case "insert-basic-geometry":
+					// loop values
+					item = new THREE.Mesh(new THREE[event.geo.name](...event.geo.args));
+					item.geometry.computeBoundingBox();
+					item.receiveShadow = true;
+					item.castShadow = true;
+					item.position.set(...event.geo.position);
+					// rotation in relation to the camera
+					[x, y, z] = event.geo.rotation;
+					item.rotation.x += Math.PI * x;
+					item.rotation.y += Math.PI * y;
+					item.rotation.z += Math.PI * z;
+					// add item to original model
+					originalModel.add(item);
+					break;
+				case "insert-OBJ-geometry":
+					item = loader.parse(event.geo.str);
+					item.traverse(c => {
+						if (!c.isMesh) return;
+						c.geometry.computeBoundingBox();
+						c.receiveShadow = true;
+						c.castShadow = true;
+					});
+					originalModel.add(item);
+					break;
 				case "update-models":
-					if (!originalModel.children.length) return;
-					// init models
-					Self.dispatch({ type: "init-edges-model" });
-					Self.dispatch({ type: "init-background-model" });
-					Self.dispatch({ type: "init-conditional-model" });
+					// return console.log(originalModel);
+					originalModel.traverse(c => {
+						if (!c.isMesh) return;
+						// shadow material
+						let sGeo = c.geometry.clone();
+						let sMesh = new THREE.Mesh(sGeo, mtlShadow);
+						objectGroup.add(sMesh);
+
+						// outlines
+						let lGeo = sGeo.clone().toIndexed(false);
+						let lMesh = new THREE.Mesh(lGeo);
+						let lObj = new OutlineMesh(lMesh, mtlLine);
+						objectGroup.add(lObj);
+					});
 					// update floor
 					let firstGeo = originalModel.children[0].isMesh
 									? originalModel.children[0]
@@ -191,108 +198,6 @@ let Viewport = (() => {
 						floor.material.color.set(theme.floorColor);
 						floor.material.opacity = .2;
 						floor.position.y = firstGeo.geometry.boundingBox.min.y - .025;
-					}
-					break;
-				case "init-edges-model":
-					if (edgesModel) {
-						if (edgesModel.parent) edgesModel.parent.remove(edgesModel);
-						edgesModel.traverse(c => {
-							if (!c.isMesh) return;
-							if (Array.isArray(c.material)) c.material.forEach(m => m.dispose());
-							else c.material.dispose();
-						});
-					}
-					// store the model and add it to the scene to display behind the lines
-					edgesModel = originalModel.clone();
-					objectGroup.add(edgesModel);
-
-					meshes = [];
-					edgesModel.traverse(c => c.isMesh ? meshes.push(c) : void(0));
-					for (let key in meshes) {
-						let mesh = meshes[key];
-						let parent = mesh.parent;
-						let lineGeom = new THREE.EdgesGeometry(mesh.geometry, edgesThreshold);
-						let lineMat = new THREE.LineBasicMaterial({ color: theme.edgesColor });
-						let line = new THREE.LineSegments(lineGeom, lineMat);
-						line.position.copy(mesh.position);
-						line.scale.copy(mesh.scale);
-						line.rotation.copy(mesh.rotation);
-						let thickLineGeom = new LineSegmentsGeometry().fromEdgesGeometry(lineGeom);
-						let thickLineMat = new LineMaterial({ color: theme.edgesColor, linewidth: theme.edgesLine });
-						let thickLines = new LineSegments2(thickLineGeom, thickLineMat);
-						thickLines.position.copy(mesh.position);
-						thickLines.scale.copy(mesh.scale);
-						thickLines.rotation.copy(mesh.rotation);
-						parent.remove(mesh);
-						parent.add(line);
-						parent.add(thickLines);
-					}
-					break;
-				case "init-background-model":
-					if (shadowModel) {
-						if (shadowModel.parent) shadowModel.parent.remove(shadowModel);
-						shadowModel.traverse(c => {
-							if (!c.isMesh) return;
-							if (Array.isArray(c.material)) c.material.forEach(m => m.dispose());
-							else c.material.dispose();
-						});
-					}
-					shadowModel = originalModel.clone();
-					shadowModel.visible = true;
-					shadowModel.traverse(c => {
-						if (!c.isMesh) return;
-						c.material = new ColoredShadowMaterial({ color: theme.materialShadowHigh, shininess: 1.0 });
-						c.material.polygonOffset = true;
-						c.material.polygonOffsetFactor = 1;
-						c.material.polygonOffsetUnits = 1;
-						c.receiveShadow = true;
-						c.material.transparent = false;
-						c.material.shadowColor.set(theme.materialShadowLow);
-						c.renderOrder = 2;
-					});
-					objectGroup.add(shadowModel);
-					break;
-				case "init-conditional-model":
-					if (conditionalModel) {
-						if (conditionalModel.parent) conditionalModel.parent.remove(conditionalModel);
-						conditionalModel.traverse(c => {
-							if (!c.isMesh) return;
-							if (Array.isArray(c.material)) c.material.forEach(m => m.dispose());
-							else c.material.dispose();
-						});
-					}
-					conditionalModel = originalModel.clone();
-					objectGroup.add(conditionalModel);
-					conditionalModel.visible = true;
-					// get all meshes
-					meshes = [];
-					conditionalModel.traverse(c => c.isMesh ? meshes.push(c) : void(0));
-
-					for (let key in meshes) {
-						let mesh = meshes[key];
-						let parent = mesh.parent;
-						// Remove everything but the position attribute
-						let mergedGeom = mesh.geometry.clone();
-						for (let key in mergedGeom.attributes) {
-							if (key !== "position") mergedGeom.deleteAttribute(key);
-						}
-						// Create the conditional edges geometry and associated material
-						let lineGeom = new ConditionalEdgesGeometry(BufferGeometryUtils.mergeVertices(mergedGeom));
-						let material = new THREE.ShaderMaterial(ConditionalEdgesShader);
-						material.uniforms.diffuse.value.set(theme.conditionalEdgesColor);
-						// Create the line segments objects and replace the mesh
-						let line = new THREE.LineSegments(lineGeom, material);
-						line.position.copy(mesh.position);
-						line.scale.copy(mesh.scale);
-						line.rotation.copy(mesh.rotation);
-						let thickLineGeom = new ConditionalLineSegmentsGeometry().fromConditionalEdgesGeometry(lineGeom);
-						let thickLines = new LineSegments2(thickLineGeom, new ConditionalLineMaterial({ color: theme.conditionalEdgesColor, linewidth: theme.conditionalEdgesLine }));
-						thickLines.position.copy(mesh.position);
-						thickLines.scale.copy(mesh.scale);
-						thickLines.rotation.copy(mesh.rotation);
-						parent.remove(mesh);
-						parent.add(line);
-						parent.add(thickLines);
 					}
 					break;
 			}
