@@ -259,6 +259,9 @@ let Viewport = (() => {
 									? originalModel.children[0]
 									: originalModel.children[0].children[0];
 					if (firstGeo.geometry) {
+						// update floor color
+						floor.material.color.set(theme.floorColor);
+						floor.material.opacity = .2;
 						floor.position.y = firstGeo.geometry.boundingBox.min.y - .025;
 					}
 					break;

@@ -19,7 +19,6 @@ let Timeline = (() => {
 				tape[step].map(track => {
 					track.mixer.update(clockDelta);
 					if (track.item.name === "lookTarget") {
-						console.log(111);
 						Viewport.items.camera.lookAt(track.item.position);
 					}
 				});
