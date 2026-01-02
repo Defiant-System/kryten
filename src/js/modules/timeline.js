@@ -14,9 +14,7 @@ let Timeline = (() => {
 			// setTimeout(() => this.dispatch({ type: "play-next" }), 500);
 		},
 		tick(time, delta) {
-			if (step !== undefined) {
-				// testPiece.rotation.y += 0.01;
-
+			if (step !== undefined && tape[step] !== undefined) {
 				let clockDelta = clock.getDelta();
 				tape[step].map(track => track.mixer.update(clockDelta));
 			}
@@ -28,7 +26,7 @@ let Timeline = (() => {
 				attr,
 				times,
 				values,
-				piece,
+				item,
 				clip,
 				track,
 				action,
@@ -39,8 +37,22 @@ let Timeline = (() => {
 					// reserv step on tape
 					if (!tape[event.step]) tape[event.step] = [];
 					track = new THREE.NumberKeyframeTrack(event.track.attr, event.track.times, event.track.values);
-					piece = Viewport.pieces[event.track.piece];
-					mixer = new THREE.AnimationMixer(piece);
+					item = Viewport.items[event.track.item];
+
+					if (event.track.item === "camera") {
+						track = new THREE.VectorKeyframeTrack(
+							".position",
+							[0, 2],
+							[
+								1,1,2,
+								1,2,3,
+							]
+						);
+						// Viewport.items.cameraRig.position.set(1,1,2);
+						// return;
+					}
+
+					mixer = new THREE.AnimationMixer(item);
 					clip = new THREE.AnimationClip(event.track.name, Math.max(...event.track.times), [track]);
 					// set loop value
 					switch (true) {
@@ -51,33 +63,13 @@ let Timeline = (() => {
 					// action + mixer
 					action = mixer.clipAction(clip);
 					action.setLoop(...loop);
+					action.clampWhenFinished = true;
 					// add track to "tape"
-					tape[event.step].push({ piece, track, mixer, action });
+					tape[event.step].push({ item, track, mixer, action });
 					break;
 				case "play-step":
 					step = +event.step - 1;
-					tape[step].map(track => track.action.play());
-					break;
-				case "play-next":
-					testPiece = Viewport.pieces[event.arg];
-					// if (!testPiece) return;
-					// testPiece.visible = true;
-
-					mixer = new THREE.AnimationMixer(testPiece);
-					mixer.addEventListener("finished", (event) => {
-						if (event.action === action) {
-							console.log("Action finished!");
-						}
-					});
-					action = mixer.clipAction(clip);
-					
-					// action.setLoop(THREE.LoopRepeat);
-					// action.setLoop(THREE.LoopOnce, 1);
-					action.setLoop(THREE.LoopRepeat, 1);
-					// action.clampWhenFinished = true;
-					action.play();
-
-					// setTimeout(() => action.stop(), 500);
+					if (tape[step]) tape[step].map(track => track.action.play());
 					break;
 			}
 		}

@@ -56,7 +56,7 @@ class File {
 				track.times = JSON.parse(xTrack.getAttribute("times"));
 				track.values = JSON.parse(xTrack.getAttribute("values"));
 				track.attr = xTrack.getAttribute("attr");
-				track.piece = xTrack.getAttribute("piece");
+				track.item = xTrack.getAttribute("item");
 				track.name = xTrack.getAttribute("name");
 				if (xTrack.getAttribute("repeat")) track.repeat = +xTrack.getAttribute("repeat");
 				if (xTrack.getAttribute("loop")) track.loop = xTrack.getAttribute("loop") === "true";

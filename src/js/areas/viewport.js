@@ -25,6 +25,7 @@ let Viewport = (() => {
 		renderer,
 		scene,
 		camera,
+		cameraRig = new THREE.Object3D(),
 		dirLight,
 		shadowCam,
 		floor,
@@ -51,7 +52,7 @@ let Viewport = (() => {
 			// save reference to app
 			this.APP = APP;
 			// memory record
-			this.pieces = {};
+			this.items = {};
 
 			this.dispatch({ type: "refresh-theme-values" });
 			this.dispatch({ type: "init-viewport" });
@@ -75,7 +76,10 @@ let Viewport = (() => {
 					scene = new THREE.Scene();
 					// camera
 					camera = new THREE.PerspectiveCamera(60, ratio, 0.1, 1000);
-					camera.position.set(.65, .75, 1.5);
+					// mount camera on the rig
+					// cameraRig.add(camera);
+					// cameraRig.name = "cameraRig";
+					// cameraRig.position.set(.65, .75, 1.5);
 					// orbit controls
 					orbit = new OrbitControls(camera, renderer.domElement);
 					orbit.enableZoom = false;
@@ -122,6 +126,12 @@ let Viewport = (() => {
 					scene.add(objectGroup);
 					// add renderer canvas to window body
 					APP.els.showcase.append(renderer.domElement);
+
+					Self.items.light = dirLight;
+					Self.items.camera = camera;
+					Self.items.cameraRig = cameraRig;
+					Self.items.shadowCam = shadowCam;
+					Self.items.scene = scene;
 					break;
 				case "init-player":
 					// create FPS controller
@@ -141,10 +151,10 @@ let Viewport = (() => {
 					});
 					break;
 				case "reset-camera":
-					camera.position.set(...event.position);
-					camera.lookAt(...event.lookAt);
-					camera.updateProjectionMatrix();
-					shadowCam.updateProjectionMatrix();
+					Self.items.camera.position.set(...event.position);
+					Self.items.camera.lookAt(...event.lookAt);
+					Self.items.camera.updateProjectionMatrix();
+					Self.items.shadowCam.updateProjectionMatrix();
 					break;
 				case "refresh-theme-values":
 					// prepare to update three.js
@@ -229,11 +239,11 @@ let Viewport = (() => {
 						let lMesh = new THREE.Mesh(lGeo);
 						let lObj = new OutlineMesh(lMesh, mtlLine);
 						oGroup.add(lObj);
-						// name of piece as group name
+						// name of item as group name
 						oGroup.name = c.name;
 						// oGroup.visible = false;
-						// save references to pieces
-						vp.pieces[c.name] = oGroup;
+						// save references to items
+						Self.items[c.name] = oGroup;
 						// insert in to scene
 						objectGroup.add(oGroup);
 					});
