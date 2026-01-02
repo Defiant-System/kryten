@@ -26,6 +26,7 @@ let Viewport = (() => {
 		scene,
 		camera,
 		cameraRig = new THREE.Object3D(),
+		lookTarget = new THREE.Object3D(),
 		dirLight,
 		shadowCam,
 		floor,
@@ -80,6 +81,9 @@ let Viewport = (() => {
 					// cameraRig.add(camera);
 					// cameraRig.name = "cameraRig";
 					// cameraRig.position.set(.65, .75, 1.5);
+
+					lookTarget.name = "lookTarget";
+
 					// orbit controls
 					orbit = new OrbitControls(camera, renderer.domElement);
 					orbit.enableZoom = false;
@@ -129,6 +133,7 @@ let Viewport = (() => {
 
 					Self.items.light = dirLight;
 					Self.items.camera = camera;
+					Self.items.lookTarget = lookTarget;
 					Self.items.cameraRig = cameraRig;
 					Self.items.shadowCam = shadowCam;
 					Self.items.scene = scene;
@@ -151,8 +156,10 @@ let Viewport = (() => {
 					});
 					break;
 				case "reset-camera":
+					Self.items.lookTarget.position.set(...event.lookAt);
+
 					Self.items.camera.position.set(...event.position);
-					Self.items.camera.lookAt(...event.lookAt);
+					Self.items.camera.lookAt(Self.items.lookTarget.position);
 					Self.items.camera.updateProjectionMatrix();
 					Self.items.shadowCam.updateProjectionMatrix();
 					break;

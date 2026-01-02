@@ -10,11 +10,12 @@
 	</Meta>
 	<Timeline>
 		<Step><!-- step 1 -->
-			<!-- --><Track name="001-rising" item="001" attr=".position[y]" times="[0,1,2]" values="[0,0.5,0]" repeat="2"/>
+			<Track name="001-rising" item="001" attr=".position[y]" times="[0,1,2]" values="[0,0.5,0]" repeat="2"/>
 			<Track name="002-rotate" item="002" attr=".rotation[y]" times="[0,1,2]" values="[0,0.5,0]" loop="true"/>
 			<Track name="003-rise" item="003" attr=".position[y]" times="[0,0.25,2]" values="[0,0.25,0]"/>
 			
-			<Track name="camera-zoom" item="camera" attr=".position" times="[0,0.25,2]" values="[0,0.25,0]"/>
+			<Track name="camera-zoom" item="camera" attr=".position" times="[0,2]" values="[1,1,2,1,2,3]"/>
+			<!-- <Track name="camera-zoom" item="lookTarget" attr=".position" times="[0,2]" values="[0,0,0,1,0,0]"/> -->
 		</Step>
 	</Timeline>
 	<Pieces>

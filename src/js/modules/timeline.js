@@ -16,7 +16,13 @@ let Timeline = (() => {
 		tick(time, delta) {
 			if (step !== undefined && tape[step] !== undefined) {
 				let clockDelta = clock.getDelta();
-				tape[step].map(track => track.mixer.update(clockDelta));
+				tape[step].map(track => {
+					track.mixer.update(clockDelta);
+					if (track.item.name === "lookTarget") {
+						console.log(111);
+						Viewport.items.camera.lookAt(track.item.position);
+					}
+				});
 			}
 		},
 		dispatch(event) {
@@ -36,21 +42,9 @@ let Timeline = (() => {
 				case "add-step":
 					// reserv step on tape
 					if (!tape[event.step]) tape[event.step] = [];
-					track = new THREE.NumberKeyframeTrack(event.track.attr, event.track.times, event.track.values);
+					let trackType = ["camera", "lookTarget"].includes(event.track.item) ? "VectorKeyframeTrack" : "NumberKeyframeTrack";
+					track = new THREE[trackType](event.track.attr, event.track.times, event.track.values);
 					item = Viewport.items[event.track.item];
-
-					if (event.track.item === "camera") {
-						track = new THREE.VectorKeyframeTrack(
-							".position",
-							[0, 2],
-							[
-								1,1,2,
-								1,2,3,
-							]
-						);
-						// Viewport.items.cameraRig.position.set(1,1,2);
-						// return;
-					}
 
 					mixer = new THREE.AnimationMixer(item);
 					clip = new THREE.AnimationClip(event.track.name, Math.max(...event.track.times), [track]);
