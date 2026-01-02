@@ -55,9 +55,11 @@ class File {
 				let track = {};
 				track.times = JSON.parse(xTrack.getAttribute("times"));
 				track.values = JSON.parse(xTrack.getAttribute("values"));
-				track.attr = ".position[y]";
+				track.attr = xTrack.getAttribute("attr");
 				track.piece = xTrack.getAttribute("piece");
 				track.name = xTrack.getAttribute("name");
+				if (xTrack.getAttribute("repeat")) track.repeat = +xTrack.getAttribute("repeat");
+				if (xTrack.getAttribute("loop")) track.loop = xTrack.getAttribute("loop") === "true";
 				Timeline.dispatch({ type: "add-step", step: i, track });
 			});
 		});

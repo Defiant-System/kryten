@@ -24,6 +24,7 @@ let Timeline = (() => {
 		dispatch(event) {
 			let Self = tl,
 				APP = Self.APP,
+				loop,
 				attr,
 				times,
 				values,
@@ -36,21 +37,26 @@ let Timeline = (() => {
 			switch (event.type) {
 				case "add-step":
 					// reserv step on tape
-					tape[event.step] = [];
+					if (!tape[event.step]) tape[event.step] = [];
 					track = new THREE.NumberKeyframeTrack(event.track.attr, event.track.times, event.track.values);
 					piece = Viewport.pieces[event.track.piece];
 					mixer = new THREE.AnimationMixer(piece);
 					clip = new THREE.AnimationClip(event.track.name, Math.max(...event.track.times), [track]);
-					
+					// set loop value
+					switch (true) {
+						case event.track.repeat > 0: loop = [THREE.LoopRepeat, event.track.repeat]; break;
+						case event.track.loop: loop = [THREE.LoopRepeat]; break;
+						default: loop = [THREE.LoopOnce];
+					}
+					// action + mixer
 					action = mixer.clipAction(clip);
-					action.setLoop(THREE.LoopRepeat, 1);
-
+					action.setLoop(...loop);
+					// add track to "tape"
 					tape[event.step].push({ piece, track, mixer, action });
 					break;
 				case "play-step":
 					step = +event.step - 1;
-					track = +event.track - 1;
-					tape[step][track].action.play();
+					tape[step].map(track => track.action.play());
 					break;
 				case "play-next":
 					testPiece = Viewport.pieces[event.arg];
