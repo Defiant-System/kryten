@@ -1,6 +1,28 @@
 
-@import "./areas/viewport.js";
+// import libs
+let {
+	THREE,
+	THREE_dispose,
+
+	ToIndexed,
+	OutlineMaterial,
+	OutlineMesh,
+	ColoredShadowMaterial,
+
+	EffectComposer,
+	RenderPass,
+	ShaderPass,
+	OutlinePass,
+	FXAAShader,
+
+	OBJLoader,
+	OrbitControls,
+} = await window.fetch("~/js/bundle.js");
+
+
 @import "./classes/file.js"
+@import "./areas/viewport.js";
+@import "./modules/timeline.js";
 @import "./modules/test.js"
 
 
@@ -17,6 +39,7 @@ const kryten = {
 			.filter(i => typeof this[i].init === "function")
 			.map(i => this[i].init(this));
 
+		Timeline.init(this);
 		Viewport.init(this);
 		
 		// DEV-ONLY-START

@@ -8,6 +8,7 @@ let Test = {
 
 		// setTimeout(() => Viewport.fpsControl.start(), 500);
 		setTimeout(() => Viewport.fpsControl.stop(), 5000);
-		setTimeout(() => Viewport.dispatch({ type: "test-piece", arg: "Cube.025" }), 1000);
+		setTimeout(() => Timeline.dispatch({ type: "test-piece", arg: "001" }), 1000);
+		// setTimeout(() => Viewport.dispatch({ type: "test-piece", arg: "Cube.025" }), 1000);
 	}
 };

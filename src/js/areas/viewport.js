@@ -1,25 +1,4 @@
 
-// import libs
-let {
-	THREE,
-	THREE_dispose,
-
-	ToIndexed,
-	OutlineMaterial,
-	OutlineMesh,
-	ColoredShadowMaterial,
-
-	EffectComposer,
-	RenderPass,
-	ShaderPass,
-	OutlinePass,
-	FXAAShader,
-
-	OBJLoader,
-	OrbitControls,
-} = await window.fetch("~/js/bundle.js");
-
-
 let Viewport = (() => {
 
 	let width = window.innerWidth,
@@ -71,6 +50,8 @@ let Viewport = (() => {
 		init(APP) {
 			// save reference to app
 			this.APP = APP;
+			// memory record
+			this.pieces = {};
 
 			this.dispatch({ type: "refresh-theme-values" });
 			this.dispatch({ type: "init-viewport" });
@@ -107,8 +88,8 @@ let Viewport = (() => {
 					dirLight.shadow.mapSize.height = 1024;
 					// shadows setup
 					shadowCam = dirLight.shadow.camera;
-					shadowCam.left = shadowCam.bottom = -1;
-					shadowCam.right = shadowCam.top = 1;
+					shadowCam.left = shadowCam.bottom = -2;
+					shadowCam.right = shadowCam.top = 2;
 					scene.add(dirLight);
 					
 					/* postprocessing
@@ -133,7 +114,7 @@ let Viewport = (() => {
 						new THREE.ShadowMaterial({ color: 0xffffff, opacity: 0, transparent: true })
 					);
 					floor.rotation.x = - Math.PI / 2;
-					floor.scale.setScalar(20);
+					floor.scale.setScalar(50);
 					floor.receiveShadow = true;
 					scene.add(floor);
 					// view object setup
@@ -148,8 +129,8 @@ let Viewport = (() => {
 						fps: 50,
 						// autoplay: true,
 						callback(time, delta) {
-							// let item = scene.getObjectByName("Cube.025");
-							// item.rotation.y -= 0.005;
+							Timeline.tick(time, delta);
+
 							objectGroup.rotation.y -= 0.005;
 							// objectGroup.rotation.x += 0.02;
 							// objectGroup.rotation.z += 0.015;
@@ -204,9 +185,11 @@ let Viewport = (() => {
 					item.position.set(...event.geo.position);
 					// rotation in relation to the camera
 					[x, y, z] = event.geo.rotation;
-					item.rotation.x += Math.PI * x;
-					item.rotation.y += Math.PI * y;
-					item.rotation.z += Math.PI * z;
+					item.rotation.x += (Math.PI/180) * x;
+					item.rotation.y += (Math.PI/180) * y;
+					item.rotation.z += (Math.PI/180) * z;
+					// set mesh id/name
+					item.name = event.geo.id;
 					// add item to original model
 					originalModel.add(item);
 					break;
@@ -223,6 +206,8 @@ let Viewport = (() => {
 					originalModel.traverse(c => {
 						if (!c.isMesh) return;
 						let oGroup = new THREE.Group();
+						oGroup.position.set(...c.position.toArray());
+						oGroup.rotation.set(...c.rotation.toArray());
 						// shadow material
 						let sGeo = c.geometry.clone();
 						let sMesh = new THREE.Mesh(sGeo, mtlShadow);
@@ -230,12 +215,16 @@ let Viewport = (() => {
 						sMesh.castShadow = true;
 						oGroup.add(sMesh);
 						// outlines
-						let lGeo = sGeo.clone().toIndexed(false);
+						let lGeo = sGeo.clone();
+						if (!lGeo.index) lGeo = lGeo.toIndexed(false);
 						let lMesh = new THREE.Mesh(lGeo);
 						let lObj = new OutlineMesh(lMesh, mtlLine);
 						oGroup.add(lObj);
 						// name of piece as group name
 						oGroup.name = c.name;
+						// oGroup.visible = false;
+						// save references to pieces
+						vp.pieces[c.name] = oGroup;
 						// insert in to scene
 						objectGroup.add(oGroup);
 					});
@@ -248,9 +237,6 @@ let Viewport = (() => {
 						floor.material.opacity = .2;
 						floor.position.y = firstGeo.geometry.boundingBox.min.y - .025;
 					}
-					break;
-				case "test-piece":
-					item = scene.getObjectByName(event.arg);
 					break;
 			}
 		}

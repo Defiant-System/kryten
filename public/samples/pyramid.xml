@@ -10,7 +10,7 @@
 	</Meta>
 	<Steps />
 	<Pieces>
-		<i id="001"><![CDATA[# Blender 4.1.1
+		<i><![CDATA[# Blender 4.1.1
 # www.blender.org
 mtllib pyramid.mtl
 o Cube.028

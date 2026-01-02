@@ -33,6 +33,7 @@ class File {
 			switch (type) {
 				case "basic":
 					// basic THREE build-in geometries
+					geo.id = xPiece.getAttribute("id");
 					geo.name = xPiece.getAttribute("name");
 					geo.args = JSON.parse(xPiece.getAttribute("args"));
 					geo.position = JSON.parse(xPiece.getAttribute("position"));
