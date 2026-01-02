@@ -16,7 +16,7 @@
 			<Menu name="Antique" click="set-ui-theme" arg="antique" check-group="ui-theme"/>
 			<Menu type="divider"/>
 			<Menu type="caption" name="Lines:"/>
-			<Menu type="slider" min="1" max="100" value="10" change="change-edges-threshold"/>
+			<Menu type="slider" min="1" max="179" value="20" change="change-edges-threshold"/>
 			<Menu type="divider"/>
 			<Menu name="Play/Pause" click="toggle-play-pause"/>
 		</Menu>

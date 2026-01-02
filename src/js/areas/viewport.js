@@ -175,6 +175,15 @@ let Viewport = (() => {
 								break;
 						}
 					});
+					if (floor) {
+						// update floor color
+						floor.material.color.set(theme.floorColor);
+						floor.material.opacity = .2;
+					}
+					break;
+				case "change-edges-threshold":
+					// update material angle threshold
+					mtlLine.angleThreshold = +event.arg;
 					break;
 				case "insert-basic-geometry":
 					// loop values
@@ -233,8 +242,6 @@ let Viewport = (() => {
 									? originalModel.children[0]
 									: originalModel.children[0].children[0];
 					if (firstGeo.geometry) {
-						floor.material.color.set(theme.floorColor);
-						floor.material.opacity = .2;
 						floor.position.y = firstGeo.geometry.boundingBox.min.y - .025;
 					}
 					break;

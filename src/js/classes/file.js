@@ -49,6 +49,10 @@ class File {
 		// update viewport & start player
 		Viewport.dispatch({ type: "update-models" });
 
+		// prepare steps
+		let xSteps = this._file.data.selectNodes(`//Timeline/Step`);
+		Timeline.dispatch({ type: "timeline-steps", steps: xSteps });
+
 		// update camera
 		let xCamera = this._file.data.selectSingleNode(`./Meta/*[@id="camera"]`),
 			position = JSON.parse(xCamera.getAttribute("position")),

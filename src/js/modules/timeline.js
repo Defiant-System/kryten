@@ -36,6 +36,7 @@ let Timeline = (() => {
 			// save reference to app
 			this.APP = APP;
 
+			// setTimeout(() => this.dispatch({ type: "play-next" }), 500);
 		},
 		tick(time, delta) {
 			if (testPiece) {
@@ -49,10 +50,12 @@ let Timeline = (() => {
 			let Self = tl,
 				APP = Self.APP,
 				item;
+			// console.log(event);
 			switch (event.type) {
-				case "setup-timeline":
+				case "timeline-steps":
+					console.log(event);
 					break;
-				case "test-piece":
+				case "play-next":
 					testPiece = Viewport.pieces[event.arg];
 					// if (!testPiece) return;
 					// testPiece.visible = true;
