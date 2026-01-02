@@ -50,8 +50,17 @@ class File {
 		Viewport.dispatch({ type: "update-models" });
 
 		// prepare steps
-		let xSteps = this._file.data.selectNodes(`//Timeline/Step`);
-		Timeline.dispatch({ type: "timeline-steps", steps: xSteps });
+		this._file.data.selectNodes(`./Timeline/Step`).map((xStep, i) => {
+			xStep.selectNodes(`./Track`).map((xTrack, j) => {
+				let track = {};
+				track.times = JSON.parse(xTrack.getAttribute("times"));
+				track.values = JSON.parse(xTrack.getAttribute("values"));
+				track.attr = ".position[y]";
+				track.piece = xTrack.getAttribute("piece");
+				track.name = xTrack.getAttribute("name");
+				Timeline.dispatch({ type: "add-step", step: i, track });
+			});
+		});
 
 		// update camera
 		let xCamera = this._file.data.selectSingleNode(`./Meta/*[@id="camera"]`),

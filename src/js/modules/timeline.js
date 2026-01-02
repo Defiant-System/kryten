@@ -2,33 +2,8 @@
 let Timeline = (() => {
 
 	let clock = new THREE.Clock();
-
-	// Animate position.y
-	// let track1 = new THREE.NumberKeyframeTrack(
-	//   ".position[y]",
-	//   [0, 0.3, 0.5, 0.7, 1.0],
-	//   [0, 0.6, 0.7, 0.6, 0]
-	// );
-
-	// Animate rotation.y
-	let track1 = new THREE.NumberKeyframeTrack(
-	  ".position[y]",
-	  [0, 4],
-	  [0, .75]
-	);
-
-	// Animate rotation.y
-	let track2 = new THREE.NumberKeyframeTrack(
-	  ".rotation[y]",
-	  [0, 4],
-	  [0, Math.PI * 2]
-	);
-
-	// Create animation clip (duration = 1 second)
-	let clip = new THREE.AnimationClip("bounce", Math.max(...track1.times), [track1, track2]);
-	let mixer,
-		action,
-		testPiece;
+	let tape = {};
+	let step;
 
 
 	let tl = {
@@ -39,21 +14,43 @@ let Timeline = (() => {
 			// setTimeout(() => this.dispatch({ type: "play-next" }), 500);
 		},
 		tick(time, delta) {
-			if (testPiece) {
+			if (step !== undefined) {
 				// testPiece.rotation.y += 0.01;
 
 				let clockDelta = clock.getDelta();
-				mixer.update(clockDelta);
+				tape[step].map(track => track.mixer.update(clockDelta));
 			}
 		},
 		dispatch(event) {
 			let Self = tl,
 				APP = Self.APP,
-				item;
+				attr,
+				times,
+				values,
+				piece,
+				clip,
+				track,
+				action,
+				mixer;
 			// console.log(event);
 			switch (event.type) {
-				case "timeline-steps":
-					console.log(event);
+				case "add-step":
+					// reserv step on tape
+					tape[event.step] = [];
+					track = new THREE.NumberKeyframeTrack(event.track.attr, event.track.times, event.track.values);
+					piece = Viewport.pieces[event.track.piece];
+					mixer = new THREE.AnimationMixer(piece);
+					clip = new THREE.AnimationClip(event.track.name, Math.max(...event.track.times), [track]);
+					
+					action = mixer.clipAction(clip);
+					action.setLoop(THREE.LoopRepeat, 1);
+
+					tape[event.step].push({ piece, track, mixer, action });
+					break;
+				case "play-step":
+					step = +event.step - 1;
+					track = +event.track - 1;
+					tape[step][track].action.play();
 					break;
 				case "play-next":
 					testPiece = Viewport.pieces[event.arg];
@@ -61,20 +58,17 @@ let Timeline = (() => {
 					// testPiece.visible = true;
 
 					mixer = new THREE.AnimationMixer(testPiece);
-
 					mixer.addEventListener("finished", (event) => {
 						if (event.action === action) {
 							console.log("Action finished!");
 						}
 					});
-
 					action = mixer.clipAction(clip);
 					
 					// action.setLoop(THREE.LoopRepeat);
 					// action.setLoop(THREE.LoopOnce, 1);
 					action.setLoop(THREE.LoopRepeat, 1);
 					// action.clampWhenFinished = true;
-
 					action.play();
 
 					// setTimeout(() => action.stop(), 500);

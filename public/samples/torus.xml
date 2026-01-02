@@ -9,8 +9,8 @@
 		<i id="light" position="[7,6,-1]" color="#fff"/>
 	</Meta>
 	<Timeline>
-		<Step num="1">
-			<Track piece="001" start="2" duration="3" pos1="[0,0,0]" pos2="[0,1,0]"/>
+		<Step><!-- step 1 -->
+			<Track name="001-rising" piece="001" attr=".position[y]" times="[0,1]" values="[0,0.5]"/>
 		</Step>
 	</Timeline>
 	<Pieces>
