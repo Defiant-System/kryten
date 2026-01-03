@@ -21,7 +21,7 @@ let {
 
 
 @import "./classes/file.js"
-@import "./areas/viewport.js";
+@import "./modules/viewport.js";
 @import "./modules/timeline.js";
 @import "./modules/test.js"
 
@@ -86,6 +86,16 @@ const kryten = {
 			case "change-edges-threshold":
 				Viewport.dispatch(event);
 				break;
+			default:
+				el = event.el;
+				if (!el && event.origin) el = event.origin.el;
+				if (el) {
+					let pEl = el.parents(`?div[data-area]`);
+					if (pEl.length) {
+						let name = pEl.data("area");
+						return Self[name].dispatch(event);
+					}
+				}
 		}
 	},
 	openLocal(url) {
@@ -112,7 +122,8 @@ const kryten = {
 				})
 				.catch(err => reject(err));
 		});
-	}
+	},
+	timeline: @import "./areas/timeline.js",
 };
 
 window.exports = kryten;
