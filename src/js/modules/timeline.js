@@ -32,6 +32,7 @@ let Timeline = (() => {
 				times,
 				values,
 				item,
+				items,
 				clip,
 				track,
 				action,
@@ -61,6 +62,20 @@ let Timeline = (() => {
 					tape[event.step].push({ item, track, mixer, action });
 					break;
 				case "play-step":
+					step = +event.step - 1;
+					if (tape[step]) tape[step].map(track => track.action.play());
+					break;
+				case "goto-step":
+					// hide meshes after "event step"
+					items = [];
+					Object.keys(tape).filter(i => i < event.step).map(i => {
+						tape[i].map(step => {
+							items.push(step.item.name);
+						});
+					});
+					Viewport.dispatch({ type: "show-only-models", items });
+
+					// start playing step
 					step = +event.step - 1;
 					if (tape[step]) tape[step].map(track => track.action.play());
 					break;

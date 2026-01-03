@@ -13,6 +13,26 @@ content {
 	right: 0;
 	bottom: 0;
 	border-radius: inherit;
+	
+	[class*="icon-"],
+	[class^="icon-"] {
+		position: relative;
+		display: inline-block;
+		vertical-align: middle;
+		width: 21px;
+		height: 21px;
+		background-size: cover;
+		background-repeat: no-repeat;
+		background-position: 50% 50%;
+		// filter: invert(1) brightness(3) opacity(.8) drop-shadow(0 1px 0 #0002);
+		// background: #f00;
+		
+		&.icon-play { background-image: url(~/icons/icon-play.png); }
+		&.icon-pause { background-image: url(~/icons/icon-pause.png); }
+		&.icon-forward { background-image: url(~/icons/icon-forward.png); }
+		&.icon-rewind { background-image: url(~/icons/icon-rewind.png); }
+		&.icon-restart { background-image: url(~/icons/icon-restart.png); }
+	}
 
 	.showcase {
 		position: absolute;

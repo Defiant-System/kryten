@@ -33,7 +33,7 @@ class File {
 			switch (type) {
 				case "basic":
 					// basic THREE build-in geometries
-					geo.id = xPiece.getAttribute("id");
+					geo.id = "--"+ xPiece.getAttribute("id");
 					geo.name = xPiece.getAttribute("name");
 					geo.args = JSON.parse(xPiece.getAttribute("args"));
 					geo.position = JSON.parse(xPiece.getAttribute("position"));
@@ -56,8 +56,8 @@ class File {
 				track.times = JSON.parse(xTrack.getAttribute("times"));
 				track.values = JSON.parse(xTrack.getAttribute("values"));
 				track.attr = xTrack.getAttribute("attr");
-				track.item = xTrack.getAttribute("item");
 				track.name = xTrack.getAttribute("name");
+				track.item = "--"+ xTrack.getAttribute("item");
 				if (xTrack.getAttribute("repeat")) track.repeat = +xTrack.getAttribute("repeat");
 				if (xTrack.getAttribute("loop")) track.loop = xTrack.getAttribute("loop") === "true";
 				Timeline.dispatch({ type: "add-step", step: i, track });

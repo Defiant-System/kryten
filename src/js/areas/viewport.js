@@ -146,9 +146,7 @@ let Viewport = (() => {
 						callback(time, delta) {
 							Timeline.tick(time, delta);
 
-							objectGroup.rotation.y -= 0.005;
-							// objectGroup.rotation.x += 0.02;
-							// objectGroup.rotation.z += 0.015;
+							// objectGroup.rotation.y -= 0.005;
 
 							if (postprocess) composer.render();
 							else renderer.render(scene, camera);
@@ -227,6 +225,11 @@ let Viewport = (() => {
 					});
 					originalModel.add(item);
 					break;
+				case "show-only-models":
+					Object.keys(Self.items).filter(k => k.startsWith("--")).map(key => {
+						Self.items[key].visible = event.items.includes(key);
+					});
+					break;
 				case "update-models":
 					// return console.log(originalModel);
 					originalModel.traverse(c => {
@@ -248,7 +251,6 @@ let Viewport = (() => {
 						oGroup.add(lObj);
 						// name of item as group name
 						oGroup.name = c.name;
-						// oGroup.visible = false;
 						// save references to items
 						Self.items[c.name] = oGroup;
 						// insert in to scene
