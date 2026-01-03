@@ -58,12 +58,32 @@ let Timeline = (() => {
 					action = mixer.clipAction(clip);
 					action.setLoop(...loop);
 					action.clampWhenFinished = true;
+
+					mixer.addEventListener("finished", e => Self.dispatch({ type: "anim-finished", originalEvent: e }));
 					// add track to "tape"
 					tape[event.step].push({ item, track, mixer, action });
 					break;
+				case "anim-finished":
+					if (Self.activestep === Object.keys(tape).length) {
+						APP.timeline.dispatch({ type: "build-completed" });
+					}
+					console.log(event);
+					break;
 				case "play-step":
 					step = +event.step - 1;
-					if (tape[step]) tape[step].map(track => track.action.play());
+					if (tape[step]) {
+						tape[step].map(track => track.action.play());
+						// save reference
+						Self.activestep = step;
+					}
+					break;
+				case "goto-prev-step":
+					step = Self.activestep - 1;
+					Self.dispatch({ type: "goto-step", step });
+					break;
+				case "goto-next-step":
+					step = Self.activestep + 1;
+					Self.dispatch({ type: "goto-step", step });
 					break;
 				case "goto-step":
 					// hide meshes after "event step"
@@ -77,7 +97,11 @@ let Timeline = (() => {
 
 					// start playing step
 					step = +event.step - 1;
-					if (tape[step]) tape[step].map(track => track.action.play());
+					if (tape[step]) {
+						tape[step].map(track => track.action.play());
+						// save reference
+						Self.activestep = +event.step;
+					}
 					break;
 			}
 		}

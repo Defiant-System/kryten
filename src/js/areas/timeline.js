@@ -1,5 +1,5 @@
 
-// ozil.timeline
+// kryten.timeline
 
 {
 	init() {
@@ -15,9 +15,9 @@
 		// console.log(event);
 		switch (event.type) {
 			// custom events
-			case "goto-next-step":
 			case "goto-prev-step":
-				console.log(event);
+			case "goto-next-step":
+				Timeline.dispatch(event);
 				break;
 			case "goto-step":
 				Timeline.dispatch({ type: "goto-step", step: +event.arg });
@@ -25,6 +25,9 @@
 			case "toggle-play":
 				if (Viewport.fpsControl._stopped) Viewport.fpsControl.play();
 				else Viewport.fpsControl.stop();
+				break;
+			case "build-completed":
+				Self.els.content.addClass("build-finished");
 				break;
 		}
 	}
