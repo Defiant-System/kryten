@@ -9,7 +9,7 @@
 		<i id="light" position="[7,6,-1]" color="#fff"/>
 	</Meta>
 	<Timeline>
-		<Start>
+		<Start duration="1">
 			<Item object="camera" position="[0,1,2]" lookAt="[0,0,0]"/>
 			<Item object="root" position="[0,0,0]" rotation="[0,0,0]"/>
 			<Item object="001" position1="[0,0,0]" rotation1="[0,0,0]"/>

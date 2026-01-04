@@ -85,8 +85,10 @@ class File {
 	}
 
 	getState(step) {
-		let state = [];
-		this._file.data.selectNodes(`//Timeline/Start/Item`).map(xItem => {
+		let state = [],
+			duration = +this._file.data.selectSingleNode(`//Timeline/Start`).getAttribute("duration"),
+			startItems = this._file.data.selectNodes(`//Timeline/Start/Item`);
+		startItems.map(xItem => {
 			let values = {};
 			[...xItem.attributes].map(k => {
 				let v = k.nodeValue;
@@ -96,7 +98,7 @@ class File {
 			});
 			state.push(values);
 		});
-		return state;
+		return { state, duration };
 	}
 
 	toBlob(kind) {

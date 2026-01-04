@@ -46,17 +46,16 @@ let Timeline = (() => {
 					// pause "auto-rotation"
 					Self.paused = false;
 					// accumulate scene / objects state
-					values = APP.file.getState("start");
-					// Viewport.dispatch({ type: "reset-view", values });
-					Self.dispatch({ type: "transition-to-start", values });
+					let { state, duration } = APP.file.getState("start");
+					Self.dispatch({ type: "transition-to-start", state, duration });
 					break;
 				case "transition-to-start":
 					// add tracks before steps to "tape" - from current to start state
 					tape.unshift(null);
 					// transition duration
-					times = [0,1];
+					times = [0, event.duration];
 					
-					event.values.map(entry => {
+					event.state.map(entry => {
 						let item = Viewport.objects[entry.object];
 						switch (true) {
 							case entry.object === "camera":
@@ -71,8 +70,8 @@ let Timeline = (() => {
 								Self.dispatch({ type: "add-step", step: 0, track });
 								break;
 							default:
-								if (entry.hidden) {
-									item.visible = false;
+								if (entry.hidden !== undefined) {
+									item.visible = entry.hidden !== true;
 								}
 								if (entry.position) {
 									entry.position.map((aV, i) => {

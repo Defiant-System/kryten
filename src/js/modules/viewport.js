@@ -235,14 +235,13 @@ let Viewport = (() => {
 					});
 					originalModel.add(object);
 					break;
-				case "reset-view":
+				case "reset-view": // DEPRICATED ?
 					// set up scene
 					event.values.map(entry => {
 						let object = Self.objects[entry.object];
 						switch (true) {
 							case entry.object === "camera":
 								Self.dispatch({ ...entry, type: "reset-camera" });
-								// Timeline.dispatch({ type: "test-transition" });
 								break;
 							default:
 								if (entry.hidden) {
