@@ -11,6 +11,8 @@ let Timeline = (() => {
 			// save reference to app
 			this.APP = APP;
 
+			this.paused = true;
+
 			// setTimeout(() => this.dispatch({ type: "play-next" }), 500);
 		},
 		tick(time, delta) {
@@ -39,6 +41,9 @@ let Timeline = (() => {
 				mixer;
 			// console.log(event);
 			switch (event.type) {
+				case "goto-start":
+					Self.paused = false;
+					break;
 				case "add-step":
 					// reserv step on tape
 					if (!tape[event.step]) tape[event.step] = [];

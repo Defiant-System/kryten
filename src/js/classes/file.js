@@ -33,7 +33,7 @@ class File {
 			switch (type) {
 				case "basic":
 					// basic THREE build-in geometries
-					geo.id = "--"+ xPiece.getAttribute("id");
+					geo.id = xPiece.getAttribute("id");
 					geo.name = xPiece.getAttribute("name");
 					geo.args = JSON.parse(xPiece.getAttribute("args"));
 					geo.position = JSON.parse(xPiece.getAttribute("position"));
@@ -58,12 +58,17 @@ class File {
 				track.values = JSON.parse(xTrack.getAttribute("values"));
 				track.attr = xTrack.getAttribute("attr");
 				track.name = xTrack.getAttribute("name");
-				track.item = "--"+ xTrack.getAttribute("item");
+				track.item = xTrack.getAttribute("item");
 				if (xTrack.getAttribute("repeat")) track.repeat = +xTrack.getAttribute("repeat");
 				if (xTrack.getAttribute("loop")) track.loop = xTrack.getAttribute("loop") === "true";
 				Timeline.dispatch({ type: "add-step", step: i, track });
 			});
 		});
+
+		let xShadowCam = this._file.data.selectSingleNode(`./Meta/*[@id="shadowCam"]`),
+			values = { top: 2, left: -2, bottom: -2, right: 2 };
+		if (xShadowCam) Object.keys(values).map(k => values[k] = +xShadowCam.getAttribute(k));
+		Viewport.dispatch({ type: "reset-shadow-cam", values });
 
 		// update camera
 		let xCamera = this._file.data.selectSingleNode(`./Meta/*[@id="camera"]`),

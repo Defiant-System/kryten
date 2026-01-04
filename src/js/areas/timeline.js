@@ -15,6 +15,7 @@
 		// console.log(event);
 		switch (event.type) {
 			// custom events
+			case "goto-start":
 			case "goto-prev-step":
 			case "goto-next-step":
 				Timeline.dispatch(event);

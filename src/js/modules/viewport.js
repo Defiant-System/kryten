@@ -86,6 +86,7 @@ let Viewport = (() => {
 
 					// orbit controls
 					orbit = new OrbitControls(camera, renderer.domElement);
+					// orbit.enableDamping = true;
 					orbit.enableZoom = false;
 					// lights setup
 					dirLight = new THREE.DirectionalLight(0xffffff, 1.0);
@@ -96,8 +97,8 @@ let Viewport = (() => {
 					dirLight.shadow.mapSize.height = 1024;
 					// shadows setup
 					shadowCam = dirLight.shadow.camera;
-					shadowCam.left = shadowCam.bottom = -20;
-					shadowCam.right = shadowCam.top = 20;
+					shadowCam.left = shadowCam.bottom = -5;
+					shadowCam.right = shadowCam.top = 5;
 					scene.add(dirLight);
 					
 					/* postprocessing
@@ -146,7 +147,7 @@ let Viewport = (() => {
 						callback(time, delta) {
 							Timeline.tick(time, delta);
 
-							objectGroup.rotation.y -= 0.0025;
+							if (Timeline.paused) objectGroup.rotation.y -= 0.0025;
 
 							if (postprocess) composer.render();
 							else renderer.render(scene, camera);
@@ -158,6 +159,14 @@ let Viewport = (() => {
 					Self.items.camera.position.set(...event.position);
 					Self.items.camera.lookAt(Self.items.lookTarget.position);
 					Self.items.camera.updateProjectionMatrix();
+					// update orbit controls
+					orbit.target.copy(Self.items.lookTarget.position);
+					break;
+				case "reset-shadow-cam":
+					Self.items.shadowCam.top = event.values.top;
+					Self.items.shadowCam.left = event.values.left;
+					Self.items.shadowCam.bottom = event.values.bottom;
+					Self.items.shadowCam.right = event.values.right;
 					Self.items.shadowCam.updateProjectionMatrix();
 					break;
 				case "refresh-theme-values":
@@ -256,12 +265,16 @@ let Viewport = (() => {
 						// name of item as group name
 						oGroup.name = c.name;
 						// hide "helper" meshes
-						if (oGroup.name.startsWith("--")) oGroup.visible = false;
+						if (oGroup.name.startsWith("--")) {
+							oGroup.visible = false;
+						}
 						// save references to items
 						Self.items[c.name] = oGroup;
 						// insert in to scene
 						objectGroup.add(oGroup);
 					});
+					// regerence to root group
+					Self.items.root = objectGroup;
 					// update floor
 					floor.material.color.set(theme.floorColor);
 					floor.material.opacity = .2;

@@ -9,6 +9,12 @@
 		<i id="light" position="[7,6,-1]" color="#fff"/>
 	</Meta>
 	<Timeline>
+		<Start>
+			<Group item="root"/>
+			<Group item="001"/>
+			<Group item="002" state="hidden"/>
+			<Group item="003" state="hidden"/>
+		</Start>
 		<Step><!-- step 1 -->
 			<Track name="001-rising" item="001" attr=".position[y]" times="[0,1,2]" values="[0,0.5,0]"/>
 		</Step>
