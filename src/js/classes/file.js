@@ -39,8 +39,9 @@ class File {
 					geo.position = JSON.parse(xPiece.getAttribute("position"));
 					geo.rotation = JSON.parse(xPiece.getAttribute("rotation"));
 					break;
+				case "compound":
 				default:
-					type = "OBJ";
+					if (!type) type = "OBJ";
 					geo.str = xPiece.textContent;
 			}
 			Viewport.dispatch({ type: `insert-${type}-geometry`, geo });

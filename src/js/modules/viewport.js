@@ -96,8 +96,8 @@ let Viewport = (() => {
 					dirLight.shadow.mapSize.height = 1024;
 					// shadows setup
 					shadowCam = dirLight.shadow.camera;
-					shadowCam.left = shadowCam.bottom = -2;
-					shadowCam.right = shadowCam.top = 2;
+					shadowCam.left = shadowCam.bottom = -20;
+					shadowCam.right = shadowCam.top = 20;
 					scene.add(dirLight);
 					
 					/* postprocessing
@@ -146,7 +146,7 @@ let Viewport = (() => {
 						callback(time, delta) {
 							Timeline.tick(time, delta);
 
-							// objectGroup.rotation.y -= 0.005;
+							objectGroup.rotation.y -= 0.0025;
 
 							if (postprocess) composer.render();
 							else renderer.render(scene, camera);
@@ -155,7 +155,6 @@ let Viewport = (() => {
 					break;
 				case "reset-camera":
 					Self.items.lookTarget.position.set(...event.lookAt);
-
 					Self.items.camera.position.set(...event.position);
 					Self.items.camera.lookAt(Self.items.lookTarget.position);
 					Self.items.camera.updateProjectionMatrix();
@@ -217,6 +216,7 @@ let Viewport = (() => {
 					// add item to original model
 					originalModel.add(item);
 					break;
+				case "insert-compound-geometry":
 				case "insert-OBJ-geometry":
 					item = loader.parse(event.geo.str);
 					item.traverse(c => {
@@ -231,12 +231,16 @@ let Viewport = (() => {
 					});
 					break;
 				case "update-models":
-					// return console.log(originalModel);
+					// for floor
+					y = Infinity;
+					// prepare render objects
 					originalModel.traverse(c => {
 						if (!c.isMesh) return;
 						let oGroup = new THREE.Group();
 						oGroup.position.set(...c.position.toArray());
 						oGroup.rotation.set(...c.rotation.toArray());
+						// find out where floor should be
+						y = Math.min(y, c.geometry.boundingBox.min.y);
 						// shadow material
 						let sGeo = c.geometry.clone();
 						let sMesh = new THREE.Mesh(sGeo, mtlShadow);
@@ -251,21 +255,17 @@ let Viewport = (() => {
 						oGroup.add(lObj);
 						// name of item as group name
 						oGroup.name = c.name;
+						// hide "helper" meshes
+						if (oGroup.name.startsWith("--")) oGroup.visible = false;
 						// save references to items
 						Self.items[c.name] = oGroup;
 						// insert in to scene
 						objectGroup.add(oGroup);
 					});
 					// update floor
-					let firstGeo = originalModel.children[0].isMesh
-									? originalModel.children[0]
-									: originalModel.children[0].children[0];
-					if (firstGeo.geometry) {
-						// update floor color
-						floor.material.color.set(theme.floorColor);
-						floor.material.opacity = .2;
-						floor.position.y = firstGeo.geometry.boundingBox.min.y - .025;
-					}
+					floor.material.color.set(theme.floorColor);
+					floor.material.opacity = .2;
+					floor.position.y = y - .025;
 					break;
 			}
 		}
