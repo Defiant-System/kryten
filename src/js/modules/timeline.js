@@ -1,8 +1,9 @@
 
 let Timeline = (() => {
 
+	let AXIS = ["x", "y", "z"];
 	let clock = new THREE.Clock();
-	let tape = {};
+	let tape = [];
 	let step;
 
 
@@ -46,7 +47,63 @@ let Timeline = (() => {
 					Self.paused = false;
 					// accumulate scene / objects state
 					values = APP.file.getState("start");
-					Viewport.dispatch({ type: "reset-view", values });
+					// Viewport.dispatch({ type: "reset-view", values });
+					Self.dispatch({ type: "transition-to-start", values });
+					break;
+				case "transition-to-start":
+					// add tracks before steps to "tape" - from current to start state
+					tape.unshift(null);
+					// transition duration
+					times = [0,1];
+					
+					event.values.map(entry => {
+						let item = Viewport.objects[entry.object];
+						switch (true) {
+							case entry.object === "camera":
+								// anim track for position
+								values = item.position.toArray().concat(...entry.position);
+								track = { attr: ".position", name: "camera-move", object: "camera", times, values };
+								Self.dispatch({ type: "add-step", step: 0, track });
+								// anim track for target
+								item = Viewport.objects.lookTarget;
+								values = item.position.toArray().concat(...entry.lookAt);
+								track = { attr: ".position", name: "camera-target", object: "lookTarget", times, values };
+								Self.dispatch({ type: "add-step", step: 0, track });
+								break;
+							default:
+								if (entry.hidden) {
+									item.visible = false;
+								}
+								if (entry.position) {
+									entry.position.map((aV, i) => {
+										let axis = AXIS[i],
+											object = entry.object;
+										values = [item.position.toArray()[i], aV];
+										attr = `.position[${axis}]`;
+										name = `${entry.object}-position-${axis}`;
+										track = { attr, name, object, times, values };
+										// add individual axis animation
+										Self.dispatch({ type: "add-step", step: 0, track });
+									});
+								}
+								if (entry.rotation) {
+									entry.rotation.map((aV, i) => {
+										let axis = AXIS[i],
+											object = entry.object;
+										// translate from degress to radians
+										aV = (Math.PI/180) * aV;
+										values = [item.rotation.toArray()[i], aV];
+										attr = `.rotation[${axis}]`;
+										name = `${entry.object}-rotation-${axis}`;
+										track = { attr, name, object, times, values };
+										// add individual axis animation
+										Self.dispatch({ type: "add-step", step: 0, track });
+									});
+								}
+						}
+					});
+
+					Self.dispatch({ type: "goto-step", step: 1 });
 					break;
 				case "add-step":
 					// reserv step on tape

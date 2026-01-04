@@ -2,7 +2,7 @@
 	<Meta>
 		<i id="name" value="Lack"/>
 		<i id="description"><![CDATA[Sidobord, vitlaserad ekeffekt. 55 x 55 x 45 cm]]></i>
-		<i id="assembly" value="7"/>
+		<i id="assembly" value="5-7"/>
 		<i id="steps" value="21"/>
 		<i id="parts" value="13"/>
 		<i id="camera" position="[0,10,15]" lookAt="[0,3,0]"/>
@@ -11,11 +11,20 @@
 	</Meta>
 	<Timeline>
 		<Start>
-			<Item object="camera" position="[0,10,15]" lookAt="[0,3,0]"/>
-			<Item object="root" position="[0,6.9,0]" rotation="[0,0,180]"/>
+			<Item object="camera" position="[0,5,10]" lookAt="[0,0,3]"/>
+			<Item object="root" position="[0,6.9,0]" rotation="[0,180,180]"/>
+			<Item object="Screw.001" position="[0,-1.65,0]"/>
+			<Item object="Screw.002" position="[0,-1.65,0]" hidden="true"/>
+			<Item object="Screw.003" position="[0,-1.65,0]" hidden="true"/>
+			<Item object="Screw.004" position="[0,-1.65,0]" hidden="true"/>
+
+			<Item object="Leg.001" position="[0,-3,0]" hidden="true"/>
+			<Item object="Leg.002" position="[0,-3,0]" hidden="true"/>
+			<Item object="Leg.003" position="[0,-3,0]" hidden="true"/>
+			<Item object="Leg.004" position="[0,-3,0]" hidden="true"/>
 		</Start>
 		<Step num="1">
-			<Track name="001-rising" object="root" attr=".position[y]" times="[0,1,2]" values="[0,0.5,0]"/>
+			<Track name="table-flip" object="root" attr=".position[y]" times="[0,1,2]" values="[0,0.5,0]"/>
 		</Step>
 	</Timeline>
 	<Pieces>
@@ -5325,7 +5334,7 @@ f 2043/1147/420 2044/1146/420 2042/1148/420 2041/1149/420
 f 2041/1149/421 2042/1148/421 2038/1150/421 2037/1151/421
 f 2039/1152/422 2043/1147/422 2041/1149/422 2037/1153/422
 f 2044/1146/423 2040/1154/423 2038/1155/423 2042/1148/423
-o Leg-004
+o Leg.004
 v 3.550000 6.003826 -4.450000
 v 3.550000 0.003825 -4.450000
 v 3.550000 6.003826 -3.550000

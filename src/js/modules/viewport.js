@@ -242,6 +242,7 @@ let Viewport = (() => {
 						switch (true) {
 							case entry.object === "camera":
 								Self.dispatch({ ...entry, type: "reset-camera" });
+								// Timeline.dispatch({ type: "test-transition" });
 								break;
 							default:
 								if (entry.hidden) {
