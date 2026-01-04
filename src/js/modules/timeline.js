@@ -21,7 +21,7 @@ let Timeline = (() => {
 				tape[step].map(track => {
 					track.mixer.update(clockDelta);
 					if (track.item.name === "lookTarget") {
-						Viewport.items.camera.lookAt(track.item.position);
+						Viewport.objects.camera.lookAt(track.item.position);
 					}
 				});
 			}
@@ -34,7 +34,7 @@ let Timeline = (() => {
 				times,
 				values,
 				item,
-				items,
+				objects,
 				clip,
 				track,
 				action,
@@ -42,14 +42,19 @@ let Timeline = (() => {
 			// console.log(event);
 			switch (event.type) {
 				case "goto-start":
+					// pause "auto-rotation"
 					Self.paused = false;
+
+					values = [];
+					values.push({ object: "" });
+					Viewport.dispatch({ type: "reset-view", values });
 					break;
 				case "add-step":
 					// reserv step on tape
 					if (!tape[event.step]) tape[event.step] = [];
-					let trackType = ["camera", "lookTarget"].includes(event.track.item) ? "VectorKeyframeTrack" : "NumberKeyframeTrack";
+					let trackType = ["camera", "lookTarget"].includes(event.track.object) ? "VectorKeyframeTrack" : "NumberKeyframeTrack";
 					track = new THREE[trackType](event.track.attr, event.track.times, event.track.values);
-					item = Viewport.items[event.track.item];
+					item = Viewport.objects[event.track.object];
 
 					mixer = new THREE.AnimationMixer(item);
 					clip = new THREE.AnimationClip(event.track.name, Math.max(...event.track.times), [track]);
@@ -72,7 +77,6 @@ let Timeline = (() => {
 					if (Self.activestep === Object.keys(tape).length) {
 						APP.timeline.dispatch({ type: "build-completed" });
 					}
-					console.log(event);
 					break;
 				case "play-step":
 					step = +event.step - 1;
@@ -92,13 +96,13 @@ let Timeline = (() => {
 					break;
 				case "goto-step":
 					// hide meshes after "event step"
-					items = [];
+					objects = [];
 					Object.keys(tape).filter(i => i < event.step).map(i => {
 						tape[i].map(step => {
-							items.push(step.item.name);
+							objects.push(step.item.name);
 						});
 					});
-					Viewport.dispatch({ type: "show-only-models", items });
+					Viewport.dispatch({ type: "show-only-models", objects });
 
 					// start playing step
 					step = +event.step - 1;

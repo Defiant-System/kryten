@@ -8,7 +8,7 @@
 		<i id="camera" position="[0,6,10]" lookAt="[0,0,0]"/>
 		<i id="light" position="[7,6,-1]" color="#fff"/>
 	</Meta>
-	<Steps />
+	<Timeline />
 	<Pieces>
 		<i type="compound"><![CDATA[# Blender 4.1.1
 # www.blender.org

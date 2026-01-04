@@ -24,8 +24,7 @@
 				Timeline.dispatch({ type: "goto-step", step: +event.arg });
 				break;
 			case "toggle-play":
-				if (Viewport.fpsControl._stopped) Viewport.fpsControl.play();
-				else Viewport.fpsControl.stop();
+				Timeline.paused = !Timeline.paused;
 				break;
 			case "build-completed":
 				Self.els.content.addClass("build-finished");

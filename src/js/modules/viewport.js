@@ -53,7 +53,7 @@ let Viewport = (() => {
 			// save reference to app
 			this.APP = APP;
 			// memory record
-			this.items = {};
+			this.objects = {};
 
 			this.dispatch({ type: "refresh-theme-values" });
 			this.dispatch({ type: "init-viewport" });
@@ -64,7 +64,7 @@ let Viewport = (() => {
 				APP = Self.APP,
 				x, y, z,
 				meshes,
-				item;
+				object;
 			switch (event.type) {
 				case "init-viewport":
 					// renderer setup
@@ -132,12 +132,14 @@ let Viewport = (() => {
 					// add renderer canvas to window body
 					APP.els.showcase.append(renderer.domElement);
 
-					Self.items.light = dirLight;
-					Self.items.camera = camera;
-					Self.items.lookTarget = lookTarget;
-					Self.items.cameraRig = cameraRig;
-					Self.items.shadowCam = shadowCam;
-					Self.items.scene = scene;
+					Self.objects.light = dirLight;
+					Self.objects.camera = camera;
+					Self.objects.lookTarget = lookTarget;
+					Self.objects.cameraRig = cameraRig;
+					Self.objects.shadowCam = shadowCam;
+					Self.objects.scene = scene;
+					// reserved objects
+					Self.reserved = "light camera lookTarget cameraRig shadowCam scene root".split(" ");
 					break;
 				case "init-player":
 					// create FPS controller
@@ -145,9 +147,8 @@ let Viewport = (() => {
 						fps: 50,
 						// autoplay: true,
 						callback(time, delta) {
-							Timeline.tick(time, delta);
-
 							if (Timeline.paused) objectGroup.rotation.y -= 0.0025;
+							else Timeline.tick(time, delta);
 
 							if (postprocess) composer.render();
 							else renderer.render(scene, camera);
@@ -155,19 +156,19 @@ let Viewport = (() => {
 					});
 					break;
 				case "reset-camera":
-					Self.items.lookTarget.position.set(...event.lookAt);
-					Self.items.camera.position.set(...event.position);
-					Self.items.camera.lookAt(Self.items.lookTarget.position);
-					Self.items.camera.updateProjectionMatrix();
+					Self.objects.lookTarget.position.set(...event.lookAt);
+					Self.objects.camera.position.set(...event.position);
+					Self.objects.camera.lookAt(Self.objects.lookTarget.position);
+					Self.objects.camera.updateProjectionMatrix();
 					// update orbit controls
-					orbit.target.copy(Self.items.lookTarget.position);
+					orbit.target.copy(Self.objects.lookTarget.position);
 					break;
 				case "reset-shadow-cam":
-					Self.items.shadowCam.top = event.values.top;
-					Self.items.shadowCam.left = event.values.left;
-					Self.items.shadowCam.bottom = event.values.bottom;
-					Self.items.shadowCam.right = event.values.right;
-					Self.items.shadowCam.updateProjectionMatrix();
+					shadowCam.top = event.values.top;
+					shadowCam.left = event.values.left;
+					shadowCam.bottom = event.values.bottom;
+					shadowCam.right = event.values.right;
+					shadowCam.updateProjectionMatrix();
 					break;
 				case "refresh-theme-values":
 					// prepare to update three.js
@@ -210,34 +211,34 @@ let Viewport = (() => {
 					break;
 				case "insert-basic-geometry":
 					// loop values
-					item = new THREE.Mesh(new THREE[event.geo.name](...event.geo.args));
-					item.geometry.computeBoundingBox();
-					item.receiveShadow = true;
-					item.castShadow = true;
-					item.position.set(...event.geo.position);
+					object = new THREE.Mesh(new THREE[event.geo.name](...event.geo.args));
+					object.geometry.computeBoundingBox();
+					object.receiveShadow = true;
+					object.castShadow = true;
+					object.position.set(...event.geo.position);
 					// rotation in relation to the camera
 					[x, y, z] = event.geo.rotation;
-					item.rotation.x += (Math.PI/180) * x;
-					item.rotation.y += (Math.PI/180) * y;
-					item.rotation.z += (Math.PI/180) * z;
+					object.rotation.x += (Math.PI/180) * x;
+					object.rotation.y += (Math.PI/180) * y;
+					object.rotation.z += (Math.PI/180) * z;
 					// set mesh id/name
-					item.name = event.geo.id;
-					// add item to original model
-					originalModel.add(item);
+					object.name = event.geo.id;
+					// add object to original model
+					originalModel.add(object);
 					break;
 				case "insert-compound-geometry":
 				case "insert-OBJ-geometry":
-					item = loader.parse(event.geo.str);
-					item.traverse(c => {
+					object = loader.parse(event.geo.str);
+					object.traverse(c => {
 						if (!c.isMesh) return;
 						c.geometry.computeBoundingBox();
 					});
-					originalModel.add(item);
+					originalModel.add(object);
 					break;
-				case "show-only-models":
-					Object.keys(Self.items).filter(k => k.startsWith("--")).map(key => {
-						Self.items[key].visible = event.items.includes(key);
-					});
+				case "reset-view":
+					// Object.keys(Self.objects).filter(k => !Self.reserved.includes(k)).map(key => {
+					// 	Self.objects[key].visible = event.objects.includes(key);
+					// });
 					break;
 				case "update-models":
 					// for floor
@@ -268,13 +269,13 @@ let Viewport = (() => {
 						if (oGroup.name.startsWith("--")) {
 							oGroup.visible = false;
 						}
-						// save references to items
-						Self.items[c.name] = oGroup;
+						// save references to objects
+						Self.objects[c.name] = oGroup;
 						// insert in to scene
 						objectGroup.add(oGroup);
 					});
 					// regerence to root group
-					Self.items.root = objectGroup;
+					Self.objects.root = objectGroup;
 					// update floor
 					floor.material.color.set(theme.floorColor);
 					floor.material.opacity = .2;

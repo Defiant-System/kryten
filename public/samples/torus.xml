@@ -10,19 +10,20 @@
 	</Meta>
 	<Timeline>
 		<Start>
-			<Group item="root"/>
-			<Group item="001"/>
-			<Group item="002" state="hidden"/>
-			<Group item="003" state="hidden"/>
+			<Item object="camera" position="[1,1,2]" lookAt="[0,0,0]"/>
+			<Item object="root"/>
+			<Item object="001"/>
+			<Item object="002" state="hidden"/>
+			<Item object="003" state="hidden"/>
 		</Start>
 		<Step><!-- step 1 -->
-			<Track name="001-rising" item="001" attr=".position[y]" times="[0,1,2]" values="[0,0.5,0]"/>
+			<Track name="001-rising" object="001" attr=".position[y]" times="[0,1,2]" values="[0,0.5,0]"/>
 		</Step>
 		<Step><!-- step 2 -->
-			<Track name="002-rotate" item="002" attr=".rotation[y]" times="[0,1,2]" values="[0,0.5,0]"/>
+			<Track name="002-rotate" object="002" attr=".rotation[y]" times="[0,1,2]" values="[0,0.5,0]"/>
 		</Step>
 		<Step><!-- step 3 -->
-			<Track name="003-rise" item="003" attr=".position[y]" times="[0,0.25,2]" values="[0,0.25,0]"/>
+			<Track name="003-rise" object="003" attr=".position[y]" times="[0,0.25,2]" values="[0,0.25,0]"/>
 		</Step>
 	</Timeline>
 	<Pieces>

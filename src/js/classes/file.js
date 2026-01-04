@@ -9,7 +9,7 @@ class File {
 		switch (this._file.kind) {
 			case "ikea": break;
 			case "xml":
-				// console.log(fsFile.data.xml);
+				// console.log(fsFile.data.xml);getA
 				break;
 		}
 
@@ -58,7 +58,7 @@ class File {
 				track.values = JSON.parse(xTrack.getAttribute("values"));
 				track.attr = xTrack.getAttribute("attr");
 				track.name = xTrack.getAttribute("name");
-				track.item = xTrack.getAttribute("item");
+				track.object = xTrack.getAttribute("object");
 				if (xTrack.getAttribute("repeat")) track.repeat = +xTrack.getAttribute("repeat");
 				if (xTrack.getAttribute("loop")) track.loop = xTrack.getAttribute("loop") === "true";
 				Timeline.dispatch({ type: "add-step", step: i, track });
@@ -76,6 +76,7 @@ class File {
 			lookAt = JSON.parse(xCamera.getAttribute("lookAt"));
 		Viewport.dispatch({ type: "reset-camera", position, lookAt});
 
+		Viewport.dispatch({ type: "refresh-theme-values" });
 		Viewport.fpsControl.start();
 	}
 

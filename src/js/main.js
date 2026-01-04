@@ -81,7 +81,7 @@ const kryten = {
 				break;
 			case "set-ui-theme":
 				Self.els.content.data({ theme: event.arg });
-				Viewport.dispatch({ type: "refresh-theme-values", update: true });
+				Viewport.dispatch({ type: "refresh-theme-values" });
 				break;
 			case "change-edges-threshold":
 				Viewport.dispatch(event);
