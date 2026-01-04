@@ -150,19 +150,13 @@ let Timeline = (() => {
 					Self.dispatch({ type: "goto-step", step });
 					break;
 				case "goto-step":
-					// hide meshes after "event step"
-					objects = [];
-					Object.keys(tape).filter(i => i < event.step).map(i => {
-						tape[i].map(step => {
-							objects.push(step.item.name);
-						});
-					});
-					Viewport.dispatch({ type: "show-only-models", objects });
-
 					// start playing step
 					step = +event.step - 1;
 					if (tape[step]) {
-						tape[step].map(track => track.action.play());
+						tape[step].map(track => {
+							if (step > 0) track.item.visible = true;
+							track.action.play();
+						});
 						// save reference
 						Self.activestep = +event.step;
 					}
