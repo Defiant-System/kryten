@@ -44,9 +44,8 @@ let Timeline = (() => {
 				case "goto-start":
 					// pause "auto-rotation"
 					Self.paused = false;
-
-					values = [];
-					values.push({ object: "" });
+					// accumulate scene / objects state
+					values = APP.file.getState("start");
 					Viewport.dispatch({ type: "reset-view", values });
 					break;
 				case "add-step":

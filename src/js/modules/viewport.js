@@ -236,9 +236,26 @@ let Viewport = (() => {
 					originalModel.add(object);
 					break;
 				case "reset-view":
-					// Object.keys(Self.objects).filter(k => !Self.reserved.includes(k)).map(key => {
-					// 	Self.objects[key].visible = event.objects.includes(key);
-					// });
+					// set up scene
+					event.values.map(entry => {
+						let object = Self.objects[entry.object];
+						switch (true) {
+							case entry.object === "camera":
+								Self.dispatch({ ...entry, type: "reset-camera" });
+								break;
+							default:
+								if (entry.hidden) {
+									object.visible = false;
+								}
+								if (entry.position) {
+									object.position.set(...entry.position);
+								}
+								if (entry.rotation) {
+									// translate from degress to radians
+									object.rotation.set(...entry.rotation.map(r => (Math.PI/180) * r));
+								}
+						}
+					});
 					break;
 				case "update-models":
 					// for floor

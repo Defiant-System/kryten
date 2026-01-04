@@ -10,7 +10,11 @@
 		<i id="light" position="[7,6,-1]" color="#fff"/>
 	</Meta>
 	<Timeline>
-		<Step><!-- step 1 -->
+		<Start>
+			<Item object="camera" position="[0,10,15]" lookAt="[0,3,0]"/>
+			<Item object="root" position="[0,6.9,0]" rotation="[0,0,180]"/>
+		</Start>
+		<Step num="1">
 			<Track name="001-rising" object="root" attr=".position[y]" times="[0,1,2]" values="[0,0.5,0]"/>
 		</Step>
 	</Timeline>

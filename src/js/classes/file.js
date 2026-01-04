@@ -84,6 +84,21 @@ class File {
 		return this._file.base;
 	}
 
+	getState(step) {
+		let state = [];
+		this._file.data.selectNodes(`//Timeline/Start/Item`).map(xItem => {
+			let values = {};
+			[...xItem.attributes].map(k => {
+				let v = k.nodeValue;
+				if (v.startsWith("[") && v.endsWith("]")) v = JSON.parse(v);
+				if (["true", "false"].includes(v)) v = v === "true";
+				values[k.nodeName] = v;
+			});
+			state.push(values);
+		});
+		return state;
+	}
+
 	toBlob(kind) {
 		
 	}

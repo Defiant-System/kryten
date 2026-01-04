@@ -61,7 +61,7 @@ const kryten = {
 				// open application local sample file
 				Self.openLocal(`~/samples/${event.name || event.arg}`)
 					.then(fsFile => {
-						Self.File = new File(fsFile);
+						Self.file = new File(fsFile);
 					});
 				break;
 			case "open-help":

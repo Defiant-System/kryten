@@ -2,7 +2,7 @@
 	<Meta>
 		<i id="name" value="Torus"/>
 		<i id="description"><![CDATA[Byrå med 2 lådor, vitbets. 54 x 66 x 113 cm]]></i>
-		<i id="assembly" value="7"/>
+		<i id="assembly" value="7-8"/>
 		<i id="steps" value="21"/>
 		<i id="parts" value="13"/>
 		<i id="camera" position="[1,1,2]" lookAt="[0,0,0]"/>
@@ -10,19 +10,19 @@
 	</Meta>
 	<Timeline>
 		<Start>
-			<Item object="camera" position="[1,1,2]" lookAt="[0,0,0]"/>
-			<Item object="root"/>
+			<Item object="camera" position="[0,1,2]" lookAt="[0,0,0]"/>
+			<Item object="root" position="[0,0.5,0]" rotation="[90,0,0]"/>
 			<Item object="001"/>
-			<Item object="002" state="hidden"/>
-			<Item object="003" state="hidden"/>
+			<Item object="002" hidden="true"/>
+			<Item object="003" hidden="true"/>
 		</Start>
-		<Step><!-- step 1 -->
+		<Step num="1">
 			<Track name="001-rising" object="001" attr=".position[y]" times="[0,1,2]" values="[0,0.5,0]"/>
 		</Step>
-		<Step><!-- step 2 -->
+		<Step num="2">
 			<Track name="002-rotate" object="002" attr=".rotation[y]" times="[0,1,2]" values="[0,0.5,0]"/>
 		</Step>
-		<Step><!-- step 3 -->
+		<Step num="3">
 			<Track name="003-rise" object="003" attr=".position[y]" times="[0,0.25,2]" values="[0,0.25,0]"/>
 		</Step>
 	</Timeline>
