@@ -82,7 +82,7 @@ let Timeline = (() => {
 										name = `${entry.object}-position-${axis}`;
 										track = { attr, name, object, times, values };
 										// add individual axis animation
-										Self.dispatch({ type: "add-step", step: 0, track });
+										if (values[0] !== values[1]) Self.dispatch({ type: "add-step", step: 0, track });
 									});
 								}
 								if (entry.rotation) {
@@ -96,7 +96,7 @@ let Timeline = (() => {
 										name = `${entry.object}-rotation-${axis}`;
 										track = { attr, name, object, times, values };
 										// add individual axis animation
-										Self.dispatch({ type: "add-step", step: 0, track });
+										if (values[0] !== values[1]) Self.dispatch({ type: "add-step", step: 0, track });
 									});
 								}
 						}
