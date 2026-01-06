@@ -44,9 +44,6 @@ let Timeline = (() => {
 				case "goto-start":
 					// pause "auto-rotation"
 					Self.paused = false;
-					// accumulate scene / objects state
-					APP.file.stateToTracks(0);
-					// Self.dispatch({ type: "transition-to-start", state, duration });
 					Self.dispatch({ type: "goto-step", step: 0 });
 					break;
 				case "add-step":
@@ -96,16 +93,15 @@ let Timeline = (() => {
 					break;
 				case "goto-step":
 					// start playing step
-					// step = +event.step - 1;
 					step = +event.step;
-					if (tape[step]) {
-						tape[step].map(track => {
-							// if (step > 0) track.item.visible = true;
-							track.action.play();
-						});
-						// save reference
-						Self.activestep = +event.step;
-					}
+					// accumulate scene / objects state
+					APP.file.stateToTracks(step);
+					// if step is on tape
+					if (!tape[step]) return;
+					// play it white boy
+					tape[step].map(track => track.action.play());
+					// save reference
+					Self.activestep = +event.step;
 					break;
 			}
 		}

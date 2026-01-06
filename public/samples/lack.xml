@@ -29,7 +29,8 @@
 			<Item object="--Arrow.004" hidden="true"/>
 		</Start>
 		<Step num="1">
-			<Item object="Screw.001" name="Screw-001-show" position="[-1.5,-1]" times="[0,1]"/>
+			<Item object="Screw.001" name="Screw-001-show" hidden="false"/>
+			<Item object="--Arrow.001" name="--Arrow.001-show" hidden="false"/>
 		</Step>
 		<Step num="2">
 			<Item object="Screw.001" name="Screw-001-down" values="[0,0.5,0]" times="[0,1]"/>

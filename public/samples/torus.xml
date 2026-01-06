@@ -9,26 +9,24 @@
 		<i id="light" position="[7,6,-1]" color="#fff"/>
 	</Meta>
 	<Timeline>
-		<Start duration="1">
+		<Start num="0" duration="1.5">
 			<Item object="camera" position="[0,1,2]" lookAt="[0,0,0]"/>
 			<Item object="root" position="[0,0,0]" rotation="[0,0,0]"/>
-			<Item object="001" position1="[0,0,0]" rotation1="[0,0,0]"/>
-			<Item object="002" hidden1="true"/>
-			<Item object="003" hidden1="true"/>
+			<Item object="001" position="[0,0.5,0]"/>
+			<Item object="002" hidden="true"/>
+			<Item object="003" hidden="true"/>
 		</Start>
-		<Step num="1">
-			<Track name="001-rising" object="001" attr=".position[y]" times="[0,1,2]" values="[0,0.5,0]"/>
+		<Step num="2">
+			<Item object="001" name="001-rising" position="[0,0,0]" hidden="false"/>
+			<Item object="002" name="002-rotate" position="[-1,0.35,0]" delay="1" hidden="false"/>
 		</Step>
 		<Step num="2">
-			<Track name="002-rotate" object="002" attr=".rotation[y]" times="[0,1,2]" values="[0,0.5,0]"/>
-		</Step>
-		<Step num="3">
-			<Track name="003-rise" object="003" attr=".position[y]" times="[0,0.25,2]" values="[0,0.25,0]"/>
+			<Item object="003" name="003-rise" position="[1,0.5,0]" hidden="false"/>
 		</Step>
 	</Timeline>
 	<Pieces>
-		<i id="001" type="basic" name="TorusGeometry" args="[0.35, 0.15, 9, 20]" position="[0,0,0]" rotation="[0,0,0]"/>
-		<i id="002" type="basic" name="DodecahedronGeometry" args="[0.35, 0]" position="[-0.9,0,0]" rotation="[0,0,0]"/>
-		<i id="003" type="basic" name="CylinderGeometry" args="[0.35, 0.35, 0.6, 8]" position="[0.9,0,0]" rotation="[0,0,0]"/>
+		<i id="001" type="basic" name="TorusGeometry" args="[0.35, 0.15, 9, 20]" position="[0,0,0]" />
+		<i id="002" type="basic" name="DodecahedronGeometry" args="[0.35, 0]" position="[-1,0,0]" />
+		<i id="003" type="basic" name="CylinderGeometry" args="[0.35, 0.35, 0.6, 8]" position="[1,0,0]" />
 	</Pieces>
 </Data>

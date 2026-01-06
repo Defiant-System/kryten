@@ -128,6 +128,7 @@ let Viewport = (() => {
 					APP.els.showcase.append(renderer.domElement);
 
 					Self.objects.light = dirLight;
+					Self.objects.orbit = orbit;
 					Self.objects.camera = camera;
 					Self.objects.lookTarget = lookTarget;
 					Self.objects.shadowCam = shadowCam;
@@ -155,7 +156,7 @@ let Viewport = (() => {
 					Self.objects.camera.lookAt(Self.objects.lookTarget.position);
 					Self.objects.camera.updateProjectionMatrix();
 					// update orbit controls
-					orbit.target.copy(Self.objects.lookTarget.position);
+					Self.objects.orbit.target.copy(Self.objects.lookTarget.position);
 					break;
 				case "reset-shadow-cam":
 					shadowCam.top = event.values.top;

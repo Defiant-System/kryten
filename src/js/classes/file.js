@@ -36,8 +36,8 @@ class File {
 					geo.id = xPiece.getAttribute("id");
 					geo.name = xPiece.getAttribute("name");
 					geo.args = JSON.parse(xPiece.getAttribute("args"));
-					geo.position = JSON.parse(xPiece.getAttribute("position"));
-					geo.rotation = JSON.parse(xPiece.getAttribute("rotation"));
+					geo.position = JSON.parse(xPiece.getAttribute("position")) || [0, 0, 0];
+					geo.rotation = JSON.parse(xPiece.getAttribute("rotation")) || [0, 0, 0];
 					break;
 				case "compound":
 				default:
