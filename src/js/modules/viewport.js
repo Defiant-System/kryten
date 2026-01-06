@@ -5,7 +5,7 @@ let Viewport = (() => {
 		height = window.innerHeight,
 		ratio = width / height,
 		loader = new OBJLoader(),
-		mtlLine = new OutlineMaterial(20, true, "#888"),
+		mtlLine = new OutlineMaterial(179, true, "#888"),
 		mtlShadow = new ColoredShadowMaterial({
 			color: 0xffffff,
 			shadowColor: 0xdddddd,
@@ -25,8 +25,7 @@ let Viewport = (() => {
 		renderer,
 		scene,
 		camera,
-		cameraRig = new THREE.Object3D(),
-		lookTarget = new THREE.Object3D(),
+		lookTarget,
 		dirLight,
 		shadowCam,
 		floor,
@@ -77,11 +76,7 @@ let Viewport = (() => {
 					scene = new THREE.Scene();
 					// camera
 					camera = new THREE.PerspectiveCamera(60, ratio, 0.1, 1000);
-					// mount camera on the rig
-					// cameraRig.add(camera);
-					// cameraRig.name = "cameraRig";
-					// cameraRig.position.set(.65, .75, 1.5);
-
+					lookTarget = new THREE.Object3D();
 					lookTarget.name = "lookTarget";
 
 					// orbit controls
@@ -135,11 +130,10 @@ let Viewport = (() => {
 					Self.objects.light = dirLight;
 					Self.objects.camera = camera;
 					Self.objects.lookTarget = lookTarget;
-					Self.objects.cameraRig = cameraRig;
 					Self.objects.shadowCam = shadowCam;
 					Self.objects.scene = scene;
 					// reserved objects
-					Self.reserved = "light camera lookTarget cameraRig shadowCam scene root".split(" ");
+					Self.reserved = "light camera lookTarget shadowCam scene root".split(" ");
 					break;
 				case "init-player":
 					// create FPS controller

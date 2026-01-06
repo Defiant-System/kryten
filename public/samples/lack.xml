@@ -10,9 +10,9 @@
 		<i id="light" position="[7,6,-1]" color="#fff"/>
 	</Meta>
 	<Timeline>
-		<Start duration="1.5">
+		<Start num="0" duration="1.5">
 			<Item object="camera" position="[-8,5,11]" lookAt="[-2,1.5,3.5]"/>
-			<Item object="root" position="[0,6.9,0]" rotation="[0,180,180]"/>
+			<Item object="root" position="[0,6.9,0]" rotation="[0,-180,180]"/>
 			<Item object="Screw.001" position="[0,-1.5,0]" hidden="true"/>
 			<Item object="Screw.002" position="[0,-1.5,0]" hidden="true"/>
 			<Item object="Screw.003" position="[0,-1.5,0]" hidden="true"/>
@@ -29,11 +29,10 @@
 			<Item object="--Arrow.004" hidden="true"/>
 		</Start>
 		<Step num="1">
-			<Track object="Screw.001" name="Screw-001-show" attr=".position[y]" times="[0,1]" values="[-1.5,-1]"/>
-			<Track object="--Arrow.001" name="Srrow-001-rotate" attr=".rotation[y]" times="[0,3]" values="[0,0.5]" loop="3"/>
+			<Item object="Screw.001" name="Screw-001-show" position="[-1.5,-1]" times="[0,1]"/>
 		</Step>
 		<Step num="2">
-			<Track object="Screw.001" attr=".position[y]" times="[0,1,2]" values="[0,0.5,0]"/>
+			<Item object="Screw.001" name="Screw-001-down" values="[0,0.5,0]" times="[0,1]"/>
 		</Step>
 	</Timeline>
 	<Pieces>

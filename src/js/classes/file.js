@@ -51,19 +51,21 @@ class File {
 		Viewport.dispatch({ type: "update-models" });
 
 		// prepare steps
-		this._file.data.selectNodes(`./Timeline/Step`).map((xStep, i) => {
-			xStep.selectNodes(`./Track`).map((xTrack, j) => {
-				let track = {};
-				track.times = JSON.parse(xTrack.getAttribute("times"));
-				track.values = JSON.parse(xTrack.getAttribute("values"));
-				track.attr = xTrack.getAttribute("attr");
-				track.name = xTrack.getAttribute("name");
-				track.object = xTrack.getAttribute("object");
-				if (xTrack.getAttribute("repeat")) track.repeat = +xTrack.getAttribute("repeat");
-				if (xTrack.getAttribute("loop")) track.loop = xTrack.getAttribute("loop") === "true";
-				Timeline.dispatch({ type: "add-step", step: i, track });
-			});
-		});
+		// this._file.data.selectNodes(`./Timeline/Step`).map((xStep, i) => {
+		// 	let num = xStep.getAttribute("num"),
+		// 		{ state, duration } = this.getState(num);
+		// 	xStep.selectNodes(`./Item`).map((xTrack, j) => {
+		// 		let track = {};
+		// 		track.times = JSON.parse(xTrack.getAttribute("times"));
+		// 		track.values = JSON.parse(xTrack.getAttribute("values"));
+		// 		track.attr = xTrack.getAttribute("attr");
+		// 		track.name = xTrack.getAttribute("name");
+		// 		track.object = xTrack.getAttribute("object");
+		// 		if (xTrack.getAttribute("repeat")) track.repeat = +xTrack.getAttribute("repeat");
+		// 		if (xTrack.getAttribute("loop")) track.loop = xTrack.getAttribute("loop") === "true";
+		// 		Timeline.dispatch({ type: "add-step", step: i, track });
+		// 	});
+		// });
 
 		let xShadowCam = this._file.data.selectSingleNode(`./Meta/*[@id="shadowCam"]`),
 			values = { top: 2, left: -2, bottom: -2, right: 2 };
@@ -84,10 +86,11 @@ class File {
 		return this._file.base;
 	}
 
-	getState(step) {
+	getState(num) {
 		let state = [],
-			duration = +this._file.data.selectSingleNode(`//Timeline/Start`).getAttribute("duration"),
-			startItems = this._file.data.selectNodes(`//Timeline/Start/Item`);
+			step = this._file.data.selectSingleNode(`//Timeline/*[@num="${num}"]`),
+			duration = +step.getAttribute("duration") || 1,
+			startItems = step.selectNodes(`./Item`);
 		startItems.map(xItem => {
 			let values = {};
 			[...xItem.attributes].map(k => {
@@ -101,12 +104,63 @@ class File {
 		return { state, duration };
 	}
 
-	toBlob(kind) {
-		
-	}
+	stateToTracks(step) {
+		let { state, duration } = this.getState(step);
+		// transition duration
+		let times = [0, duration];
 
-	get isDirty() {
-		
+		state.map(entry => {
+			let item = Viewport.objects[entry.object],
+				values,
+				track,
+				attr,
+				name;
+			// special handlers
+			switch (true) {
+				case entry.object === "camera":
+					// anim track for position
+					values = item.position.toArray().concat(...entry.position);
+					track = { attr: ".position", name: "camera-move", object: "camera", times, values };
+					Timeline.dispatch({ type: "add-step", step, track });
+					// anim track for target
+					item = Viewport.objects.lookTarget;
+					values = item.position.toArray().concat(...entry.lookAt);
+					track = { attr: ".position", name: "camera-target", object: "lookTarget", times, values };
+					Timeline.dispatch({ type: "add-step", step, track });
+					break;
+				// "normal" meshes
+				default:
+					if (entry.hidden !== undefined) {
+						item.visible = entry.hidden !== true;
+					}
+					if (entry.position) {
+						entry.position.map((aV, i) => {
+							let axis = AXIS[i],
+								object = entry.object;
+							values = [item.position.toArray()[i], aV];
+							attr = `.position[${axis}]`;
+							name = `${entry.object}-position-${axis}`;
+							track = { attr, name, object, times, values };
+							// add individual axis animation
+							if (values[0] !== values[1]) Timeline.dispatch({ type: "add-step", step, track });
+						});
+					}
+					if (entry.rotation) {
+						entry.rotation.map((aV, i) => {
+							let axis = AXIS[i],
+								object = entry.object;
+							// translate from degress to radians
+							aV = (Math.PI/180) * aV;
+							values = [item.rotation.toArray()[i], aV];
+							attr = `.rotation[${axis}]`;
+							name = `${entry.object}-rotation-${axis}`;
+							track = { attr, name, object, times, values };
+							// add individual axis animation
+							if (values[0] !== values[1]) Timeline.dispatch({ type: "add-step", step, track });
+						});
+					}
+			}
+		});
 	}
 
 }

@@ -26,6 +26,9 @@ let {
 @import "./modules/test.js"
 
 
+const AXIS = ["x", "y", "z"];
+
+
 const kryten = {
 	init() {
 		// fast references
