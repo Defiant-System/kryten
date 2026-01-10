@@ -11,6 +11,6 @@ let Test = {
 
 		// setTimeout(() => Viewport.dispatch({ type: "test-piece", arg: "Cube.025" }), 1000);
 		setTimeout(() => APP.timeline.dispatch({ type: "goto-start" }), 1000);
-		setTimeout(() => Timeline.dispatch({ type: "goto-next-step" }), 3000);
+		setTimeout(() => Timeline.dispatch({ type: "goto-next-step" }), 2500);
 	}
 };

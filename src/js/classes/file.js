@@ -88,9 +88,9 @@ class File {
 
 	getState(num) {
 		let state = [],
-			step = this._file.data.selectSingleNode(`//Timeline/*[@num="${num}"]`),
-			duration = +step.getAttribute("duration") || 1,
-			startItems = step.selectNodes(`./Item`);
+			xStep = this._file.data.selectSingleNode(`//Timeline/*[@num="${num}"]`),
+			duration = +xStep.getAttribute("duration") || 1,
+			startItems = xStep.selectNodes(`./Item`);
 		startItems.map(xItem => {
 			let values = {};
 			[...xItem.attributes].map(k => {
@@ -108,11 +108,12 @@ class File {
 		let { state, duration } = this.getState(step);
 		// transition duration
 		let times = [0, duration];
-
+		// iterate step states
 		state.map(entry => {
 			let item = Viewport.objects[entry.object],
 				values,
 				track,
+				repeat,
 				attr,
 				name;
 			// special handlers
@@ -138,11 +139,13 @@ class File {
 							let axis = AXIS[i],
 								object = entry.object;
 							values = [item.position.toArray()[i], aV];
+							if (values[0] === values[1]) return;
+							if (entry.times) times = entry.times;
 							attr = `.position[${axis}]`;
 							name = `${entry.object}-position-${axis}`;
 							track = { attr, name, object, times, values };
 							// add individual axis animation
-							if (values[0] !== values[1]) Timeline.dispatch({ type: "add-step", step, track });
+							Timeline.dispatch({ type: "add-step", step, track });
 						});
 					}
 					if (entry.rotation) {
@@ -152,9 +155,12 @@ class File {
 							// translate from degress to radians
 							aV = (Math.PI/180) * aV;
 							values = [item.rotation.toArray()[i], aV];
+							if (values[0] === values[1]) return;
+							if (entry.times) times = entry.times;
 							attr = `.rotation[${axis}]`;
 							name = `${entry.object}-rotation-${axis}`;
 							track = { attr, name, object, times, values };
+							if (entry.repeat) track.repeat = +entry.repeat;
 							// add individual axis animation
 							if (values[0] !== values[1]) Timeline.dispatch({ type: "add-step", step, track });
 						});

@@ -49,16 +49,16 @@ let Timeline = (() => {
 				case "add-step":
 					// reserv step on tape
 					if (!tape[event.step]) tape[event.step] = [];
-					let trackType = ["camera", "lookTarget"].includes(event.track.object) ? "VectorKeyframeTrack" : "NumberKeyframeTrack";
+					let trackType = ["camera", "lookTarget"].includes() ? "VectorKeyframeTrack" : "NumberKeyframeTrack";
 					track = new THREE[trackType](event.track.attr, event.track.times, event.track.values);
-					item = Viewport.objects[event.track.object];
+					item = event.track.mesh || Viewport.objects[event.track.object];
 
 					mixer = new THREE.AnimationMixer(item);
 					clip = new THREE.AnimationClip(event.track.name, Math.max(...event.track.times), [track]);
 					// set loop value
 					switch (true) {
+						case event.track.repeat > 8: loop = [THREE.LoopRepeat]; break;
 						case event.track.repeat > 0: loop = [THREE.LoopRepeat, event.track.repeat]; break;
-						case event.track.loop: loop = [THREE.LoopRepeat]; break;
 						default: loop = [THREE.LoopOnce];
 					}
 					// action + mixer
