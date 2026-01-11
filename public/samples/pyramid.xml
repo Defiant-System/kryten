@@ -5,18 +5,19 @@
 		<i id="assembly" value="7"/>
 		<i id="steps" value="21"/>
 		<i id="parts" value="13"/>
-		<i id="camera" position="[0,7,10]" lookAt="[0,1,0]"/>
+		<i id="floorY" value="-0.125"/>
+		<i id="camera" position="[0,6,10]" lookAt="[0,1,0]"/>
 		<i id="shadowCam" top="10" left="-10" bottom="-10" right="10"/>
 		<i id="light" position="[7,6,-1]" color="#fff"/>
 	</Meta>
 	<Timeline>
-		<Start num="0" duration=".5">
+		<Start num="0" duration=".5" autoNext=".5">
 			<Item object="camera" position="[0,7,10]" lookAt="[0,2,0]"/>
 			<Item object="root" position="[0,0,0]" rotation="[0,70,0]"/>
 			<Item object="Part.001" name="001-rise" position="[0,3,0]" rotation="[0,0,90]" state="save"/>
 			<Item object="Part.002" name="002-rise" hidden="true"/>
 			<Item object="Part.003" name="003-rise" hidden="true"/>
-			<Item object="Part.004" name="004-rise" hidden1="true"/>
+			<Item object="Part.004" name="004-rise" hidden="true"/>
 			<Item object="Part.005" name="005-rise" hidden="true"/>
 			<Item object="Part.006" name="006-rise" hidden="true"/>
 			<Item object="Part.007" name="007-rise" hidden="true"/>
@@ -25,7 +26,8 @@
 			<Item object="Part.010" name="010-rise" hidden="true"/>
 		</Start>
 		<Step num="1">
-			<Item object="Part.001" name="001-rise" rotation="[0,360,0]" times="[0,3]" repeat="9"/>
+			<Item object="camera" position="[0,5,10]" lookAt="[0,2,0]"/>
+			<Item object="Part.001" name="001-rise" rotation="[0,360,0]" times="[0,3.5]" repeat="9"/>
 		</Step>
 		<Step num="2">
 			<Item object="Part.001" name="001-rise" state="restore"/>

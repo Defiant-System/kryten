@@ -286,7 +286,7 @@ let Viewport = (() => {
 					// update floor
 					floor.material.color.set(theme.floorColor);
 					floor.material.opacity = .2;
-					floor.position.y = y - .025;
+					floor.position.y = event.file?.getMeta("floorY") || (y - .025);
 					break;
 			}
 		}

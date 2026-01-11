@@ -48,7 +48,7 @@ class File {
 		});
 
 		// update viewport & start player
-		Viewport.dispatch({ type: "update-models" });
+		Viewport.dispatch({ type: "update-models", file: this });
 
 		// prepare steps
 		// this._file.data.selectNodes(`./Timeline/Step`).map((xStep, i) => {
@@ -86,10 +86,19 @@ class File {
 		return this._file.base;
 	}
 
+	getMeta(id) {
+		let xMeta = this._file.data.selectSingleNode(`//Meta/*[@id="${id}"]`);
+		if (!xMeta) return;
+		let val = xMeta.getAttribute("value");
+		if (val == +val) val = +val;
+		return val;
+	}
+
 	getState(num) {
 		let state = [],
 			xStep = this._file.data.selectSingleNode(`//Timeline/*[@num="${num}"]`),
 			duration = +xStep.getAttribute("duration") || 1,
+			autoNext = +xStep.getAttribute("autoNext"),
 			startItems = xStep.selectNodes(`./Item`);
 		startItems.map(xItem => {
 			let values = {};
@@ -101,11 +110,11 @@ class File {
 			});
 			state.push(values);
 		});
-		return { state, duration };
+		return { state, duration, autoNext };
 	}
 
 	stateToTracks(step) {
-		let { state, duration } = this.getState(step);
+		let { state, duration, autoNext } = this.getState(step);
 		// transition duration
 		let times = [0, duration];
 		// iterate step states
@@ -116,6 +125,20 @@ class File {
 				repeat,
 				attr,
 				name;
+			if (entry.state === "save") {
+				let position = item.position.clone(),
+					rotation = item.rotation.clone(),
+					state = { object: item.name, position, rotation };
+				Viewport.dispatch({ type: "save-item-state", state });
+			} else if (entry.state === "restore") {
+				// restore state from state stack
+				let { position, rotation } = Viewport.dispatch({ type: "get-item-state" }),
+					x = THREE.MathUtils.radToDeg(rotation.x - item.rotation.x),
+					y = THREE.MathUtils.radToDeg(rotation.y - item.rotation.y),
+					z = THREE.MathUtils.radToDeg(rotation.z - item.rotation.z);
+				entry.position = position.sub(item.position).toArray();
+				entry.rotation = [x, y, z];
+			}
 			// special handlers
 			switch (true) {
 				case entry.object === "camera":
@@ -129,22 +152,6 @@ class File {
 					track = { attr: ".position", name: "camera-target", object: "lookTarget", times, values };
 					Timeline.dispatch({ type: "add-step", step, track });
 					break;
-				case !!entry.state:
-					if (entry.state === "save") {
-						let position = item.position.clone(),
-							rotation = item.rotation.clone(),
-							state = { object: item.name, position, rotation };
-						Viewport.dispatch({ type: "save-item-state", state });
-					} else {
-						// restore state from state stack
-						let { position, rotation } = Viewport.dispatch({ type: "get-item-state" }),
-							x = THREE.MathUtils.radToDeg(rotation.x - item.rotation.x),
-							y = THREE.MathUtils.radToDeg(rotation.y - item.rotation.y),
-							z = THREE.MathUtils.radToDeg(rotation.z - item.rotation.z);
-						entry.position = position.sub(item.position).toArray();
-						entry.rotation = [x, y, z];
-					}
-					/* falls thorugh */
 				// "normal" meshes
 				default:
 					if (entry.hidden !== undefined) {
@@ -186,6 +193,10 @@ class File {
 					}
 			}
 		});
+		// if step should go to next automatically
+		if (autoNext) {
+			Timeline.dispatch({ type: "auto-go-next-step", step, autoNext });
+		}
 	}
 
 }

@@ -75,6 +75,14 @@ let Timeline = (() => {
 						APP.timeline.dispatch({ type: "build-completed" });
 					}
 					break;
+				case "auto-go-next-step":
+					action = { play() { setTimeout(() => Self.dispatch({ type: "goto-next-step" }), event.autoNext * 1000); } };
+					mixer = { update() {} };
+					item = {};
+
+					step = +event.step;
+					tape[step].push({ item, item, action, mixer });
+					break;
 				case "play-step":
 					step = +event.step - 1;
 					if (tape[step]) {
