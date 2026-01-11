@@ -129,6 +129,22 @@ class File {
 					track = { attr: ".position", name: "camera-target", object: "lookTarget", times, values };
 					Timeline.dispatch({ type: "add-step", step, track });
 					break;
+				case !!entry.state:
+					if (entry.state === "save") {
+						let position = item.position.clone(),
+							rotation = item.rotation.clone(),
+							state = { object: item.name, position, rotation };
+						Viewport.dispatch({ type: "save-item-state", state });
+					} else {
+						// restore state from state stack
+						let { position, rotation } = Viewport.dispatch({ type: "get-item-state" }),
+							x = THREE.MathUtils.radToDeg(rotation.x - item.rotation.x),
+							y = THREE.MathUtils.radToDeg(rotation.y - item.rotation.y),
+							z = THREE.MathUtils.radToDeg(rotation.z - item.rotation.z);
+						entry.position = position.sub(item.position).toArray();
+						entry.rotation = [x, y, z];
+					}
+					/* falls thorugh */
 				// "normal" meshes
 				default:
 					if (entry.hidden !== undefined) {
@@ -137,8 +153,10 @@ class File {
 					if (entry.position) {
 						entry.position.map((aV, i) => {
 							let axis = AXIS[i],
-								object = entry.object;
-							values = [item.position.toArray()[i], aV];
+								object = entry.object,
+								oPos = Viewport.pivots[object],
+								dPos = item.position.clone().toArray()[i];
+							values = [dPos, dPos+aV];
 							if (values[0] === values[1]) return;
 							if (entry.times) times = entry.times;
 							attr = `.position[${axis}]`;
@@ -151,10 +169,11 @@ class File {
 					if (entry.rotation) {
 						entry.rotation.map((aV, i) => {
 							let axis = AXIS[i],
-								object = entry.object;
+								object = entry.object,
+								dRot = item.rotation.toArray()[i];
 							// translate from degress to radians
-							aV = (Math.PI/180) * aV;
-							values = [item.rotation.toArray()[i], aV];
+							aV = THREE.MathUtils.degToRad(aV);
+							values = [dRot, dRot+aV];
 							if (values[0] === values[1]) return;
 							if (entry.times) times = entry.times;
 							attr = `.rotation[${axis}]`;

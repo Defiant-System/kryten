@@ -51,8 +51,10 @@ let Viewport = (() => {
 		init(APP) {
 			// save reference to app
 			this.APP = APP;
-			// memory record
+			// memory records
 			this.objects = {};
+			this.pivots = {};
+			this.states = {};
 
 			this.dispatch({ type: "refresh-theme-values" });
 			this.dispatch({ type: "init-viewport" });
@@ -117,7 +119,7 @@ let Viewport = (() => {
 						new THREE.PlaneGeometry(),
 						new THREE.ShadowMaterial({ color: 0xffffff, opacity: 0, transparent: true })
 					);
-					floor.rotation.x = - Math.PI / 2;
+					floor.rotation.x = -Math.PI / 2;
 					floor.scale.setScalar(50);
 					floor.receiveShadow = true;
 					scene.add(floor);
@@ -213,9 +215,9 @@ let Viewport = (() => {
 					object.position.set(...event.geo.position);
 					// rotation in relation to the camera
 					[x, y, z] = event.geo.rotation;
-					object.rotation.x += (Math.PI/180) * x;
-					object.rotation.y += (Math.PI/180) * y;
-					object.rotation.z += (Math.PI/180) * z;
+					object.rotation.x += THREE.MathUtils.degToRad(x);
+					object.rotation.y += THREE.MathUtils.degToRad(y);
+					object.rotation.z += THREE.MathUtils.degToRad(z);
 					// set mesh id/name
 					object.name = event.geo.id;
 					// add object to original model
@@ -227,31 +229,24 @@ let Viewport = (() => {
 					object.traverse(c => {
 						if (!c.isMesh) return;
 						c.geometry.computeBoundingBox();
+						let pivot = new THREE.Vector3();
+						c.geometry.boundingBox.getCenter(pivot);
+						c.geometry.center();
+						c.position.add(pivot);
+						Self.pivots[c.name] = pivot.clone();
 					});
 					originalModel.add(object);
+
+					Self.pivots.root = new THREE.Vector3();
 					break;
-				case "reset-view": // DEPRICATED ?
-					// set up scene
-					event.values.map(entry => {
-						let object = Self.objects[entry.object];
-						switch (true) {
-							case entry.object === "camera":
-								Self.dispatch({ ...entry, type: "reset-camera" });
-								break;
-							default:
-								if (entry.hidden) {
-									object.visible = false;
-								}
-								if (entry.position) {
-									object.position.set(...entry.position);
-								}
-								if (entry.rotation) {
-									// translate from degress to radians
-									object.rotation.set(...entry.rotation.map(r => (Math.PI/180) * r));
-								}
-						}
-					});
+				case "save-item-state":
+					if (!Self.states[event.object]) {
+						Self.states[event.object] = [];
+					}
+					Self.states[event.object].push({ ...event.state });
 					break;
+				case "get-item-state":
+					return Self.states[event.object].pop();
 				case "update-models":
 					// for floor
 					y = Infinity;
