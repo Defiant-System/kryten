@@ -129,7 +129,6 @@ class File {
 				let position = item.position.clone(),
 					rotation = item.rotation.clone(),
 					state = { object: item.name, position, rotation };
-				console.log(state);
 				Viewport.dispatch({ type: "save-item-state", state });
 			} else if (entry.state === "restore") {
 				// restore state from state stack
