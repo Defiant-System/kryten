@@ -71,7 +71,7 @@ let Timeline = (() => {
 					tape[event.step].push({ item, track, mixer, action });
 					break;
 				case "anim-finished":
-					if (Self.activestep === Object.keys(tape).length) {
+					if (Self.activestep === APP.file.getMeta("steps")) {
 						APP.timeline.dispatch({ type: "build-completed" });
 					}
 					break;
@@ -106,6 +106,8 @@ let Timeline = (() => {
 					APP.file.stateToTracks(step);
 					// if step is on tape
 					if (!tape[step]) return;
+					// step number
+					APP.els.stepNum.html(step);
 					// play it white boy
 					tape[step].map(track => track.action.play());
 					// save reference

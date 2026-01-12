@@ -56,6 +56,20 @@ content {
 				background: url(~/icons/icon-logo.png) 50% 50%/contain no-repeat;
 			}
 
+			h2[data-prefix] {
+				position: absolute;
+				bottom: 11px;
+				left: 11px;
+				font-family: "Noto IKEA";
+				font-size: 25px;
+				text-transform: uppercase;
+
+				&:before {
+					content: attr(data-prefix);
+					padding-right: 5px;
+				}
+			}
+
 			.details {
 				position: absolute;
 				bottom: 0;
@@ -294,6 +308,11 @@ content {
 	}
 
 	&.build-finished {
+		.outlines {
+			h2[data-prefix] {
+				display: none;
+			}
+		}
 		.congratulations {
 			opacity: 1;
 			visibility: visible;

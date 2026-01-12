@@ -34,6 +34,7 @@ const kryten = {
 		// fast references
 		this.els = {
 			content: window.find("content"),
+			stepNum: window.find("h2[data-prefix]"),
 			showcase: window.find(".showcase"),
 		};
 

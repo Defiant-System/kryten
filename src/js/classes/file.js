@@ -21,8 +21,9 @@ class File {
 		["name", "assembly", "steps", "parts", "description"].map(key => {
 			let el = this._APP.els.content.find(`[data-id="${key}"]`),
 				suffix = el.data("suffix") || "",
-				xMeta = this._file.data.selectSingleNode(`./Meta/*[@id="${key}"]`),
-				value = xMeta.getAttribute("value") || xMeta.textContent;
+				// xMeta = this._file.data.selectSingleNode(`./Meta/*[@id="${key}"]`),
+				// value = xMeta.getAttribute("value") || xMeta.textContent;
+				value = this.getMeta(key);
 			el.html(value +" "+ suffix);
 		});
 
@@ -87,9 +88,18 @@ class File {
 	}
 
 	getMeta(id) {
-		let xMeta = this._file.data.selectSingleNode(`//Meta/*[@id="${id}"]`);
+		let xMeta = this._file.data.selectSingleNode(`//Meta/*[@id="${id}"]`),
+			val;
+		switch (id) {
+			case "steps":
+				val = 0;
+				this._file.data.selectNodes(`//Timeline/*[@num]`).map(x => {
+					val = Math.max(val, +x.getAttribute("num"));
+				});
+				return val;
+		}
 		if (!xMeta) return;
-		let val = xMeta.getAttribute("value");
+		val = xMeta.getAttribute("value") || xMeta.textContent;
 		if (val == +val) val = +val;
 		return val;
 	}

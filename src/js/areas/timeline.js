@@ -27,6 +27,7 @@
 				Timeline.paused = !Timeline.paused;
 				break;
 			case "build-completed":
+				Self.els.content.find(`.congratulations h2 span`).html(APP.file.getMeta("name"));
 				Self.els.content.addClass("build-finished");
 				break;
 		}

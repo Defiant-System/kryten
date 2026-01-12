@@ -1,9 +1,8 @@
 <Data>
 	<Meta>
-		<i id="name" value="Pyramid Puzzel"/>
-		<i id="description"><![CDATA[Pyramid puzzel consisting of 11 pieces.]]></i>
-		<i id="assembly" value="7"/>
-		<i id="steps" value="21"/>
+		<i id="name" value="Pyramid Pussel"/>
+		<i id="description"><![CDATA[Pyramid pussel av 10 bitar.]]></i>
+		<i id="assembly" value="3"/>
 		<i id="parts" value="13"/>
 		<i id="floorY" value="-0.125"/>
 		<i id="camera" position="[0,6,10]" lookAt="[0,1,0]"/>
@@ -45,7 +44,7 @@
 		<Step num="6" autoNext="1">
 			<Item object="Part.002" name="002-restore" state="restore"/>
 		</Step>
-		<Step num="7" autoNext="2">
+		<Step num="7" autoNext="1.5">
 			<Item object="root" rotation="[0,60,0]"/>
 			<Item object="Part.003" name="003-move" position="[0,0,0]" hidden="false" state="save"/>
 		</Step>
@@ -93,8 +92,82 @@
 		<Step num="21">
 			<Item object="Part.005" name="005-rotate" rotation="[0,360,0]" times="[0,4]" repeat="9"/>
 		</Step>
-		<Step num="22">
+		<Step num="22" autoNext="1">
 			<Item object="Part.005" name="005-restore" state="restore"/>
+		</Step>
+		<Step num="23" autoNext="1">
+			<Item object="root" rotation="[0,50,0]"/>
+			<Item object="Part.006" name="006-restore" position="[0,0,0]" hidden="false" state="save"/>
+		</Step>
+		<Step num="24" autoNext="1">
+			<Item object="Part.006" name="006-move" position="[0,0,-1.5]"/>
+		</Step>
+		<Step num="25" autoNext="1">
+			<Item object="Part.006" name="006-rise" position="[0,3.5,0]" rotation="[0,0,90]"/>
+		</Step>
+		<Step num="26">
+			<Item object="Part.006" name="006-rotate" rotation="[0,360,0]" times="[0,4]" repeat="9"/>
+		</Step>
+		<Step num="27" autoNext="1">
+			<Item object="Part.006" name="006-restore" state="restore"/>
+		</Step>
+		<Step num="28" autoNext="1">
+			<Item object="root" rotation="[0,-20,0]"/>
+			<Item object="Part.008" name="008-restore" position="[0,0,0]" hidden="false" state="save"/>
+		</Step>
+		<Step num="29" autoNext="1">
+			<Item object="Part.008" name="008-move" position="[2,0,0]"/>
+		</Step>
+		<Step num="30" autoNext="1">
+			<Item object="Part.008" name="008-rise" position="[0,3,0]"/>
+		</Step>
+		<Step num="31">
+			<Item object="Part.008" name="008-rotate" rotation="[0,360,0]" times="[0,4]" repeat="9"/>
+		</Step>
+		<Step num="32" autoNext="1">
+			<Item object="Part.008" name="008-restore" state="restore"/>
+		</Step>
+		<Step num="33" autoNext="1">
+			<Item object="root" rotation="[0,-20,0]"/>
+			<Item object="Part.007" name="007-restore" position="[0,0,0]" hidden="false" state="save"/>
+		</Step>
+		<Step num="34" autoNext="1">
+			<Item object="Part.007" name="007-move" position="[2,0,0]"/>
+		</Step>
+		<Step num="35" autoNext="1">
+			<Item object="Part.007" name="007-rise" position="[0,3,0]"/>
+		</Step>
+		<Step num="36">
+			<Item object="Part.007" name="007-rotate" rotation="[0,360,0]" times="[0,4]" repeat="9"/>
+		</Step>
+		<Step num="37" autoNext="1">
+			<Item object="Part.007" name="007-restore" state="restore"/>
+		</Step>
+		<Step num="38" autoNext="1">
+			<Item object="root" rotation="[0,-55,0]"/>
+			<Item object="Part.009" name="009-restore" position="[0,0,0]" hidden="false" state="save"/>
+		</Step>
+		<Step num="39" autoNext="1">
+			<Item object="Part.009" name="009-rise" position="[0,2,0]"/>
+		</Step>
+		<Step num="40">
+			<Item object="Part.009" name="009-rotate" rotation="[0,360,0]" times="[0,4]" repeat="9"/>
+		</Step>
+		<Step num="41" autoNext="1">
+			<Item object="Part.009" name="009-restore" state="restore"/>
+		</Step>
+		<Step num="42" autoNext="1">
+			<Item object="root" rotation="[0,195,0]"/>
+			<Item object="Part.010" name="010-restore" position="[0,0,0]" hidden="false" state="save"/>
+		</Step>
+		<Step num="43" autoNext="1">
+			<Item object="Part.010" name="010-rise" position="[0,2,0]"/>
+		</Step>
+		<Step num="44">
+			<Item object="Part.010" name="010-rotate" rotation="[0,360,0]" times="[0,4]" repeat="9"/>
+		</Step>
+		<Step num="45">
+			<Item object="Part.010" name="010-restore" state="restore"/>
 		</Step>
 	</Timeline>
 	<Pieces>
