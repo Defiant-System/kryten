@@ -3,7 +3,7 @@
 		<i id="name" value="Pyramid Pussel"/>
 		<i id="description"><![CDATA[Pyramid pussel av 10 bitar.]]></i>
 		<i id="assembly" value="3"/>
-		<i id="parts" value="13"/>
+		<i id="parts" value="10"/>
 		<i id="floorY" value="-0.125"/>
 		<i id="camera" position="[0,6,10]" lookAt="[0,1,0]"/>
 		<i id="shadowCam" top="10" left="-10" bottom="-10" right="10"/>
