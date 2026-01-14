@@ -12,7 +12,7 @@
 	</Meta>
 	<Timeline>
 		<Start num="0" duration=".8" autoNext="1">
-			<Item object="camera" position="[-7,6,10]" lookAt="[-2,2,1.5]"/>
+			<Item object="camera" position="[-9,6,10]" lookAt="[-2,3,1.5]"/>
 			<Item object="root" position="[0,7,0]" rotation="[0,-180,180]"/>
 			<Item object="Screw.001" hidden="true" position="[0,-1.5,0]" state="save"/>
 
@@ -75,11 +75,31 @@
 		</Step>
 		<Step num="15" autoNext="1">
 			<Item object="root" rotation="[0,-90,0]"/>
-			<Item object="Screw.002" name="Screw-002-hidden" position="[0,-1.5,-8]" hidden="true"/>
+			<Item object="Screw.001" name="Screw-001-hidden" position="[-8,-1.5,0]" hidden="true"/>
 		</Step>
 		<Step num="16">
-			<Item object="Screw.002" name="Screw-002-show" hidden="false"/>
+			<Item object="Screw.001" name="Screw-001-show" hidden="false"/>
 			<Item object="--Arrow.001" name="Arrow.001-rotate" rotation="[0,-360,0]" times="[0,4]" repeat="9" hidden="false"/>
+		</Step>
+		<Step num="17" autoNext="1.5">
+			<Item object="Screw.001" name="Screw-001-down" position="[0,1.5,0]"/>
+			<Item object="--Arrow.001" name="Arrow.001-hide" position="[-8,0,0]" hidden="true"/>
+		</Step>
+		<Step num="18">
+			<Item object="Leg.002" name="Leg.002-show" rotation="[0,-360,0]" times="[0,4]" repeat="1" hidden="false"/>
+		</Step>
+		<Step num="19" autoNext="1">
+			<Item object="Leg.002" name="Leg.002-restore" state="restore"/>
+		</Step>
+		<Step num="20" autoNext="1">
+			<Item object="root" rotation="[0,45,0]"/>
+		</Step>
+		<Step num="21" autoNext="1.5">
+			<Item object="root" position="[0,-7,0]" rotation="[0,-180,180]"/>
+		</Step>
+		<Step num="22">
+			<Item object="camera" position="[0,10,15]" lookAt="[0,3,0]"/>
+			<Item object="root" rotation="[0,-360,0]" times="[0,15]" repeat="9"/>
 		</Step>
 	</Timeline>
 	<Pieces>
