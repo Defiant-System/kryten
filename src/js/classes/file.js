@@ -142,7 +142,7 @@ class File {
 				Viewport.dispatch({ type: "save-item-state", state });
 			} else if (entry.state === "restore") {
 				// restore state from state stack
-				let { position, rotation } = Viewport.dispatch({ type: "get-item-state" }),
+				let { position, rotation } = Viewport.dispatch({ type: "get-item-state", object: item.name }),
 					x = THREE.MathUtils.radToDeg(rotation.x - item.rotation.x),
 					y = THREE.MathUtils.radToDeg(rotation.y - item.rotation.y),
 					z = THREE.MathUtils.radToDeg(rotation.z - item.rotation.z);

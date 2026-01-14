@@ -25,7 +25,6 @@
 			<Item object="Part.010" name="010-rise" hidden="true" />
 		</Start>
 		<Step num="1">
-			<!-- <Item object="camera" position="[0,5,10]" lookAt="[0,2,0]"/> -->
 			<Item object="Part.001" name="001-rotate" rotation="[0,360,0]" times="[0,4]" repeat="9"/>
 		</Step>
 		<Step num="2" autoNext="1.5">

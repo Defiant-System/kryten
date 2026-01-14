@@ -240,10 +240,10 @@ let Viewport = (() => {
 					Self.pivots.root = new THREE.Vector3();
 					break;
 				case "save-item-state":
-					if (!Self.states[event.object]) {
-						Self.states[event.object] = [];
+					if (!Self.states[event.state.object]) {
+						Self.states[event.state.object] = [];
 					}
-					Self.states[event.object].push({ ...event.state });
+					Self.states[event.state.object].push({ ...event.state });
 					break;
 				case "get-item-state":
 					return Self.states[event.object].pop();
