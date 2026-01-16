@@ -32,7 +32,7 @@
 			<Item object="--Arrow.001" name="Arrow.001-hide" position="[8,0,0]" hidden="true"/>
 		</Step>
 		<Step num="3">
-			<Item object="Leg.001" name="Leg.001-show" rotation="[0,-360,0]" times="[0,4]" repeat="1" hidden="false"/>
+			<Item object="Leg.001" name="Leg.001-show" rotation="[0,360,0]" times="[0,4]" repeat="1" hidden="false"/>
 		</Step>
 		<Step num="4" autoNext="1">
 			<Item object="Leg.001" name="Leg.001-restore" state="restore"/>
@@ -50,7 +50,7 @@
 			<Item object="--Arrow.001" name="Arrow.001-hide" position="[0,0,8]" hidden="true"/>
 		</Step>
 		<Step num="8">
-			<Item object="Leg.004" name="Leg.004-show" rotation="[0,-360,0]" times="[0,4]" repeat="1" hidden="false"/>
+			<Item object="Leg.004" name="Leg.004-show" rotation="[0,360,0]" times="[0,4]" repeat="1" hidden="false"/>
 		</Step>
 		<Step num="9" autoNext="1">
 			<Item object="Leg.004" name="Leg.004-restore" state="restore"/>
@@ -68,7 +68,7 @@
 			<Item object="--Arrow.001" name="Arrow.001-hide" position="[-8,0,0]" hidden="true"/>
 		</Step>
 		<Step num="13">
-			<Item object="Leg.003" name="Leg.003-show" rotation="[0,-360,0]" times="[0,4]" repeat="1" hidden="false"/>
+			<Item object="Leg.003" name="Leg.003-show" rotation="[0,360,0]" times="[0,4]" repeat="1" hidden="false"/>
 		</Step>
 		<Step num="14" autoNext="1">
 			<Item object="Leg.003" name="Leg.003-restore" state="restore"/>
@@ -86,7 +86,7 @@
 			<Item object="--Arrow.001" name="Arrow.001-hide" position="[-8,0,0]" hidden="true"/>
 		</Step>
 		<Step num="18">
-			<Item object="Leg.002" name="Leg.002-show" rotation="[0,-360,0]" times="[0,4]" repeat="1" hidden="false"/>
+			<Item object="Leg.002" name="Leg.002-show" rotation="[0,360,0]" times="[0,4]" repeat="1" hidden="false"/>
 		</Step>
 		<Step num="19" autoNext="1">
 			<Item object="Leg.002" name="Leg.002-restore" state="restore"/>
@@ -99,7 +99,7 @@
 		</Step>
 		<Step num="22">
 			<Item object="camera" position="[0,10,15]" lookAt="[0,3,0]"/>
-			<Item object="root" rotation="[0,-360,0]" times="[0,15]" repeat="9"/>
+			<Item object="root" rotation="[0,-360,0]" times="[0,20]" repeat="9"/>
 		</Step>
 	</Timeline>
 	<Pieces>

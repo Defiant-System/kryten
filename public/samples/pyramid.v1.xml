@@ -31,146 +31,142 @@
 			<Item object="root" rotation="[0,-90,0]"/>
 			<Item object="Part.001" name="001-restore" state="restore"/>
 		</Step>
-		<Step num="3" autoNext=".1">
-			<Item object="Part.002" name="002-move" position="[1.5,0,0]" times="[0,0.1]" state="save"/>
+		<Step num="3" autoNext="1">
+			<Item object="Part.002" name="002-move" position="[1.5,0,0]" hidden="false" state="save"/>
 		</Step>
-		<Step num="4" autoNext=".1">
-			<Item object="Part.002" name="002-rise" position="[0,3.5,0]" times="[0,0.1]" rotation="[0,0,-90]"/>
+		<Step num="4" autoNext="1">
+			<Item object="Part.002" name="002-rise" position="[0,3.5,0]" rotation="[0,0,-90]"/>
 		</Step>
 		<Step num="5">
-			<Item object="Part.002" name="002-rotate" rotation="[0,360,0]" hidden="false" times="[0,4]" repeat="9"/>
+			<Item object="Part.002" name="002-rotate" rotation="[0,360,0]" times="[0,4]" repeat="9"/>
 		</Step>
 		<Step num="6" autoNext="1">
 			<Item object="Part.002" name="002-restore" state="restore"/>
 		</Step>
 		<Step num="7" autoNext="1.5">
 			<Item object="root" rotation="[0,60,0]"/>
-			<Item object="Part.003" name="003-move" position="[0,0,0]" state="save"/>
+			<Item object="Part.003" name="003-move" position="[0,0,0]" hidden="false" state="save"/>
 		</Step>
-		<Step num="8" autoNext=".1">
-			<Item object="Part.003" name="003-move" position="[-1.5,0,0]" times="[0,0.1]"/>
+		<Step num="8" autoNext="1">
+			<Item object="Part.003" name="003-move" position="[-1.5,0,0]"/>
 		</Step>
-		<Step num="9" autoNext=".1">
-			<Item object="Part.003" name="003-rise" position="[0,3,0]" times="[0,0.1]"/>
+		<Step num="9" autoNext="1">
+			<Item object="Part.003" name="003-rise" position="[0,3,0]"/>
 		</Step>
 		<Step num="10">
-			<Item object="Part.003" name="003-rotate" rotation="[0,360,0]" hidden="false" times="[0,4]" repeat="9"/>
+			<Item object="Part.003" name="003-rotate" rotation="[0,360,0]" times="[0,4]" repeat="9"/>
 		</Step>
 		<Step num="11" autoNext="1.25">
 			<Item object="Part.003" name="003-restore" state="restore"/>
 		</Step>
 		<Step num="12" autoNext="1.25">
 			<Item object="root" rotation="[0,-150,0]"/>
-			<Item object="Part.004" name="004-restore" position="[0,0,0]" state="save"/>
+			<Item object="Part.004" name="004-restore" position="[0,0,0]" hidden="false" state="save"/>
 		</Step>
-		<Step num="13" autoNext=".1">
-			<Item object="Part.004" name="004-move" times="[0,0.1]" position="[0,0,-1.5]"/>
+		<Step num="13" autoNext="1">
+			<Item object="Part.004" name="004-move" position="[0,0,-1.5]"/>
 		</Step>
-		<Step num="14" autoNext=".1">
-			<Item object="Part.004" name="004-rise" times="[0,0.1]" position="[0,4,0]" rotation="[0,0,-90]"/>
+		<Step num="14" autoNext="1">
+			<Item object="Part.004" name="004-rise" position="[0,4,0]" rotation="[0,0,-90]"/>
 		</Step>
 		<Step num="15">
-			<Item object="Part.004" name="004-rotate" rotation="[0,360,0]" hidden="false" times="[0,4]" repeat="9"/>
+			<Item object="Part.004" name="004-rotate" rotation="[0,360,0]" times="[0,4]" repeat="9"/>
 		</Step>
 		<Step num="16" autoNext="1.25">
 			<Item object="Part.004" name="004-restore" state="restore"/>
 		</Step>
 		<Step num="17" autoNext="1.25">
 			<Item object="root" rotation="[0,-120,0]"/>
-			<Item object="Part.005" name="005-restore" position="[0,0,0]" state="save"/>
+			<Item object="Part.005" name="005-restore" position="[0,0,0]" hidden="false" state="save"/>
 		</Step>
-		<Step num="18" autoNext=".1">
-			<Item object="Part.005" name="005-move" times="[0,0.1]" position="[0,0,-1.5]"/>
+		<Step num="18" autoNext="1">
+			<Item object="Part.005" name="005-move" position="[0,0,-1.5]"/>
 		</Step>
-		<Step num="19" autoNext=".1">
-			<Item object="Part.005" name="005-rise" times="[0,0.1]" position="[0,3,0]" rotation="[0,0,90]"/>
+		<Step num="19" autoNext="1">
+			<Item object="Part.005" name="005-rise" position="[0,3,0]" rotation="[0,0,90]"/>
 		</Step>
 		<Step num="20" autoNext=".5">
 			<Item object="root" rotation="[0,110,0]"/>
 		</Step>
 		<Step num="21">
-			<Item object="Part.005" name="005-rotate" rotation="[0,360,0]" hidden="false" times="[0,4]" repeat="9"/>
+			<Item object="Part.005" name="005-rotate" rotation="[0,360,0]" times="[0,4]" repeat="9"/>
 		</Step>
 		<Step num="22" autoNext="1">
 			<Item object="Part.005" name="005-restore" state="restore"/>
 		</Step>
 		<Step num="23" autoNext="1">
 			<Item object="root" rotation="[0,50,0]"/>
-			<Item object="Part.006" name="006-restore" position="[0,0,0]" state="save"/>
+			<Item object="Part.006" name="006-restore" position="[0,0,0]" hidden="false" state="save"/>
 		</Step>
-		<Step num="24" autoNext=".1">
-			<Item object="Part.006" name="006-move" times="[0,0.1]" position="[0,0,-1.5]"/>
+		<Step num="24" autoNext="1">
+			<Item object="Part.006" name="006-move" position="[0,0,-1.5]"/>
 		</Step>
-		<Step num="25" autoNext=".1">
-			<Item object="Part.006" name="006-rise" times="[0,0.1]" position="[0,3.5,0]" rotation="[0,0,90]"/>
+		<Step num="25" autoNext="1">
+			<Item object="Part.006" name="006-rise" position="[0,3.5,0]" rotation="[0,0,90]"/>
 		</Step>
 		<Step num="26">
-			<Item object="Part.006" name="006-rotate" rotation="[0,360,0]" hidden="false" times="[0,4]" repeat="9"/>
+			<Item object="Part.006" name="006-rotate" rotation="[0,360,0]" times="[0,4]" repeat="9"/>
 		</Step>
 		<Step num="27" autoNext="1">
 			<Item object="Part.006" name="006-restore" state="restore"/>
 		</Step>
 		<Step num="28" autoNext="1">
 			<Item object="root" rotation="[0,-20,0]"/>
-			<Item object="Part.008" name="008-restore" position="[0,0,0]" state="save"/>
+			<Item object="Part.008" name="008-restore" position="[0,0,0]" hidden="false" state="save"/>
 		</Step>
-		<Step num="29" autoNext=".1">
-			<Item object="Part.008" name="008-move" position="[2,0,0]" times="[0,0.1]"/>
+		<Step num="29" autoNext="1">
+			<Item object="Part.008" name="008-move" position="[2,0,0]"/>
 		</Step>
-		<Step num="30" autoNext=".1">
-			<Item object="Part.008" name="008-rise" position="[0,3,0]" times="[0,0.1]"/>
+		<Step num="30" autoNext="1">
+			<Item object="Part.008" name="008-rise" position="[0,3,0]"/>
 		</Step>
 		<Step num="31">
-			<Item object="Part.008" name="008-rotate" rotation="[0,360,0]" times="[0,4]" hidden="false" repeat="9"/>
+			<Item object="Part.008" name="008-rotate" rotation="[0,360,0]" times="[0,4]" repeat="9"/>
 		</Step>
 		<Step num="32" autoNext="1">
 			<Item object="Part.008" name="008-restore" state="restore"/>
 		</Step>
 		<Step num="33" autoNext="1">
 			<Item object="root" rotation="[0,-20,0]"/>
-			<Item object="Part.007" name="007-restore" position="[0,0,0]" state="save"/>
+			<Item object="Part.007" name="007-restore" position="[0,0,0]" hidden="false" state="save"/>
 		</Step>
-		<Step num="34" autoNext=".1">
-			<Item object="Part.007" name="007-move" times="[0,0.1]" position="[2,0,0]"/>
+		<Step num="34" autoNext="1">
+			<Item object="Part.007" name="007-move" position="[2,0,0]"/>
 		</Step>
-		<Step num="35" autoNext=".1">
-			<Item object="Part.007" name="007-rise" times="[0,0.1]" position="[0,3,0]"/>
+		<Step num="35" autoNext="1">
+			<Item object="Part.007" name="007-rise" position="[0,3,0]"/>
 		</Step>
 		<Step num="36">
-			<Item object="Part.007" name="007-rotate" rotation="[0,360,0]" hidden="false" times="[0,4]" repeat="9"/>
+			<Item object="Part.007" name="007-rotate" rotation="[0,360,0]" times="[0,4]" repeat="9"/>
 		</Step>
 		<Step num="37" autoNext="1">
 			<Item object="Part.007" name="007-restore" state="restore"/>
 		</Step>
 		<Step num="38" autoNext="1">
 			<Item object="root" rotation="[0,-55,0]"/>
-			<Item object="Part.009" name="009-restore" position="[0,0,0]" state="save"/>
+			<Item object="Part.009" name="009-restore" position="[0,0,0]" hidden="false" state="save"/>
 		</Step>
-		<Step num="39" autoNext=".1">
-			<Item object="Part.009" name="009-rise" times="[0,0.1]" position="[0,2,0]"/>
+		<Step num="39" autoNext="1">
+			<Item object="Part.009" name="009-rise" position="[0,2,0]"/>
 		</Step>
 		<Step num="40">
-			<Item object="Part.009" name="009-rotate" rotation="[0,360,0]" hidden="false" times="[0,4]" repeat="9"/>
+			<Item object="Part.009" name="009-rotate" rotation="[0,360,0]" times="[0,4]" repeat="9"/>
 		</Step>
 		<Step num="41" autoNext="1">
 			<Item object="Part.009" name="009-restore" state="restore"/>
 		</Step>
 		<Step num="42" autoNext="1">
 			<Item object="root" rotation="[0,195,0]"/>
-			<Item object="Part.010" name="010-restore" position="[0,0,0]" state="save"/>
+			<Item object="Part.010" name="010-restore" position="[0,0,0]" hidden="false" state="save"/>
 		</Step>
-		<Step num="43" autoNext=".1">
-			<Item object="Part.010" name="010-rise" times="[0,0.1]" position="[0,2,0]"/>
+		<Step num="43" autoNext="1">
+			<Item object="Part.010" name="010-rise" position="[0,2,0]"/>
 		</Step>
 		<Step num="44">
-			<Item object="Part.010" name="010-rotate" rotation="[0,360,0]" hidden="false" times="[0,4]" repeat="9"/>
+			<Item object="Part.010" name="010-rotate" rotation="[0,360,0]" times="[0,4]" repeat="9"/>
 		</Step>
-		<Step num="45" autoNext="1.5">
+		<Step num="45">
 			<Item object="Part.010" name="010-restore" state="restore"/>
-		</Step>
-		<Step num="46">
-			<Item object="camera" position="[0,7,10]" lookAt="[0,2,0]"/>
-			<Item object="root" rotation="[0,-360,0]" times="[0,20]" repeat="9"/>
 		</Step>
 	</Timeline>
 	<Pieces>
