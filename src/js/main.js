@@ -90,6 +90,10 @@ const kryten = {
 			case "change-edges-threshold":
 				Viewport.dispatch(event);
 				break;
+			case "toggle-speech":
+				value = event.el.data("speech") === "on";
+				event.el.data("speech", value ? "off" : "on")
+				break;
 			default:
 				el = event.el;
 				if (!el && event.origin) el = event.origin.el;

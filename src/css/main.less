@@ -32,6 +32,8 @@ content {
 		&.icon-forward { background-image: url(~/icons/icon-forward.png); }
 		&.icon-rewind { background-image: url(~/icons/icon-rewind.png); }
 		&.icon-restart { background-image: url(~/icons/icon-restart.png); }
+		&.icon-mic-on { background-image: url(~/icons/icon-mic-on.png); width: 23px; height: 23px; }
+		&.icon-mic-off { background-image: url(~/icons/icon-mic-off.png); width: 23px; height: 23px; }
 	}
 
 	.showcase {
@@ -79,6 +81,28 @@ content {
 				border-top: 1px solid var( --borderColor );
 				border-left: 1px solid var( --borderColor );
 				pointer-events: all;
+
+				.microphone {
+					position: absolute;
+					top: -31px;
+					right: 5px;
+					width: 23px;
+					cursor: pointer;
+
+					&[data-speech="on"] i.icon-mic-on { display: block; }
+					&[data-speech="off"] i.icon-mic-off { display: block; }
+
+					&:hover {
+						i {
+							filter: opacity(.75);
+						}
+					}
+
+					i {
+						display: none;
+						filter: opacity(0.35);
+					}
+				}
 
 				div {
 					position: relative;

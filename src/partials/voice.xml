@@ -1,0 +1,29 @@
+<VoiceCommands>
+	<i language="sv-SE">
+		<i id="somna" command="kryten-sleep"/>
+		<i id="vakna" command="kryten-wake-up"/>
+		<i id="ladda lack" command="load-file" arg="lack"/>
+		<i id="ladda pyramid" command="load-file" arg="pyramid"/>
+		<i id="börja" command="goto-start"/>
+		<i id="nästa" command="goto-next-step"/>
+		<i id="föregående" command="goto-prev-step"/>
+	</i>
+	<i language="en-US">
+		<i id="sleep" command="kryten-sleep"/>
+		<i id="wake up" command="kryten-wake-up"/>
+		<i id="load lack" command="load-file" arg="lack"/>
+		<i id="load pyramid" command="load-file" arg="pyramid"/>
+		<i id="start" command="goto-start"/>
+		<i id="next step" command="goto-next-step"/>
+		<i id="previous step" command="goto-prev-step"/>
+	</i>
+	<i language="tr-TR">
+		<i id="uyu" command="kryten-sleep"/>
+		<i id="uyan" command="kryten-wake-up"/>
+		<i id="dosya yükle lack" command="load-file" arg="lack"/>
+		<i id="dosya yükle pyramid" command="load-file" arg="pyramid"/>
+		<i id="başla" command="goto-start"/>
+		<i id="devam et" command="goto-next-step"/>
+		<i id="geri git" command="goto-prev-step"/>
+	</i>
+</VoiceCommands>
