@@ -1,13 +1,11 @@
 <CaptionToolBar has="display">
-	<Group class="left-empty"/>
 	<Group class="tools-left">
 		<Options>
-			<Tool symbol="icon-rewind" />
-			<Tool symbol="icon-forward" />
-			<Tool symbol="icon-previous" />
-			<Tool symbol="icon-play" />
-			<Tool symbol="icon-next" />
+			<Tool symbol="icon-previous" click="goto-prev-step"/>
+			<Tool symbol="icon-play" click="goto-start"/>
+			<Tool symbol="icon-next" click="goto-next-step"/>
 		</Options>
+		<Tool symbol="icon-mic-off" />
 	</Group>
 	<Group class="display tool-disabled_">
 		<Field class="blank-display">
@@ -29,7 +27,6 @@
 		</Field>
 		<Canvas/>
 	</Group>
-	<Group class="right-empty"/>
 	<Group class="tools-right">
 		<Search placeholder="Search" state="disabled"/>
 	</Group>

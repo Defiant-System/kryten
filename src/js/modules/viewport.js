@@ -152,6 +152,14 @@ let Viewport = (() => {
 						}
 					});
 					break;
+				case "reset-scene":
+					console.log(event.type);
+					objectGroup.children.map(c => {
+						objectGroup.remove(c);
+						c.matrixWorld.decompose(c.position,c.quaternion,c.scale);
+						// c.removeFromParent();
+					});
+					break;
 				case "reset-camera":
 					Self.objects.lookTarget.position.set(...event.lookAt);
 					Self.objects.camera.position.set(...event.position);

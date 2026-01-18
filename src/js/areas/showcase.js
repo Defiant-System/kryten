@@ -6,7 +6,7 @@
 		// fast references
 		this.els = {
 			el: window.find(".showcase"),
-			content: window.find(".blank-view"),
+			content: window.find("content"),
 		};
 	},
 	dispatch(event) {
@@ -17,7 +17,8 @@
 		// console.log(event);
 		switch (event.type) {
 			case "close-file":
-				APP.startView.dispatch({ type: "show-blank-view" });
+				APP.blankView.dispatch({ type: "show-blank-view" });
+				Viewport.dispatch({ type: "reset-scene" });
 				break;
 			case "toggle-speech":
 				value = event.el.data("speech") === "on";
@@ -38,6 +39,10 @@
 			case "build-completed":
 				Self.els.content.find(`.congratulations h2 span`).html(APP.file.getMeta("name"));
 				Self.els.content.addClass("build-finished");
+				break;
+			case "close-congratulations":
+				Self.els.content.removeClass("build-finished");
+				Self.dispatch({ type: "close-file" });
 				break;
 		}
 	}

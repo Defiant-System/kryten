@@ -84,6 +84,8 @@ const kryten = {
 			case "change-edges-threshold":
 				Viewport.dispatch(event);
 				break;
+			case "close-congratulations":
+				return Self.showcase.dispatch(event);
 			case "show-blank-view":
 			case "load-sample":
 				return Self.blankView.dispatch(event);
@@ -101,6 +103,7 @@ const kryten = {
 				}
 		}
 	},
+	toolbar: @import "./areas/toolbar.js",
 	blankView: @import "./areas/blankView.js",
 	showcase: @import "./areas/showcase.js",
 };

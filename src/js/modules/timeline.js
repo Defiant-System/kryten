@@ -72,7 +72,7 @@ let Timeline = (() => {
 					break;
 				case "anim-finished":
 					if (Self.activestep === APP.file.getMeta("steps")) {
-						APP.timeline.dispatch({ type: "build-completed" });
+						APP.showcase.dispatch({ type: "build-completed" });
 					}
 					break;
 				case "auto-go-next-step":
