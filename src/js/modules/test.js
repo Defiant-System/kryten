@@ -1,7 +1,7 @@
 
 let Test = {
 	init(APP) {
-		// return;
+		return;
 		
 		// setTimeout(() => APP.dispatch({ type: "set-ui-theme", arg: "blueprint" }), 500);
 

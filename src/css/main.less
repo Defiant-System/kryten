@@ -1,9 +1,11 @@
 
-background: transparent;
+// background: transparent;
 overflow: visible;
 
 // imports
 @import "timeline";
+@import "blank-view";
+@import "theme-dark";
 
 
 content {
@@ -13,6 +15,18 @@ content {
 	right: 0;
 	bottom: 0;
 	border-radius: inherit;
+
+	&[data-show="blank-view"] {
+		.blank-view { display: block; }
+		.showcase { display: none; }
+		.timeline { display: none; }
+	}
+
+	&[data-show="showcase"] {
+		.blank-view { display: none; }
+		.showcase { display: block; }
+		.timeline { display: block; }
+	}
 	
 	[class*="icon-"],
 	[class^="icon-"] {

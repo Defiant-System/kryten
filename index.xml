@@ -11,7 +11,7 @@
 		<meta name="repository" value="https://github.com/Defiant-System/kryten"/>
 		<meta name="width" value="962"/>
 		<meta name="height" value="602"/>
-		<meta name="top" value="150"/>
+		<meta name="top" value="175"/>
 		<meta name="left" value="130"/>
 		<meta name="minimize"/>
 		<meta name="maximize" value="disabled"/>
@@ -25,4 +25,7 @@
 		@import "src/partials/menubar.xml"
 		@import "src/partials/voice.xml"
 	</Head>
+
+	@import "src/partials/data.xml"
+	
 </Application>

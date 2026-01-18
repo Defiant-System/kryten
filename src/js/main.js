@@ -59,15 +59,9 @@ const kryten = {
 		switch (event.type) {
 			// system events
 			case "window.init":
+				Self.dispatch({ type: "show-blank-view" });
 				break;
 			// custom events
-			case "load-sample":
-				// open application local sample file
-				Self.openLocal(`~/samples/${event.name || event.arg}`)
-					.then(fsFile => {
-						Self.file = new File(fsFile);
-					});
-				break;
 			case "open-help":
 				karaqu.shell("fs -u '~/help/index.md'");
 				break;
@@ -92,8 +86,12 @@ const kryten = {
 				break;
 			case "toggle-speech":
 				value = event.el.data("speech") === "on";
-				event.el.data("speech", value ? "off" : "on")
+				event.el.data("speech", value ? "off" : "on");
+				karaqu.shell(`sys -f ${!value}`);
 				break;
+			case "show-blank-view":
+			case "load-sample":
+				return Self.blankView.dispatch(event);
 			default:
 				el = event.el;
 				if (!el && event.origin) el = event.origin.el;
@@ -106,32 +104,8 @@ const kryten = {
 				}
 		}
 	},
-	openLocal(url) {
-		let parts = url.slice(url.lastIndexOf("/") + 1),
-			[ name, kind ] = parts.split("."),
-			file = new karaqu.File({ name, kind });
-		// return promise
-		return new Promise((resolve, reject) => {
-			// fetch image and transform it to a "fake" file
-			fetch(url)
-				.then(resp => resp.blob())
-				.then(blob => {
-					let reader = new FileReader();
-					reader.addEventListener("load", () => {
-						// file info blob
-						file.blob = blob;
-						file.size = blob.size;
-						// this will then display a text file
-						file.data = $.xmlFromString(reader.result).documentElement;
-						resolve(file);
-					}, false);
-					// get file contents
-					reader.readAsText(blob);
-				})
-				.catch(err => reject(err));
-		});
-	},
 	timeline: @import "./areas/timeline.js",
+	blankView: @import "./areas/blankView.js",
 };
 
 window.exports = kryten;
