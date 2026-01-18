@@ -1,0 +1,36 @@
+<CaptionToolBar has="display">
+	<Group class="left-empty"/>
+	<Group class="tools-left">
+		<Options>
+			<Tool symbol="icon-rewind" />
+			<Tool symbol="icon-forward" />
+			<Tool symbol="icon-previous" />
+			<Tool symbol="icon-play" />
+			<Tool symbol="icon-next" />
+		</Options>
+	</Group>
+	<Group class="display tool-disabled_">
+		<Field class="blank-display">
+			<!-- song title -->
+			<div class="song-name">Karaqu</div>
+			<!-- progress bar -->
+			<div class="progress">
+				<span class="time-played">-:--</span>
+				<span class="progress-track">
+					<span class="progress-loaded"></span>
+					<span class="progress-played"></span>
+					<span class="knob"></span>
+				</span>
+				<span class="time-total">-:--</span>
+			</div>
+			<!-- random / repeat -->
+			<span class="icon-random" data-click="play-random"/>
+			<span class="icon-repeat" data-click="play-repeat"/>
+		</Field>
+		<Canvas/>
+	</Group>
+	<Group class="right-empty"/>
+	<Group class="tools-right">
+		<Search placeholder="Search" state="disabled"/>
+	</Group>
+</CaptionToolBar>

@@ -1,9 +1,11 @@
 
 let Test = {
 	init(APP) {
-		// return;
+		return;
 		
 		setTimeout(() => APP.els.content.find(`.sample .name`).trigger("click"), 300);
+		setTimeout(() => APP.els.content.find(`.microphone`).trigger("click"), 1500);
+		// setTimeout(() => APP.els.content.find(`.microphone`).trigger("click"), 5000);
 		// setTimeout(() => APP.showcase.dispatch({ type: "close-file" }), 3000);
 
 		// setTimeout(() => APP.dispatch({ type: "set-ui-theme", arg: "blueprint" }), 500);

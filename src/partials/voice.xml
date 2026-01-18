@@ -4,9 +4,9 @@
 		<i id="vakna" command="kryten-wake-up"/>
 		<i id="ladda lack" command="load-file" arg="lack"/>
 		<i id="ladda pyramid" command="load-file" arg="pyramid"/>
-		<i id="börja" command="goto-start"/>
-		<i id="nästa" command="goto-next-step"/>
-		<i id="föregående" command="goto-prev-step"/>
+		<i id="starta" command="goto-start"/>
+		<i id="nästa steg" command="goto-next-step"/>
+		<i id="föregående steg" command="goto-prev-step"/>
 	</i>
 	<i language="en-US">
 		<i id="sleep" command="kryten-sleep"/>

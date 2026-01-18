@@ -90,6 +90,7 @@ const kryten = {
 			default:
 				el = event.el;
 				if (!el && event.origin) el = event.origin.el;
+				if (!el || !el.length) el = Self.els.showcase.find(`.microphone`);
 				if (el) {
 					let pEl = el.parents(`?div[data-area]`);
 					if (!pEl.length) pEl = Self.els.showcase;
