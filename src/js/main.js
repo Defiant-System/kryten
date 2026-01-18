@@ -84,11 +84,6 @@ const kryten = {
 			case "change-edges-threshold":
 				Viewport.dispatch(event);
 				break;
-			case "toggle-speech":
-				value = event.el.data("speech") === "on";
-				event.el.data("speech", value ? "off" : "on");
-				karaqu.shell(`sys -f ${!value}`);
-				break;
 			case "show-blank-view":
 			case "load-sample":
 				return Self.blankView.dispatch(event);
@@ -97,6 +92,7 @@ const kryten = {
 				if (!el && event.origin) el = event.origin.el;
 				if (el) {
 					let pEl = el.parents(`?div[data-area]`);
+					if (!pEl.length) pEl = Self.els.showcase;
 					if (pEl.length) {
 						let name = pEl.data("area");
 						return Self[name].dispatch(event);
@@ -104,8 +100,8 @@ const kryten = {
 				}
 		}
 	},
-	timeline: @import "./areas/timeline.js",
 	blankView: @import "./areas/blankView.js",
+	showcase: @import "./areas/showcase.js",
 };
 
 window.exports = kryten;

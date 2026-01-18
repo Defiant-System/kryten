@@ -52,11 +52,18 @@
 			case "show-blank-view":
 				APP.els.content.data({ show: "blank-view" });
 				break;
+			case "select-sample":
+				el = $(event.target).parents("?.sample");
+				Self.dispatch({ type: "load-sample", name: el.data("file") });
+				break;
 			case "load-sample":
 				// open application local sample file
 				Self.openLocal(`~/samples/${event.name || event.arg}`)
 					.then(fsFile => {
-						Self.file = new File(fsFile);
+						// save reference to file
+						APP.file = new File(fsFile);
+						// switch ui
+						APP.els.content.data({ show: "showcase" });
 					});
 				break;
 		}

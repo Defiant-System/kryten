@@ -90,17 +90,18 @@
 
 	.block-samples {
 		height: 167px;
+		pointer-events: none;
 
 		.sample {
 			display: inline-block;
-			background-color: #ccc;
-			background-size: 0 0;
+			background: #eee 50% 50%/contain no-repeat;
 			position: relative;
 			width: 113px;
-			height: 113px;
+			height: 123px;
 			margin: 0 21px 13px 0;
 			border-radius: 7px;
 			cursor: pointer;
+			pointer-events: all;
 			box-shadow: 0 0 0 3px #ccc,
 						inset 0 0 0 3px #ccc;
 
@@ -126,6 +127,16 @@
 				bottom: 2px;
 				border-radius: 5px;
 			}
+
+			.name {
+				font-size: 13px;
+				position: absolute;
+				bottom: -21px;
+				left: 0;
+				right: 0;
+				text-align: center;
+				pointer-events: none;
+			}
 		}
 	}
 
@@ -138,7 +149,7 @@
 			background-size: 0 0;
 			position: relative;
 			width: 113px;
-			height: 113px;
+			height: 123px;
 			margin: 0 21px 13px 0;
 			border-radius: 9px;
 			text-align: center;

@@ -1,11 +1,15 @@
 
 let Test = {
 	init(APP) {
-		return;
+		// return;
 		
-		// setTimeout(() => APP.dispatch({ type: "set-ui-theme", arg: "blueprint" }), 500);
+		setTimeout(() => APP.els.content.find(`.sample .name`).trigger("click"), 300);
+		// setTimeout(() => APP.showcase.dispatch({ type: "close-file" }), 3000);
 
+		// setTimeout(() => APP.dispatch({ type: "set-ui-theme", arg: "blueprint" }), 500);
 		// setTimeout(() => APP.dispatch({ type: "load-sample", arg: "torus.xml" }), 1000);
+
+		return;
 
 		// setTimeout(() => Viewport.fpsControl.start(), 500);
 		// setTimeout(() => Viewport.fpsControl.stop(), 3000);

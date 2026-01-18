@@ -1,10 +1,10 @@
 <Data>
 	<Samples>
-		<i name="pyramid.xml"/>
-		<i name="lack.xml"/>
-		<i name="monkey.xml"/>
-		<i name="torus-knot"/>
-		<i name="torus.xml"/>
+		<i name="Lack" img="lack.webp" file="lack.xml"/>
+		<i name="Pyramid" img="pyramid.webp" file="pyramid.xml"/>
+		<i name="Monkey" img="monkey.webp" file="monkey.xml"/>
+		<i name="Basic" img="basic.webp" file="basic.xml"/>
+		<i name="Torus Knot" img="torus-knot.webp" file="torus-knot.xml"/>
 	</Samples>
 	<!-- <Recents>
 		<i name="basketball.png" filepath="/fs/Desktop/images/basketball.png"/>

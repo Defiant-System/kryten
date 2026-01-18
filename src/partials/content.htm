@@ -1,10 +1,10 @@
-<content data-theme="ikea" data-context="app-ui-layout">
+<content data-show="blank-view" data-theme="ikea" data-context="app-ui-layout">
 	<!-- shown if no file is opened -->
 	<div class="blank-view" data-area="blankView">
 		<!-- blank view HTML goes here -->
 	</div>
 	
-	<div class="showcase">
+	<div class="showcase" data-area="showcase">
 		<div class="outlines">
 			<h1>IKEA</h1>
 			<h2 data-prefix="Steg">1</h2>
@@ -23,20 +23,6 @@
 				<div class="row-3" data-id="description">&#160;</div>
 			</div>
 		</div>
-	</div>
-
-	<div class="timeline" data-area="timeline">
-		<span class="btn" data-click="toggle-play">Toggle Play</span>
-		<span class="btn" data-click="goto-menu">Menu</span>
-		<span class="btn blue" data-click="goto-start">Start</span>
-		<span class="btn" data-click="goto-prev-step">Previous</span>
-		<span class="btn" data-click="goto-next-step">Next</span>
-		<ul class="steps">
-			<li data-click="goto-step" data-arg="1">1</li>
-			<li data-click="goto-step" data-arg="2">2</li>
-			<li data-click="goto-step" data-arg="3">3</li>
-		</ul>
-		<span class="btn" data-click="build-completed">Completed</span>
 	</div>
 
 	<!-- for game solved -->

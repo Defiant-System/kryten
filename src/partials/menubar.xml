@@ -4,11 +4,18 @@
 		<Menu type="divider"/>
 		<Menu name="Settings&#8230;" for="app-ui-layout">
 			<Menu name="Sample files&#8230;">
+				<Menu name="Close Current" click="close-file"/>
+				<Menu type="divider"/>
 				<Menu name="Lack" click="load-sample" arg="lack.xml"/>
-				<Menu name="Monkey" click="load-sample" arg="monkey.xml"/>
-				<Menu name="Torus" click="load-sample" arg="torus.xml"/>
-				<Menu name="Torus Knot" click="load-sample" arg="torus-knot.xml"/>
 				<Menu name="Pyramid" click="load-sample" arg="pyramid.xml"/>
+				<Menu name="Monkey" click="load-sample" arg="monkey.xml"/>
+				<Menu name="Torus Knot" click="load-sample" arg="torus-knot.xml"/>
+				<Menu name="Basic" click="load-sample" arg="basic.xml"/>
+			</Menu>
+			<Menu name="Commands&#8230;">
+				<Menu name="Start" click="goto-start"/>
+				<Menu name="Next Step" click="goto-next-step"/>
+				<Menu name="Previous Step" click="goto-prev-step" disabled="1"/>
 			</Menu>
 			<Menu type="divider"/>
 			<Menu name="IKEA" click="set-ui-theme" arg="ikea" check-group="ui-theme"/>

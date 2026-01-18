@@ -1,14 +1,26 @@
 <Data>
 	<Meta>
-		<i id="name" value="Torusknot"/>
+		<i id="name" value="Torus Knot"/>
 		<i id="description"><![CDATA[Byrå med 2 lådor, vitbets. 54 x 66 x 113 cm]]></i>
 		<i id="assembly" value="7"/>
 		<i id="steps" value="21"/>
 		<i id="parts" value="13"/>
+		<i id="floorY" value="-0.5"/>
 		<i id="camera" position="[0.65,0.75,1.5]" lookAt="[0,0,0]"/>
 		<i id="light" position="[7,6,-1]" color="#fff"/>
 	</Meta>
-	<Timeline />
+	<Timeline>
+		<Start num="0" duration="1">
+			<Item object="camera" position="[0,1,2]" lookAt="[0,0,0]"/>
+			<Item object="root" position="[0,0,0]"/>
+			<Item object="001" position="[0,0,0]" state="save"/>
+			<Item object="002" position="[0,0,0]"/>
+			<Item object="003" position="[0,0,0]" hidden="true"/>
+		</Start>
+		<Step num="1">
+			<Item object="001" name="001-rise" position="[0,1,0]"/>
+		</Step>
+	</Timeline>
 	<Pieces>
 		<i id="001" type="basic" name="TorusKnotGeometry" args="[0.35,0.125,50,12]" position="[0,0,0]" rotation="[0,0.35,0]"/>
 	</Pieces>
