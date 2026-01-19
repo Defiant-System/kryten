@@ -11,19 +11,6 @@
 		<Field class="blank-display">
 			<!-- song title -->
 			<div class="song-name">Karaqu</div>
-			<!-- progress bar -->
-			<div class="progress">
-				<span class="time-played">-:--</span>
-				<span class="progress-track">
-					<span class="progress-loaded"></span>
-					<span class="progress-played"></span>
-					<span class="knob"></span>
-				</span>
-				<span class="time-total">-:--</span>
-			</div>
-			<!-- random / repeat -->
-			<span class="icon-random" data-click="play-random"/>
-			<span class="icon-repeat" data-click="play-repeat"/>
 		</Field>
 		<Canvas/>
 	</Group>

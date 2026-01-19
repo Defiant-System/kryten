@@ -68,9 +68,12 @@ let Timeline = (() => {
 
 					mixer.addEventListener("finished", e => Self.dispatch({ type: "anim-finished", originalEvent: e }));
 					// add track to "tape"
-					tape[event.step].push({ item, track, mixer, action });
+					tape[event.step].push({ item, track, mixer, action, repeat: event.track.repeat });
 					break;
 				case "anim-finished":
+					// reset flag
+					delete Self.isAnimating;
+
 					if (Self.activestep === APP.file.getMeta("steps")) {
 						APP.showcase.dispatch({ type: "build-completed" });
 					}
@@ -92,24 +95,32 @@ let Timeline = (() => {
 					}
 					break;
 				case "goto-prev-step":
+					if (Self.isAnimating) return;
 					step = Self.activestep - 1;
 					Self.dispatch({ type: "goto-step", step });
 					break;
 				case "goto-next-step":
+					if (Self.isAnimating) return;
 					step = Self.activestep + 1;
 					Self.dispatch({ type: "goto-step", step });
 					break;
 				case "goto-step":
+					if (Self.isAnimating) return;
 					// start playing step
 					step = +event.step;
 					// accumulate scene / objects state
 					APP.file.stateToTracks(step);
 					// if step is on tape
 					if (!tape[step]) return;
+					// prevents animation interuptions
+					Self.isAnimating = true;
 					// step number
 					APP.els.stepNum.html(step);
 					// play it white boy
-					tape[step].map(track => track.action.play());
+					tape[step].map(track => {
+						if (track.repeat) delete Self.isAnimating;
+						track.action.play();
+					});
 					// save reference
 					Self.activestep = +event.step;
 					break;
