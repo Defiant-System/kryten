@@ -79,7 +79,10 @@ let Timeline = (() => {
 					}
 					break;
 				case "auto-go-next-step":
-					action = { play() { setTimeout(() => Self.dispatch({ type: "goto-next-step" }), event.autoNext * 1000); } };
+					action = { play() { setTimeout(() => {
+						delete Self.isAnimating;
+						Self.dispatch({ type: "goto-next-step" });
+					}, event.autoNext * 1000); } };
 					mixer = { update() {} };
 					item = {};
 
