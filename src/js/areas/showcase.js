@@ -20,11 +20,6 @@
 				APP.blankView.dispatch({ type: "show-blank-view" });
 				Viewport.dispatch({ type: "reset-scene" });
 				break;
-			case "toggle-speech":
-				value = event.el.data("speech") === "on";
-				event.el.data("speech", value ? "off" : "on");
-				karaqu.shell(`sys -f ${!value}`);
-				break;
 			case "goto-start":
 			case "goto-prev-step":
 			case "goto-next-step":

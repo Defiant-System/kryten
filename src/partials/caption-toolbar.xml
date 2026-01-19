@@ -5,7 +5,7 @@
 			<Tool symbol="icon-play" click="goto-start"/>
 			<Tool symbol="icon-next" click="goto-next-step"/>
 		</Options>
-		<Tool symbol="icon-mic-off" />
+		<Tool symbol="icon-mic-off" click="toggle-microphone"/>
 	</Group>
 	<Group class="display tool-disabled_">
 		<Field class="blank-display">

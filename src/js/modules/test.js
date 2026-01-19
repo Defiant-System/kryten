@@ -1,7 +1,12 @@
 
+// TODO
+// - app icon
+// - scene reset
+
+
 let Test = {
 	init(APP) {
-		// return;
+		return;
 		
 		setTimeout(() => APP.els.content.find(`.sample .name`).get(1).trigger("click"), 300);
 		// setTimeout(() => APP.els.content.find(`.microphone`).trigger("click"), 1500);
