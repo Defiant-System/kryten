@@ -51,6 +51,8 @@
 		switch (event.type) {
 			case "show-blank-view":
 				APP.els.content.data({ show: "blank-view" });
+				// update toolbar
+				APP.toolbar.dispatch({ type: "disable-tools" });
 				break;
 			case "select-sample":
 				el = $(event.target).parents("?.sample");
@@ -64,6 +66,8 @@
 						APP.file = new File(fsFile);
 						// switch ui
 						APP.els.content.data({ show: "showcase" });
+						// update toolbar
+						APP.toolbar.dispatch({ type: "enable-tools", list: ["goto-start"] });
 					});
 				break;
 		}

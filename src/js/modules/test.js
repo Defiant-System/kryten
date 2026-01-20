@@ -1,6 +1,5 @@
 
 // TODO
-// - app icon
 // - scene reset
 
 
@@ -8,11 +7,11 @@ let Test = {
 	init(APP) {
 		return;
 		
-		setTimeout(() => APP.els.content.find(`.sample .name`).get(1).trigger("click"), 300);
+		setTimeout(() => APP.els.content.find(`.sample .name`).get(0).trigger("click"), 300);
 		// setTimeout(() => APP.els.content.find(`.microphone`).trigger("click"), 1500);
-		setTimeout(() => APP.showcase.dispatch({ type: "goto-start" }), 1000);
+		// setTimeout(() => APP.showcase.dispatch({ type: "goto-start" }), 1000);
 		// setTimeout(() => APP.showcase.dispatch({ type: "goto-next-step" }), 2500);
-		// setTimeout(() => APP.showcase.dispatch({ type: "close-file" }), 3000);
+		// setTimeout(() => APP.showcase.dispatch({ type: "close-file" }), 1500);
 
 		// setTimeout(() => APP.dispatch({ type: "set-ui-theme", arg: "blueprint" }), 500);
 		// setTimeout(() => APP.dispatch({ type: "load-sample", arg: "torus.xml" }), 1000);

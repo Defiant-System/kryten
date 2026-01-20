@@ -1,11 +1,11 @@
 <CaptionToolBar has="display">
 	<Group class="tools-left">
+		<Tool symbol="icon-pause" click="toggle-fps" state="disabled"/>
 		<Options>
-			<Tool symbol="icon-previous" click="goto-prev-step"/>
-			<Tool symbol="icon-play" click="goto-start"/>
-			<Tool symbol="icon-next" click="goto-next-step"/>
+			<Tool symbol="icon-play" click="goto-start" state="disabled"/>
+			<Tool symbol="icon-previous" click="goto-prev-step" state="disabled"/>
+			<Tool symbol="icon-next" click="goto-next-step" state="disabled"/>
 		</Options>
-		<Tool symbol="icon-mic-off" click="toggle-microphone"/>
 	</Group>
 	<Group class="display tool-disabled_">
 		<Field class="blank-display">
@@ -15,6 +15,9 @@
 		<Canvas/>
 	</Group>
 	<Group class="tools-right">
-		<Search placeholder="Search" state="disabled"/>
+		<Tool symbol="icon-mic-off" click="toggle-microphone"/>
+	</Group>
+	<Group class="tools-last">
+		<Tool symbol="icon-gear" menu="app-ui-layout"/>
 	</Group>
 </CaptionToolBar>

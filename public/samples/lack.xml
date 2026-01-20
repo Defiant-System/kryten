@@ -3,8 +3,7 @@
 		<i id="name" value="Lack"/>
 		<i id="description"><![CDATA[Sidobord, vitlaserad ekeffekt. 55 x 55 x 45 cm]]></i>
 		<i id="assembly" value="5-7"/>
-		<i id="steps" value="21"/>
-		<i id="parts" value="13"/>
+		<i id="parts" value="9"/>
 		<i id="floorY" value="0.01"/>
 		<i id="camera" position="[0,10,15]" lookAt="[0,3,0]"/>
 		<i id="shadowCam" top="10" left="-10" bottom="-10" right="10"/>

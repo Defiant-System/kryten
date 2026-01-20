@@ -62,6 +62,9 @@ const kryten = {
 				Self.dispatch({ type: "show-blank-view" });
 				break;
 			// custom events
+			case "kryten-sleep":
+			case "kryten-wake":
+				break;
 			case "open-help":
 				karaqu.shell("fs -u '~/help/index.md'");
 				break;
@@ -74,9 +77,7 @@ const kryten = {
 				window.bluePrint.selectSingleNode(`//Menu[@click="set-ui-theme"][@arg="${value}"]`).setAttribute("is-checked", "1");
 				break;
 			case "toggle-play-pause":
-				if (Viewport.fpsControl._stopped) Viewport.fpsControl.start();
-				else Viewport.fpsControl.stop();
-				break;
+				return Self.toolbar.dispatch(event);
 			case "set-ui-theme":
 				Self.els.content.data({ theme: event.arg });
 				Viewport.dispatch({ type: "refresh-theme-values" });

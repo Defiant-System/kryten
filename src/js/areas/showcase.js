@@ -18,9 +18,15 @@
 		switch (event.type) {
 			case "close-file":
 				APP.blankView.dispatch({ type: "show-blank-view" });
+				Viewport.dispatch({ type: "stop-fps" });
 				Viewport.dispatch({ type: "reset-scene" });
+				// update toolbar
+				APP.toolbar.dispatch({ type: "disable-tools" });
 				break;
 			case "goto-start":
+				// update toolbar
+				APP.toolbar.dispatch({ type: "enable-tools", list: ["goto-next-step"] });
+				/* falls through */
 			case "goto-prev-step":
 			case "goto-next-step":
 				Timeline.dispatch(event);
@@ -34,6 +40,8 @@
 			case "build-completed":
 				Self.els.content.find(`.congratulations h2 span`).html(APP.file.getMeta("name"));
 				Self.els.content.addClass("build-finished");
+				// update toolbar
+				APP.toolbar.dispatch({ type: "disable-tools" });
 				break;
 			case "close-congratulations":
 				Self.els.content.removeClass("build-finished");
