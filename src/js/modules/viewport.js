@@ -154,6 +154,8 @@ let Viewport = (() => {
 					});
 					break;
 				case "reset-scene":
+					
+					Timeline.paused = true;
 					// Self.fpsControl.stop();
 					scene.remove(objectGroup);
 

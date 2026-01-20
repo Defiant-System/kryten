@@ -62,12 +62,14 @@
 				// open application local sample file
 				Self.openLocal(`~/samples/${event.name || event.arg}`)
 					.then(fsFile => {
+						// reset timeline + tape
+						Timeline.dispatch({ type: "reset-timeline" });
 						// save reference to file
 						APP.file = new File(fsFile);
 						// switch ui
 						APP.els.content.data({ show: "showcase" });
 						// update toolbar
-						APP.toolbar.dispatch({ type: "enable-tools", list: ["goto-start"] });
+						APP.toolbar.dispatch({ type: "enable-tools", list: ["goto-start", "toggle-fps"] });
 					});
 				break;
 		}

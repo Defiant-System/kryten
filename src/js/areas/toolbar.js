@@ -30,12 +30,12 @@
 					Self.els.el.find(`.toolbar-tool_[data-click="${type}"]`).addClass("tool-disabled_");
 				});
 				break;
-			case "toggle-play-pause":
+			case "toggle-fps":
 				el = Self.els.el.find(`.toolbar-tool_[data-click="toggle-fps"]`);
 				value = el.hasClass("tool-active_");
 
-				if (value) Viewport.fpsControl.stop();
-				else Viewport.fpsControl.start();
+				if (value) Viewport.fpsControl.start();
+				else Viewport.fpsControl.stop();
 				// toolbar button state
 				return !value;
 			case "toggle-microphone":

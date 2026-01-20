@@ -5,7 +5,7 @@
 	</Build>
 	<Head>
 		<meta name="id" value="kryten"/>
-		<meta name="title" value="Kryten" version="1.0"/>
+		<meta name="title" value="Kryten" version="1.12"/>
 		<meta name="author" value="Hakan Bilgin" namespace="ant"/>
 		<meta name="license" value="AGPL-3.0"/>
 		<meta name="repository" value="https://github.com/Defiant-System/kryten"/>

@@ -10,10 +10,7 @@ let Timeline = (() => {
 		init(APP) {
 			// save reference to app
 			this.APP = APP;
-
 			this.paused = true;
-
-			// setTimeout(() => this.dispatch({ type: "play-next" }), 500);
 		},
 		tick(time, delta) {
 			if (step !== undefined && tape[step] !== undefined) {
@@ -41,10 +38,13 @@ let Timeline = (() => {
 				mixer;
 			// console.log(event);
 			switch (event.type) {
+				case "reset-timeline":
+					tape = [];
+					APP.els.stepNum.html(1);
+					break;
 				case "goto-start":
 					// pause "auto-rotation"
 					Self.paused = false;
-					Self.activestep = 0;
 					Self.dispatch({ type: "goto-step", step: 0 });
 					// update toolbar
 					APP.toolbar.dispatch({ type: "disable-tools", list: ["goto-start"] });
