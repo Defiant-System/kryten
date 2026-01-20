@@ -44,7 +44,11 @@ let Timeline = (() => {
 				case "goto-start":
 					// pause "auto-rotation"
 					Self.paused = false;
+					Self.activestep = 0;
 					Self.dispatch({ type: "goto-step", step: 0 });
+					// update toolbar
+					APP.toolbar.dispatch({ type: "disable-tools", list: ["goto-start"] });
+					APP.toolbar.dispatch({ type: "enable-tools", list: ["goto-next-step"] });
 					break;
 				case "add-step":
 					// reserv step on tape

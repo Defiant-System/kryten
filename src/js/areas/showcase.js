@@ -24,8 +24,6 @@
 				APP.toolbar.dispatch({ type: "disable-tools" });
 				break;
 			case "goto-start":
-				// update toolbar
-				APP.toolbar.dispatch({ type: "enable-tools", list: ["goto-next-step"] });
 				/* falls through */
 			case "goto-prev-step":
 			case "goto-next-step":
@@ -35,7 +33,7 @@
 				Timeline.dispatch({ type: "goto-step", step: +event.arg });
 				break;
 			case "toggle-play":
-				Timeline.paused = !Timeline.paused;
+				// Timeline.paused = !Timeline.paused;
 				break;
 			case "build-completed":
 				Self.els.content.find(`.congratulations h2 span`).html(APP.file.getMeta("name"));

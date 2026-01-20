@@ -16,6 +16,8 @@
 				<Menu name="Start" click="goto-start"/>
 				<Menu name="Next Step" click="goto-next-step"/>
 				<Menu name="Previous Step" click="goto-prev-step" disabled="1"/>
+				<Menu type="divider"/>
+				<Menu name="Fireworks" click="build-completed"/>
 			</Menu>
 			<Menu type="divider"/>
 			<Menu name="IKEA" click="set-ui-theme" arg="ikea" check-group="ui-theme"/>

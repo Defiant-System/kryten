@@ -144,8 +144,9 @@ let Viewport = (() => {
 						fps: 50,
 						// autoplay: true,
 						callback(time, delta) {
-							if (Timeline.paused) objectGroup.rotation.y -= 0.0025;
-							else Timeline.tick(time, delta);
+							if (Timeline.paused) {
+								objectGroup.rotation.y -= 0.0025;
+							} else Timeline.tick(time, delta);
 
 							if (postprocess) composer.render();
 							else renderer.render(scene, camera);
@@ -153,12 +154,13 @@ let Viewport = (() => {
 					});
 					break;
 				case "reset-scene":
-					console.log(event.type);
-					objectGroup.children.map(c => {
-						objectGroup.remove(c);
-						c.matrixWorld.decompose(c.position,c.quaternion,c.scale);
-						// c.removeFromParent();
-					});
+					// Self.fpsControl.stop();
+					scene.remove(objectGroup);
+
+					originalModel = new THREE.Group();
+					objectGroup = new THREE.Group();
+					objectGroup.castShadow = true;
+					scene.add(objectGroup);
 					break;
 				case "reset-camera":
 					Self.objects.lookTarget.position.set(...event.lookAt);
