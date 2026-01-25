@@ -4,6 +4,7 @@ let {
 	THREE,
 	THREE_dispose,
 
+	CSG,
 	ToIndexed,
 	OutlineMaterial,
 	OutlineMesh,

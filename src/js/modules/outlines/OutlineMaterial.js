@@ -24,18 +24,17 @@ void main() {
 	float l0 = length(aN0); 
 	float l1 = length(aN1);
 
-	if(l0*l1 < 0.0001) return; //end of mesh
+	if (l0*l1 < 0.0001) return; //end of mesh
 
 	float dd = dot(normalize(aN0),normalize(aN1));
-
-	if(acos(dd) > uAngleThresh) return;
+	if (acos(dd) > uAngleThresh) return;
 	
 	//find point
 	bool isOther = aOtherVert.w > 0.5;
 	vec3 a;
 	vec3 b;
 
-	if(isOther){
+	if (isOther) {
 		a = aOtherVert.xyz;
 		b = position;
 	} else {
@@ -58,7 +57,7 @@ void main() {
 
 	bool outline = sign(dot(vN0,viewDir)) * sign(dot(vN1,viewDir)) < 0.;
 	
-	if(uOutline == 1 && outline) return;
+	if (uOutline == 1 && outline) return;
 
 	gl_Position.z = -2000.; //wtf?
 }

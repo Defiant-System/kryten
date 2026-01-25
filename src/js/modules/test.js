@@ -3,7 +3,10 @@ let Test = {
 	init(APP) {
 		return;
 		
-		setTimeout(() => APP.els.content.find(`.sample .name`).get(1).trigger("click"), 300);
+		setTimeout(() => APP.els.content.find(`.sample .name`).get(4).trigger("click"), 300);
+
+		return;
+
 		// setTimeout(() => window.find(`.toolbar-tool_[data-click="goto-start"]`).trigger("click"), 2000);
 		// setTimeout(() => APP.els.content.find(`.microphone`).trigger("click"), 1500);
 		setTimeout(() => APP.showcase.dispatch({ type: "goto-start" }), 500);
