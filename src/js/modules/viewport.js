@@ -5,23 +5,12 @@ let Viewport = (() => {
 		height = window.innerHeight,
 		ratio = width / height,
 		loader = new OBJLoader(),
-		mtlLine = new OutlineMaterial(179, true, "#888"),
-		mtlShadow = new ColoredShadowMaterial({
-			color: 0xffffff,
-			shadowColor: 0xdddddd,
-			// shininess: 1.0,
-			// transparent: true,
-			// opacity: 0.95,
-			polygonOffset: true,
-			polygonOffsetFactor: 1,
-			polygonOffsetUnits: 1,
-		}),
+		param = { depthTexture: new THREE.DepthTexture(), depthBuffer: true },
+		renderTarget = new THREE.WebGLRenderTarget(width, height, param),
 		originalModel = new THREE.Group(),
 		objectGroup = new THREE.Group(),
-		shadowModel,
-		edgesModel,
-		conditionalModel,
-		theme,
+		surfaceFinder = new FindSurfaces(),
+		customOutline,
 		renderer,
 		scene,
 		camera,
@@ -30,21 +19,8 @@ let Viewport = (() => {
 		shadowCam,
 		floor,
 		orbit,
-		// postprocessing
-		postprocess = 0,
-		param = { 
-			minFilter: THREE.LinearFilter,
-			magFilter: THREE.LinearFilter,
-			format: THREE.RGBAFormat,
-			type: THREE.HalfFloatType,
-			stencilBuffer: false,
-			samples: 4,
-		},
-		renderTarget = new THREE.WebGLRenderTarget(width, height, param),
 		composer,
-		renderPass,
-		outlinePass,
-		effectFXAA;
+		pass;
 
 
 	let vp = {
@@ -74,6 +50,7 @@ let Viewport = (() => {
 					renderer.shadowMap.enabled = true;
 					renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 					renderer.setSize(width, height);
+
 					// scene setup
 					scene = new THREE.Scene();
 					// camera
@@ -97,22 +74,27 @@ let Viewport = (() => {
 					shadowCam.left = shadowCam.bottom = -5;
 					shadowCam.right = shadowCam.top = 5;
 					scene.add(dirLight);
-					
-					/* postprocessing
+
+					// post processing
 					composer = new EffectComposer(renderer, renderTarget);
-					renderPass = new RenderPass(scene, camera);
-					composer.addPass(renderPass);
-					outlinePass = new OutlinePass(new THREE.Vector2(width, height), scene, camera);
-					composer.addPass(outlinePass);
-					outlinePass.edgeStrength = 5.0,
-					outlinePass.edgeThickness = 0.5;
-					// outlinePass.edgeGlow = 0.0,
-					outlinePass.visibleEdgeColor.set('#ff3300');
-					outlinePass.hiddenEdgeColor.set('#002255');
-					// outlinePass.selectedObjects = [objectGroup];
-					effectFXAA = new ShaderPass(FXAAShader);
+					pass = new RenderPass(scene, camera);
+					composer.addPass(pass);
+
+					// Outline pass.
+					customOutline = new CustomOutlinePass(
+						new THREE.Vector2(width, height),
+						scene,
+						camera
+					);
+					composer.addPass(customOutline);
+
+					// Antialias pass.
+					let effectFXAA = new ShaderPass(FXAAShader);
+					effectFXAA.uniforms["resolution"].value.set(
+						1 / width,
+						1 / height
+					);
 					composer.addPass(effectFXAA);
-					*/
 
 					// floor setup
 					floor = new THREE.Mesh(
@@ -126,97 +108,23 @@ let Viewport = (() => {
 					// view object setup
 					objectGroup.castShadow = true;
 					scene.add(objectGroup);
+
 					// add renderer canvas to window body
 					APP.els.showcase.append(renderer.domElement);
-
-					Self.objects.light = dirLight;
-					Self.objects.orbit = orbit;
-					Self.objects.camera = camera;
-					Self.objects.lookTarget = lookTarget;
-					Self.objects.shadowCam = shadowCam;
-					Self.objects.scene = scene;
-					// reserved objects
-					Self.reserved = "light camera lookTarget shadowCam scene root".split(" ");
 					break;
 				case "init-player":
 					// create FPS controller
 					Self.fpsControl = karaqu.FpsControl({
-						fps: 50,
+						fps: 5,
 						// autoplay: true,
 						callback(time, delta) {
 							if (Timeline.paused) {
 								objectGroup.rotation.y -= 0.0025;
 							} else Timeline.tick(time, delta);
 
-							if (postprocess) composer.render();
-							else renderer.render(scene, camera);
+							composer.render();
 						}
 					});
-					break;
-				case "reset-scene":
-					
-					Timeline.paused = true;
-					// Self.fpsControl.stop();
-					scene.remove(objectGroup);
-
-					originalModel = new THREE.Group();
-					objectGroup = new THREE.Group();
-					objectGroup.castShadow = true;
-					scene.add(objectGroup);
-					break;
-				case "reset-camera":
-					Self.objects.lookTarget.position.set(...event.lookAt);
-					Self.objects.camera.position.set(...event.position);
-					Self.objects.camera.lookAt(Self.objects.lookTarget.position);
-					Self.objects.camera.updateProjectionMatrix();
-					// update orbit controls
-					Self.objects.orbit.target.copy(Self.objects.lookTarget.position);
-					break;
-				case "reset-shadow-cam":
-					shadowCam.top = event.values.top;
-					shadowCam.left = event.values.left;
-					shadowCam.bottom = event.values.bottom;
-					shadowCam.right = event.values.right;
-					shadowCam.updateProjectionMatrix();
-					break;
-				case "refresh-theme-values":
-					// prepare to update three.js
-					theme = {
-						lightColor: null,
-						floorColor: null,
-						materialShadowHigh: null,
-						materialShadowLow: null,
-						edgesColor: null,
-						edgesLine: null,
-					};
-					// get theme values
-					Object.keys(theme).map(key => {
-						let value = APP.els.content.cssProp(`--${key}`);
-						if (value == +value) value = +value;
-						theme[key] = value;
-					});
-					// update models if requeired
-					objectGroup.traverse(c => {
-						// if (!c.isMesh) return;
-						switch (c.type) {
-							case "LineSegments":
-								c.material.color = new THREE.Color(theme.edgesColor);
-								break;
-							case "Mesh":
-								c.material.color = new THREE.Color(theme.materialShadowHigh);
-								c.material.shadowColor = new THREE.Color(theme.materialShadowLow);
-								break;
-						}
-					});
-					if (floor) {
-						// update floor color
-						floor.material.color.set(theme.floorColor);
-						floor.material.opacity = .2;
-					}
-					break;
-				case "change-edges-threshold":
-					// update material angle threshold
-					mtlLine.angleThreshold = +event.arg;
 					break;
 				case "insert-basic-geometry":
 					// loop values
@@ -234,71 +142,23 @@ let Viewport = (() => {
 					object.name = event.geo.id;
 					// add object to original model
 					originalModel.add(object);
-					break;
-				case "insert-compound-geometry":
-				case "insert-OBJ-geometry":
-					object = loader.parse(event.geo.str);
-					object.traverse(c => {
-						if (!c.isMesh) return;
-						c.geometry.computeBoundingBox();
-						let pivot = new THREE.Vector3();
-						c.geometry.boundingBox.getCenter(pivot);
-						c.geometry.center();
-						c.position.add(pivot);
-						Self.pivots[c.name] = pivot.clone();
-					});
-					originalModel.add(object);
 
-					Self.pivots.root = new THREE.Vector3();
 					break;
-				case "save-item-state":
-					if (!Self.states[event.state.object]) {
-						Self.states[event.state.object] = [];
-					}
-					Self.states[event.state.object].push({ ...event.state });
-					break;
-				case "get-item-state":
-					return Self.states[event.object].pop();
 				case "update-models":
-					// for floor
-					y = Infinity;
-					// prepare render objects
-					originalModel.traverse(c => {
-						if (!c.isMesh) return;
-						let oGroup = new THREE.Group();
-						oGroup.position.set(...c.position.toArray());
-						oGroup.rotation.set(...c.rotation.toArray());
-						// find out where floor should be
-						y = Math.min(y, c.geometry.boundingBox.min.y);
-						// shadow material
-						let sGeo = c.geometry.clone();
-						let sMesh = new THREE.Mesh(sGeo, mtlShadow);
-						sMesh.receiveShadow = true;
-						sMesh.castShadow = true;
-						oGroup.add(sMesh);
-						// outlines
-						let lGeo = sGeo.clone();
-						if (!lGeo.index) lGeo = lGeo.toIndexed(false);
-						let lMesh = new THREE.Mesh(lGeo);
-						let lObj = new OutlineMesh(lMesh, mtlLine);
-						oGroup.add(lObj);
-						// name of item as group name
-						oGroup.name = c.name;
-						// hide "helper" meshes
-						if (oGroup.name.startsWith("--")) {
-							oGroup.visible = false;
+				// case "add-surface-id-attribute-to-mesh":
+					surfaceFinder.surfaceId = 0;
+
+					scene.traverse(c => {
+						if (c.type == "Mesh") {
+							const colorsTypedArray = surfaceFinder.getSurfaceIdAttribute(c);
+							c.geometry.setAttribute(
+								"color",
+								new THREE.BufferAttribute(colorsTypedArray, 4)
+							);
 						}
-						// save references to objects
-						Self.objects[c.name] = oGroup;
-						// insert in to scene
-						objectGroup.add(oGroup);
 					});
-					// regerence to root group
-					Self.objects.root = objectGroup;
-					// update floor
-					floor.material.color.set(theme.floorColor);
-					floor.material.opacity = .2;
-					floor.position.y = event.file?.getMeta("floorY") || (y - .025);
+
+					customOutline.updateMaxSurfaceId(surfaceFinder.surfaceId + 1);
 					break;
 			}
 		}

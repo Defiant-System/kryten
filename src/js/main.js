@@ -4,16 +4,14 @@ let {
 	THREE,
 	THREE_dispose,
 
-	CSG,
-	ToIndexed,
-	OutlineMaterial,
-	OutlineMesh,
+	FindSurfaces,
+	CustomOutlinePass,
 	ColoredShadowMaterial,
+	CSG,
 
 	EffectComposer,
 	RenderPass,
 	ShaderPass,
-	OutlinePass,
 	FXAAShader,
 
 	OBJLoader,

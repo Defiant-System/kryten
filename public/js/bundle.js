@@ -50063,465 +50063,655 @@ var THREE = /*#__PURE__*/Object.freeze({
 	Controls: Controls
 });
 
-class ToIndexed {};
+/*
+	This class computes "surface IDs" for a given mesh.
 
-// Author: Fyrestar https://mevedia.com (https://github.com/Fyrestar/THREE.BufferGeometry-toIndexed)
-BufferGeometry.prototype.toIndexed = function () {
-	let list = [], vertices = {};
-	let _src, attributesKeys, morphKeys;
-	let prec = 0, precHalf = 0, length = 0;
-
-	function floor( array, offset ) {
-		if ( array instanceof Float32Array ) {
-			return Math.floor( array[ offset ] * prec );
-		} else if ( array instanceof Float16Array ) {
-			return Math.floor( array[ offset ] * precHalf );
-		} else {
-			return array[ offset ];
-		}
+	A "surface" is defined as a set of triangles that share vertices.
+	
+	Inspired by Ian MacLarty, see:
+		https://twitter.com/ianmaclarty/status/1499494878908403712
+*/
+class FindSurfaces {
+	constructor() {
+		// This identifier, must be globally unique for each surface
+		// across all geometry rendered on screen
+		this.surfaceId = 0;
 	}
-	function createAttribute( src_attribute ) {
-		const dst_attribute = new BufferAttribute( new src_attribute.array.constructor( length * src_attribute.itemSize ), src_attribute.itemSize );
-		const dst_array = dst_attribute.array;
-		const src_array = src_attribute.array;
-		switch ( src_attribute.itemSize ) {
-			case 1:
-				for ( let i = 0, l = list.length; i < l; i++ ) {
-					dst_array[ i ] = src_array[ list[ i ] ];
+
+	/*
+	 * Returns the surface Ids as a Float32Array that can be inserted as a vertex attribute
+	 */
+	getSurfaceIdAttribute(mesh) {
+		const bufferGeometry = mesh.geometry;
+		const numVertices = bufferGeometry.attributes.position.count;
+		const vertexIdToSurfaceId = this._generateSurfaceIds(mesh);
+
+		const colors = [];
+		for (let i = 0; i < numVertices; i++) {
+			const vertexId = i;
+			let surfaceId = vertexIdToSurfaceId[vertexId];
+
+			colors.push(surfaceId, 0, 0, 1);
+		}
+
+		const colorsTypedArray = new Float32Array(colors);
+		return colorsTypedArray;
+	}
+
+	/*
+	 * Returns a `vertexIdToSurfaceId` map
+	 * given a vertex, returns the surfaceId
+	 */
+	_generateSurfaceIds(mesh) {
+		const bufferGeometry = mesh.geometry;
+		const numVertices = bufferGeometry.attributes.position.count;
+		const numIndices = bufferGeometry.index.count;
+		const indexBuffer = bufferGeometry.index.array;
+		const vertexBuffer = bufferGeometry.attributes.position.array;
+		// For each vertex, search all its neighbors
+		const vertexMap = {};
+		for (let i = 0; i < numIndices; i += 3) {
+			const i1 = indexBuffer[i + 0];
+			const i2 = indexBuffer[i + 1];
+			const i3 = indexBuffer[i + 2];
+
+			add(i1, i2);
+			add(i1, i3);
+			add(i2, i3);
+		}
+		function add(a, b) {
+			if (vertexMap[a] == undefined) vertexMap[a] = [];
+			if (vertexMap[b] == undefined) vertexMap[b] = [];
+
+			if (vertexMap[a].indexOf(b) == -1) vertexMap[a].push(b);
+			if (vertexMap[b].indexOf(a) == -1) vertexMap[b].push(a);
+		}
+
+		// Find cycles
+		const frontierNodes = Object.keys(vertexMap).map((v) => Number(v));
+		const exploredNodes = {};
+		const vertexIdToSurfaceId = {};
+
+		while (frontierNodes.length > 0) {
+			const node = frontierNodes.pop();
+			if (exploredNodes[node]) continue;
+
+			// Get all neighbors recursively
+			const surfaceVertices = getNeighborsNonRecursive(node);
+			// Mark them as explored
+			for (let v of surfaceVertices) {
+				exploredNodes[v] = true;
+				vertexIdToSurfaceId[v] = this.surfaceId;
+			}
+
+			this.surfaceId += 1;
+		}
+		function getNeighbors(node, explored) {
+			const neighbors = vertexMap[node];
+			let result = [node];
+			explored[node] = true;
+
+			for (let n of neighbors) {
+				if (explored[n]) continue;
+				explored[n] = true;
+				const newNeighbors = getNeighbors(n, explored);
+				result = result.concat(newNeighbors);
+			}
+
+			return result;
+		}
+
+		function getNeighborsNonRecursive(node) {
+			const frontier = [node];
+			const explored = {};
+			const result = [];
+
+			while (frontier.length > 0) {
+				const currentNode = frontier.pop();
+				if (explored[currentNode]) continue;
+				const neighbors = vertexMap[currentNode];
+				result.push(currentNode);
+
+				explored[currentNode] = true;
+
+				for (let n of neighbors) {
+					if (!explored[n]) {
+						frontier.push(n);
+					}
 				}
-				break;
-			case 2:
-				for ( let i = 0, l = list.length; i < l; i++ ) {
-					const index = list[ i ] * 2;
-					const offset = i * 2;
-					dst_array[ offset ] = src_array[ index ];
-					dst_array[ offset + 1 ] = src_array[ index + 1 ];
-				}
-				break;
-			case 3:
-				for ( let i = 0, l = list.length; i < l; i++ ) {
-					const index = list[ i ] * 3;
-					const offset = i * 3;
-					dst_array[ offset ] = src_array[ index ];
-					dst_array[ offset + 1 ] = src_array[ index + 1 ];
-					dst_array[ offset + 2 ] = src_array[ index + 2 ];
+			}
 
-				}
-				break;
-			case 4:
-				for ( let i = 0, l = list.length; i < l; i++ ) {
-					const index = list[ i ] * 4;
-					const offset = i * 4;
-					dst_array[ offset ] = src_array[ index ];
-					dst_array[ offset + 1 ] = src_array[ index + 1 ];
-					dst_array[ offset + 2 ] = src_array[ index + 2 ];
-					dst_array[ offset + 3 ] = src_array[ index + 3 ];
-
-				}
-				break;
+			return result;
 		}
-		return dst_attribute;
+
+		return vertexIdToSurfaceId;
 	}
-	function hashAttribute( attribute, offset ) {
-		const array = attribute.array;
-		switch ( attribute.itemSize ) {
-			case 1:
-				return floor( array, offset );
-			case 2:
-				return floor( array, offset ) + '_' + floor( array, offset + 1 );
-			case 3:
-				return floor( array, offset ) + '_' + floor( array, offset + 1 ) + '_' + floor( array, offset + 2 );
-			case 4:
-				return floor( array, offset ) + '_' + floor( array, offset + 1 ) + '_' + floor( array, offset + 2 ) + '_' + floor( array, offset + 3 );
-		}
+}
+
+function getSurfaceIdMaterial() {
+	return new ShaderMaterial({
+		uniforms: {
+			maxSurfaceId: { value: 1 },
+		},
+		vertexShader: getVertexShader(),
+		fragmentShader: getFragmentShader(),
+		vertexColors: true,
+	});
+}
+
+function getVertexShader() {
+	return `
+	varying vec2 v_uv;
+	varying vec4 vColor;
+
+	void main() {
+		 v_uv = uv;
+		 vColor = color;
+
+		 gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+	}
+	`;
+}
+
+function getFragmentShader() {
+	return `
+	varying vec2 v_uv;
+	varying vec4 vColor;
+	uniform float maxSurfaceId;
+
+	void main() {
+		// Normalize the surfaceId when writing to texture
+		// Surface ID needs rounding as precision can be lost in perspective correct interpolation 
+		// - see https://github.com/OmarShehata/webgl-outlines/issues/9 for other solutions eg. flat interpolation.
+		float surfaceId = round(vColor.r) / maxSurfaceId;
+		gl_FragColor = vec4(surfaceId, 0.0, 0.0, 1.0);
+	}
+	`;
+}
+
+// For debug rendering, assign a random color
+// to each surfaceId
+function getDebugSurfaceIdMaterial() {
+	return new ShaderMaterial({
+		uniforms: {},
+		vertexShader: getVertexShader(),
+		fragmentShader: `
+	varying vec2 v_uv;
+	varying vec4 vColor;
+
+	void main() {      
+			int surfaceId = int(round(vColor.r) * 100.0);
+			float R = float(surfaceId % 255) / 255.0;
+			float G = float((surfaceId + 50) % 255) / 255.0;
+			float B = float((surfaceId * 20) % 255) / 255.0;
+
+			gl_FragColor = vec4(R, G, B, 1.0);
+	}
+	`,
+		vertexColors: true,
+	});
+}
+
+/**
+ * Abstract base class for all post processing passes.
+ *
+ * This module is only relevant for post processing with {@link WebGLRenderer}.
+ *
+ * @abstract
+ * @three_import import { Pass } from 'three/addons/postprocessing/Pass.js';
+ */
+class Pass {
+
+	/**
+	 * Constructs a new pass.
+	 */
+	constructor() {
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isPass = true;
+
+		/**
+		 * If set to `true`, the pass is processed by the composer.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.enabled = true;
+
+		/**
+		 * If set to `true`, the pass indicates to swap read and write buffer after rendering.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.needsSwap = true;
+
+		/**
+		 * If set to `true`, the pass clears its buffer before rendering
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.clear = false;
+
+		/**
+		 * If set to `true`, the result of the pass is rendered to screen. The last pass in the composers
+		 * pass chain gets automatically rendered to screen, no matter how this property is configured.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.renderToScreen = false;
 
 	}
 
-	function store( index, n ) {
-		let id = '';
-		for ( let i = 0, l = attributesKeys.length; i < l; i++ ) {
-			const key = attributesKeys[ i ];
-			const attribute = _src.attributes[ key ];
-			const offset = attribute.itemSize * index * 3 + n * attribute.itemSize;
-			id += hashAttribute( attribute, offset ) + '_';
-		}
-		for ( let i = 0, l = morphKeys.length; i < l; i++ ) {
-			const key = morphKeys[ i ];
-			const attribute = _src.morphAttributes[ key ];
-			const offset = attribute.itemSize * index * 3 + n * attribute.itemSize;
-			id += hashAttribute( attribute, offset ) + '_';
-		}
+	/**
+	 * Sets the size of the pass.
+	 *
+	 * @abstract
+	 * @param {number} width - The width to set.
+	 * @param {number} height - The height to set.
+	 */
+	setSize( /* width, height */ ) {}
 
-		if ( vertices[ id ] === undefined ) {
-			vertices[ id ] = list.length;
-			list.push( index * 3 + n );
-		}
-		return vertices[ id ];
-	}
-	function storeFast( x, y, z, v ) {
+	/**
+	 * This method holds the render logic of a pass. It must be implemented in all derived classes.
+	 *
+	 * @abstract
+	 * @param {WebGLRenderer} renderer - The renderer.
+	 * @param {WebGLRenderTarget} writeBuffer - The write buffer. This buffer is intended as the rendering
+	 * destination for the pass.
+	 * @param {WebGLRenderTarget} readBuffer - The read buffer. The pass can access the result from the
+	 * previous pass from this buffer.
+	 * @param {number} deltaTime - The delta time in seconds.
+	 * @param {boolean} maskActive - Whether masking is active or not.
+	 */
+	render( /* renderer, writeBuffer, readBuffer, deltaTime, maskActive */ ) {
 
-		const id = Math.floor( x * prec ) + '_' + Math.floor( y * prec ) + '_' + Math.floor( z * prec );
-		if ( vertices[ id ] === undefined ) {
-			vertices[ id ] = list.length;
+		console.error( 'THREE.Pass: .render() must be implemented in derived pass.' );
 
-			list.push( v );
-		}
-		return vertices[ id ];
 	}
 
-	function indexBufferGeometry( src, dst, fullIndex ) {
-		_src = src;
-		attributesKeys = Object.keys( src.attributes );
-		morphKeys = Object.keys( src.morphAttributes );
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever the pass is no longer used in your app.
+	 *
+	 * @abstract
+	 */
+	dispose() {}
 
-		const position = src.attributes.position.array;
-		const faceCount = position.length / 3 / 3;
-		const typedArray = faceCount * 3 > 65536 ? Uint32Array : Uint16Array;
-		const indexArray = new typedArray( faceCount * 3 );
+}
 
-		// Full index only connects vertices where all attributes are equal
-		if ( fullIndex ) {
-			for ( let i = 0, l = faceCount; i < l; i++ ) {
-				indexArray[ i * 3 ] = store( i, 0 );
-				indexArray[ i * 3 + 1 ] = store( i, 1 );
-				indexArray[ i * 3 + 2 ] = store( i, 2, );
+// Helper for passes that need to fill the viewport with a single quad.
+
+const _camera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+
+// https://github.com/mrdoob/three.js/pull/21358
+
+class FullscreenTriangleGeometry extends BufferGeometry {
+
+	constructor() {
+
+		super();
+
+		this.setAttribute( 'position', new Float32BufferAttribute( [ - 1, 3, 0, - 1, - 1, 0, 3, - 1, 0 ], 3 ) );
+		this.setAttribute( 'uv', new Float32BufferAttribute( [ 0, 2, 0, 0, 2, 0 ], 2 ) );
+
+	}
+
+}
+
+const _geometry = new FullscreenTriangleGeometry();
+
+
+/**
+ * This module is a helper for passes which need to render a full
+ * screen effect which is quite common in context of post processing.
+ *
+ * The intended usage is to reuse a single full screen quad for rendering
+ * subsequent passes by just reassigning the `material` reference.
+ *
+ * This module can only be used with {@link WebGLRenderer}.
+ *
+ * @augments Mesh
+ * @three_import import { FullScreenQuad } from 'three/addons/postprocessing/Pass.js';
+ */
+class FullScreenQuad {
+
+	/**
+	 * Constructs a new full screen quad.
+	 *
+	 * @param {?Material} material - The material to render te full screen quad with.
+	 */
+	constructor( material ) {
+
+		this._mesh = new Mesh( _geometry, material );
+
+	}
+
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever the instance is no longer used in your app.
+	 */
+	dispose() {
+
+		this._mesh.geometry.dispose();
+
+	}
+
+	/**
+	 * Renders the full screen quad.
+	 *
+	 * @param {WebGLRenderer} renderer - The renderer.
+	 */
+	render( renderer ) {
+
+		renderer.render( this._mesh, _camera );
+
+	}
+
+	/**
+	 * The quad's material.
+	 *
+	 * @type {?Material}
+	 */
+	get material() {
+
+		return this._mesh.material;
+
+	}
+
+	set material( value ) {
+
+		this._mesh.material = value;
+
+	}
+
+}
+
+// Follows the structure of
+// 		https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/OutlinePass.js
+class CustomOutlinePass extends Pass {
+	constructor(resolution, scene, camera) {
+		super();
+
+		this.renderScene = scene;
+		this.renderCamera = camera;
+		this.resolution = new Vector2(resolution.x, resolution.y);
+
+		this.fsQuad = new FullScreenQuad(null);
+		this.fsQuad.material = this.createOutlinePostProcessMaterial();
+
+		// Create a buffer to store the normals of the scene onto
+		// or store the "surface IDs"
+		const surfaceBuffer = new WebGLRenderTarget(
+			this.resolution.x,
+			this.resolution.y
+		);
+		surfaceBuffer.texture.format = RGBAFormat;
+		surfaceBuffer.texture.type = HalfFloatType;
+		surfaceBuffer.texture.minFilter = NearestFilter;
+		surfaceBuffer.texture.magFilter = NearestFilter;
+		surfaceBuffer.texture.generateMipmaps = false;
+		surfaceBuffer.stencilBuffer = false;
+		this.surfaceBuffer = surfaceBuffer;
+
+		this.normalOverrideMaterial = new MeshNormalMaterial();
+		this.surfaceIdOverrideMaterial = getSurfaceIdMaterial();
+		this.surfaceIdDebugOverrideMaterial = getDebugSurfaceIdMaterial();
+	}
+
+	dispose() {
+		this.surfaceBuffer.dispose();
+		this.fsQuad.dispose();
+	}
+
+	updateMaxSurfaceId(maxSurfaceId) {
+		this.surfaceIdOverrideMaterial.uniforms.maxSurfaceId.value = maxSurfaceId;
+	}
+
+	setSize(width, height) {
+		this.surfaceBuffer.setSize(width, height);
+		this.resolution.set(width, height);
+
+		this.fsQuad.material.uniforms.screenSize.value.set(
+			this.resolution.x,
+			this.resolution.y,
+			1 / this.resolution.x,
+			1 / this.resolution.y
+		);
+	}
+
+	getDebugVisualizeValue() {
+		return this.fsQuad.material.uniforms.debugVisualize.value;
+	}
+
+	isUsingSurfaceIds() {
+		const debugVisualize = this.getDebugVisualizeValue();
+
+		return (
+			debugVisualize == 0 || // Main outlines v2 mode
+			debugVisualize == 5 || // Render just surfaceID debug buffer
+			debugVisualize == 6
+		); // Render just outlines with surfaceId
+	}
+
+	render(renderer, writeBuffer, readBuffer) {
+		// Turn off writing to the depth buffer
+		// because we need to read from it in the subsequent passes.
+		const depthBufferValue = writeBuffer.depthBuffer;
+		writeBuffer.depthBuffer = false;
+
+		// 1. Re-render the scene to capture all normals (or suface IDs) in a texture.
+		renderer.setRenderTarget(this.surfaceBuffer);
+		const overrideMaterialValue = this.renderScene.overrideMaterial;
+
+		if (this.isUsingSurfaceIds()) {
+			// Render the "surface ID buffer"
+			if (this.getDebugVisualizeValue() == 5) {
+				this.renderScene.overrideMaterial = this.surfaceIdDebugOverrideMaterial;
+			} else {
+				this.renderScene.overrideMaterial = this.surfaceIdOverrideMaterial;
 			}
 		} else {
-			for ( let i = 0, l = faceCount; i < l; i++ ) {
-				const offset = i * 9;
-				indexArray[ i * 3 ] = storeFast( position[ offset ], position[ offset + 1 ], position[ offset + 2 ], i * 3 );
-				indexArray[ i * 3 + 1 ] = storeFast( position[ offset + 3 ], position[ offset + 4 ], position[ offset + 5 ], i * 3 + 1 );
-				indexArray[ i * 3 + 2 ] = storeFast( position[ offset + 6 ], position[ offset + 7 ], position[ offset + 8 ], i * 3 + 2 );
+			// Render normal buffer
+			this.renderScene.overrideMaterial = this.normalOverrideMaterial;
+		}
+
+		renderer.render(this.renderScene, this.renderCamera);
+		this.renderScene.overrideMaterial = overrideMaterialValue;
+
+		this.fsQuad.material.uniforms["depthBuffer"].value =
+			readBuffer.depthTexture;
+		this.fsQuad.material.uniforms["surfaceBuffer"].value =
+			this.surfaceBuffer.texture;
+		this.fsQuad.material.uniforms["sceneColorBuffer"].value =
+			readBuffer.texture;
+
+		// 2. Draw the outlines using the depth texture and normal texture
+		// and combine it with the scene color
+		if (this.renderToScreen) {
+			// If this is the last effect, then renderToScreen is true.
+			// So we should render to the screen by setting target null
+			// Otherwise, just render into the writeBuffer that the next effect will use as its read buffer.
+			renderer.setRenderTarget(null);
+			this.fsQuad.render(renderer);
+		} else {
+			renderer.setRenderTarget(writeBuffer);
+			this.fsQuad.render(renderer);
+		}
+
+		// Reset the depthBuffer value so we continue writing to it in the next render.
+		writeBuffer.depthBuffer = depthBufferValue;
+	}
+
+	get vertexShader() {
+		return `
+			varying vec2 vUv;
+			void main() {
+				vUv = uv;
+				gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 			}
-		}
+			`;
+	}
+	get fragmentShader() {
+		return `
+			#include <packing>
+			// The above include imports "perspectiveDepthToViewZ"
+			// and other GLSL functions from ThreeJS we need for reading depth.
+			uniform sampler2D sceneColorBuffer;
+			uniform sampler2D depthBuffer;
+			uniform sampler2D surfaceBuffer;
+			uniform float cameraNear;
+			uniform float cameraFar;
+			uniform vec4 screenSize;
+			uniform vec3 outlineColor;
+			uniform vec4 multiplierParameters;
+			uniform int debugVisualize;
 
-		// Index
-		dst.index = new BufferAttribute( indexArray, 1 );
-		length = list.length;
+			varying vec2 vUv;
 
-		// Attributes
-		for ( let i = 0, l = attributesKeys.length; i < l; i++ ) {
-			const key = attributesKeys[ i ];
-			dst.attributes[ key ] = createAttribute( src.attributes[ key ] );
-		}
-		// Morph Attributes
-		for ( let i = 0, l = morphKeys.length; i < l; i++ ) {
-			const key = morphKeys[ i ];
-			dst.morphAttributes[ key ] = createAttribute( src.morphAttributes[ key ] );
-		}
+			// Helper functions for reading from depth buffer.
+			float readDepth (sampler2D depthSampler, vec2 coord) {
+				float fragCoordZ = texture2D(depthSampler, coord).x;
+				float viewZ = perspectiveDepthToViewZ( fragCoordZ, cameraNear, cameraFar );
+				return viewZToOrthographicDepth( viewZ, cameraNear, cameraFar );
+			}
+			float getLinearDepth(vec3 pos) {
+				return -(viewMatrix * vec4(pos, 1.0)).z;
+			}
 
-		if ( src.boundingSphere ) {
-			dst.boundingSphere = src.boundingSphere.clone();
-		} else {
-			dst.boundingSphere = new Sphere;
-			dst.computeBoundingSphere();
-		}
+			float getLinearScreenDepth(sampler2D map) {
+					vec2 uv = gl_FragCoord.xy * screenSize.zw;
+					return readDepth(map,uv);
+			}
+			// Helper functions for reading normals and depth of neighboring pixels.
+			float getPixelDepth(int x, int y) {
+				// screenSize.zw is pixel size 
+				// vUv is current position
+				return readDepth(depthBuffer, vUv + screenSize.zw * vec2(x, y));
+			}
+			// "surface value" is either the normal or the "surfaceID"
+			vec3 getSurfaceValue(int x, int y) {
+				vec3 val = texture2D(surfaceBuffer, vUv + screenSize.zw * vec2(x, y)).rgb;
+				return val;
+			}
 
-		if ( src.boundingBox ) {
-			dst.boundingBox = src.boundingBox.clone();
-		} else {
-			dst.boundingBox = new Box3;
-			dst.computeBoundingBox();
-		}
-		
-		// Groups
-		const groups = src.groups;
-		for ( let i = 0, l = groups.length; i < l; i ++ ) {
-			const group = groups[ i ];
-			dst.addGroup( group.start, group.count, group.materialIndex );
-		}
+			float saturateValue(float num) {
+				return clamp(num, 0.0, 1.0);
+			}
 
-		// Release data
-		vertices = {};
-		list = [];
-		_src = null;
-		attributesKeys = [];
-		morphKeys = [];
+			float getSufaceIdDiff(vec3 surfaceValue) {
+				float surfaceIdDiff = 0.0;
+				surfaceIdDiff += distance(surfaceValue, getSurfaceValue(1, 0));
+				surfaceIdDiff += distance(surfaceValue, getSurfaceValue(0, 1));
+				surfaceIdDiff += distance(surfaceValue, getSurfaceValue(0, 1));
+				surfaceIdDiff += distance(surfaceValue, getSurfaceValue(0, -1));
+
+				surfaceIdDiff += distance(surfaceValue, getSurfaceValue(1, 1));
+				surfaceIdDiff += distance(surfaceValue, getSurfaceValue(1, -1));
+				surfaceIdDiff += distance(surfaceValue, getSurfaceValue(-1, 1));
+				surfaceIdDiff += distance(surfaceValue, getSurfaceValue(-1, -1));
+				return surfaceIdDiff;
+			}
+
+			void main() {
+				vec4 sceneColor = texture2D(sceneColorBuffer, vUv);
+				float depth = getPixelDepth(0, 0);
+				// "surfaceValue" is either the normal or the surfaceId
+				vec3 surfaceValue = getSurfaceValue(0, 0);
+
+				// Get the difference between depth of neighboring pixels and current.
+				float depthDiff = 0.0;
+				depthDiff += abs(depth - getPixelDepth(1, 0));
+				depthDiff += abs(depth - getPixelDepth(-1, 0));
+				depthDiff += abs(depth - getPixelDepth(0, 1));
+				depthDiff += abs(depth - getPixelDepth(0, -1));
+
+				// Get the difference between surface values of neighboring pixels
+				// and current
+				float surfaceValueDiff = getSufaceIdDiff(surfaceValue);
+				
+				// Apply multiplier & bias to each 
+				float depthBias = multiplierParameters.x;
+				float depthMultiplier = multiplierParameters.y;
+				float normalBias = multiplierParameters.z;
+				float normalMultiplier = multiplierParameters.w;
+
+				depthDiff = depthDiff * depthMultiplier;
+				depthDiff = saturateValue(depthDiff);
+				depthDiff = pow(depthDiff, depthBias);
+
+				if (debugVisualize != 0 && debugVisualize != 6) {
+					// Apply these params when using
+					// normals instead of surfaceIds
+					surfaceValueDiff = surfaceValueDiff * normalMultiplier;
+					surfaceValueDiff = saturateValue(surfaceValueDiff);
+					surfaceValueDiff = pow(surfaceValueDiff, normalBias);
+				} else {
+					if (surfaceValueDiff != 0.0) surfaceValueDiff = 1.0;
+				}
+
+				float outline = saturateValue(surfaceValueDiff + depthDiff);
+			
+				// Combine outline with scene color.
+				vec4 outlineColor = vec4(outlineColor, 1.0);
+				gl_FragColor = vec4(mix(sceneColor, outlineColor, outline));
+
+				//// For debug visualization of the different inputs to this shader.
+				if (debugVisualize == 2) {
+					gl_FragColor = sceneColor;
+				}
+				if (debugVisualize == 3) {
+					gl_FragColor = vec4(vec3(depth), 1.0);
+				}
+				if (debugVisualize == 4 || debugVisualize == 5) {
+					// 4 visualizes the normal buffer
+					// 5 visualizes the surfaceID buffer 
+					// Either way they are the same buffer, we change 
+					// what we render into it
+					gl_FragColor = vec4(surfaceValue, 1.0);
+				}
+				if (debugVisualize == 6 || debugVisualize == 7) {
+					// Outlines only
+					gl_FragColor = vec4(vec3(outline * outlineColor), 1.0);
+				}				
+			}
+			`;
 	}
 
-	return function ( fullIndex, precision ) {
-		precision = precision || 6;
-		prec = Math.pow( 10, precision );
-		precHalf = Math.pow( 10, Math.floor( precision / 2 ) );
-		const geometry = new BufferGeometry;
-		indexBufferGeometry( this, geometry, fullIndex === undefined ? true : fullIndex );
-
-		return geometry;
-	}
-}();
-
-const vertexShader = `
-attribute vec3 aN0;
-attribute vec3 aN1;
-attribute vec4 aOtherVert;
-uniform float uAngleThresh;
-uniform int uOutline;
-
-varying vec4 vDebug;
-
-void main() {
-	vec4 mv = modelViewMatrix * vec4( position , 1. );
-	
-	gl_Position = projectionMatrix * mv;
-	gl_Position.z -= 0.001; //wtf?
-
-	vec3 viewDir = normalize(-mv.xyz);
-	
-	//check for null normals
-	float l0 = length(aN0); 
-	float l1 = length(aN1);
-
-	if (l0*l1 < 0.0001) return; //end of mesh
-
-	float dd = dot(normalize(aN0),normalize(aN1));
-	if (acos(dd) > uAngleThresh) return;
-	
-	//find point
-	bool isOther = aOtherVert.w > 0.5;
-	vec3 a;
-	vec3 b;
-
-	if (isOther) {
-		a = aOtherVert.xyz;
-		b = position;
-	} else {
-		a = position;
-		b = aOtherVert.xyz;
-	}
-
-	vec3 ld = normalize(b - a);
-	vec3 camToEdge = cameraPosition - a;
-	float f = dot(camToEdge,ld);
-	vec3 p = a + ld * f;
-	p = normalize(p-cameraPosition);
-
-	vec3 vp =  ( modelViewMatrix * vec4(p,   0.) ).xyz;
-	vec3 vN0 = ( modelViewMatrix * vec4(aN0, 0.) ).xyz;
-	vec3 vN1 = ( modelViewMatrix * vec4(aN1, 0.) ).xyz;
-
-	vDebug.x = sign(dot(vN0,viewDir));
-	vDebug.y = sign(dot(vN1,viewDir));
-
-	bool outline = sign(dot(vN0,viewDir)) * sign(dot(vN1,viewDir)) < 0.;
-	
-	if (uOutline == 1 && outline) return;
-
-	gl_Position.z = -2000.; //wtf?
-}
-`;
-
-const fragmentShader = `
-uniform vec3 uColor;
-varying vec4 vDebug;
-
-void main(){
-	gl_FragColor = vec4(uColor,1.);
-}
-`;
-
-const PI_INV = 1 / Math.PI;
-
-
-class OutlineMaterial extends ShaderMaterial {
-	constructor(_angleThreshold = 0, outline = true, color = '#ffffff') {
-		super({
-			vertexShader,
-			fragmentShader,
+	createOutlinePostProcessMaterial() {
+		return new ShaderMaterial({
 			uniforms: {
-				uAngleThresh: { value: 0 },
-				uOutline: { value: 0 },
-				uColor: { value: new Color() },
+				debugVisualize: { value: 0 },
+				sceneColorBuffer: {},
+				depthBuffer: {},
+				surfaceBuffer: {},
+				outlineColor: { value: new Color(0xffffff) },
+				//4 scalar values packed in one uniform: depth multiplier, depth bias, and same for normals.
+				multiplierParameters: {
+					value: new Vector4(0.9, 20, 1, 1),
+				},
+				cameraNear: { value: this.renderCamera.near },
+				cameraFar: { value: this.renderCamera.far },
+				screenSize: {
+					value: new Vector4(
+						this.resolution.x,
+						this.resolution.y,
+						1 / this.resolution.x,
+						1 / this.resolution.y
+					),
+				},
 			},
+			vertexShader: this.vertexShader,
+			fragmentShader: this.fragmentShader,
 		});
-		this.angleThreshold = _angleThreshold;
-		this.outline = outline;
-		this.color.setStyle(color);
-	}
-
-	set angleThreshold(degrees) {
-		this._angleThreshold = degrees;
-		this.uniforms.uAngleThresh.value = ((degrees / 180) * Math.PI) % Math.PI;
-	}
-
-	get angleThreshold() {
-		return this._angleThreshold;
-	}
-
-	set outline(outline) {
-		this.uniforms.uOutline.value = Number(outline);
-	}
-
-	get outline() {
-		return Boolean(this.uniforms.uOutline.value);
-	}
-
-	get color() {
-		return this.uniforms.uColor.value;
-	}
-
-	set color(v) {
-		this.uniforms.uColor.value = v;
-	}
-}
-
-const NULL_VECTOR = new Vector3();
-const WELD_FACTOR = 1000;
-
-class OutlineMesh extends LineSegments {
-	constructor(mesh, outlineMaterial = new OutlineMaterial()) {
-		super(new BufferGeometry(), outlineMaterial);
-		this._extractGeometry(mesh.geometry);
-	}
-
-	_extractGeometry(geometry) {
-		const { vArray, n0Array, n1Array, otherVertArray } = geometry.index
-			? this._extractIndexed(geometry)
-			: this._extractSoup(geometry);
-		const g = this.geometry;
-		g.setAttribute('position', new BufferAttribute(new Float32Array(vArray), 3));
-		g.setAttribute('aN0', new BufferAttribute(new Float32Array(n0Array), 3));
-		g.setAttribute('aN1', new BufferAttribute(new Float32Array(n1Array), 3));
-		g.setAttribute(
-			'aOtherVert',
-			new BufferAttribute(new Float32Array(otherVertArray), 4),
-		);
-	}
-
-	_extractIndexed(geometry) {
-		const { weldedIndices, weldedVertices } = this._weldIndexed(
-			geometry.index,
-			geometry.attributes.position,
-		);
-		const edges = this._extractEdgesFromIndex(weldedIndices, weldedVertices);
-		const vArray = [];
-		const n0Array = [];
-		const n1Array = [];
-		const otherVertArray = [];
-
-		const sg = new BoxGeometry(0.1, 0.1, 0.1);
-		const sm = new MeshBasicMaterial({ color: 'red' });
-		for (let i = 0; i < weldedVertices.length / 3; i++) {
-			const m = new Mesh(sg, sm);
-			m.position.fromArray(weldedVertices, i * 3);
-		}
-		edges.forEach(({ a, b, n0, n1 }, i) => {
-			const extract = (index, n0, n1) => {
-				const _index = index * 3;
-				n0Array.push(...n0.toArray());
-				n1Array.push(...n1.toArray());
-				for (let i = 0; i < 3; i++) vArray.push(weldedVertices[_index + i]);
-			};
-			extract(a, n0, n1);
-			extract(b, n0, n1);
-			for (let i = 0; i < 3; i++) otherVertArray.push(weldedVertices[b * 3 + i]);
-			otherVertArray.push(0);
-			for (let i = 0; i < 3; i++) otherVertArray.push(weldedVertices[a * 3 + i]);
-			otherVertArray.push(1);
-		});
-		return { vArray, n0Array, n1Array, otherVertArray }
-	}
-
-	_weldIndexed(indexBuffer, positionBuffer) {
-		const map = {};
-		const weldedVerticesMap = {};
-		const weldedVertices = [];
-		const weldedIndices = [];
-
-		for (let v = 0, c = 0; v < positionBuffer.count; v++) {
-			const v3 = v * 3;
-			const xyz = [
-				positionBuffer.array[v3],
-				positionBuffer.array[v3 + 1],
-				positionBuffer.array[v3 + 2],
-			].map((v) => Math.round(v * WELD_FACTOR));
-			const key = xyz.join(':');
-			if (map[key] === undefined) {
-				map[key] = c++;
-				weldedVertices.push(
-					positionBuffer.array[v3],
-					positionBuffer.array[v3 + 1],
-					positionBuffer.array[v3 + 2],
-				);
-			}
-			weldedVerticesMap[v] = map[key];
-		}
-		for (let t = 0; t < indexBuffer.count; t += 3)
-			for (let i = 0; i < 3; i++) {
-				const source = indexBuffer.array[t + i];
-				weldedIndices.push(weldedVerticesMap[source]);
-			}
-
-		return { weldedVertices, weldedIndices }
-	}
-
-	_extractEdgesFromIndex(indexBuffer, positionBuffer) {
-		const faceNormals = [];
-		const av = new Vector3();
-		const bv = new Vector3();
-		const cv = new Vector3();
-
-		for (let t = 0; t < indexBuffer.length; ) {
-			const normal = new Vector3();
-			av.fromArray(positionBuffer, indexBuffer[t++] * 3);
-			bv.fromArray(positionBuffer, indexBuffer[t++] * 3);
-			cv.fromArray(positionBuffer, indexBuffer[t++] * 3);
-			normal.crossVectors(bv.sub(av), cv.sub(av));
-			faceNormals.push(normal.normalize());
-		}
-
-		const edgeFaceMap = {};
-		const halfEdges = [];
-
-		for (let t = 0; t < indexBuffer.length / 3; t++) {
-			const offset = t * 3;
-			for (let curr = 0; curr < 3; curr++) {
-				const next = (curr + 1) % 3;
-				const a = indexBuffer[offset + curr];
-				const b = indexBuffer[offset + next];
-				if (!edgeFaceMap[a]) edgeFaceMap[a] = {};
-				edgeFaceMap[a][b] = t;
-				halfEdges.push([a, b]);
-			}
-		}
-
-		const edges = [];
-		const duplicateMap = {};
-
-		halfEdges.forEach(([a, b]) => {
-			if (!duplicateMap[a]) duplicateMap[a] = {};
-			if (!duplicateMap[b]) duplicateMap[b] = {};
-
-			if (duplicateMap[a][b]) return
-
-			const f0 = edgeFaceMap[a][b];
-			const f1 = edgeFaceMap[b][a];
-
-			const isOutline = f0 !== undefined && f1 !== undefined;
-			const n0 = isOutline ? faceNormals[f0] : NULL_VECTOR;
-			const n1 = isOutline ? faceNormals[f1] : NULL_VECTOR;
-
-			edges.push({ a, b, n0, n1 });
-			duplicateMap[a][b] = true;
-			duplicateMap[b][a] = true;
-		});
-
-		return edges
-	}
-
-	_extractSoup(geometry) {
-		const triangleCount = geometry.attributes.position.count;
-		const edgeMap = {};
-
-		for (let t = 0; t < triangleCount; t++) {
-			geometry.attributes.position.array;
-		}
-		const vArray = [];
-		const n0Array = [];
-		const n1Array = [];
-		const otherVertArray = [];
-		// const weldedVertices = []
-
-		return { vArray, n0Array, n1Array, otherVertArray }
 	}
 }
 
@@ -51392,189 +51582,6 @@ const CopyShader = {
 };
 
 /**
- * Abstract base class for all post processing passes.
- *
- * This module is only relevant for post processing with {@link WebGLRenderer}.
- *
- * @abstract
- * @three_import import { Pass } from 'three/addons/postprocessing/Pass.js';
- */
-class Pass {
-
-	/**
-	 * Constructs a new pass.
-	 */
-	constructor() {
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isPass = true;
-
-		/**
-		 * If set to `true`, the pass is processed by the composer.
-		 *
-		 * @type {boolean}
-		 * @default true
-		 */
-		this.enabled = true;
-
-		/**
-		 * If set to `true`, the pass indicates to swap read and write buffer after rendering.
-		 *
-		 * @type {boolean}
-		 * @default true
-		 */
-		this.needsSwap = true;
-
-		/**
-		 * If set to `true`, the pass clears its buffer before rendering
-		 *
-		 * @type {boolean}
-		 * @default false
-		 */
-		this.clear = false;
-
-		/**
-		 * If set to `true`, the result of the pass is rendered to screen. The last pass in the composers
-		 * pass chain gets automatically rendered to screen, no matter how this property is configured.
-		 *
-		 * @type {boolean}
-		 * @default false
-		 */
-		this.renderToScreen = false;
-
-	}
-
-	/**
-	 * Sets the size of the pass.
-	 *
-	 * @abstract
-	 * @param {number} width - The width to set.
-	 * @param {number} height - The height to set.
-	 */
-	setSize( /* width, height */ ) {}
-
-	/**
-	 * This method holds the render logic of a pass. It must be implemented in all derived classes.
-	 *
-	 * @abstract
-	 * @param {WebGLRenderer} renderer - The renderer.
-	 * @param {WebGLRenderTarget} writeBuffer - The write buffer. This buffer is intended as the rendering
-	 * destination for the pass.
-	 * @param {WebGLRenderTarget} readBuffer - The read buffer. The pass can access the result from the
-	 * previous pass from this buffer.
-	 * @param {number} deltaTime - The delta time in seconds.
-	 * @param {boolean} maskActive - Whether masking is active or not.
-	 */
-	render( /* renderer, writeBuffer, readBuffer, deltaTime, maskActive */ ) {
-
-		console.error( 'THREE.Pass: .render() must be implemented in derived pass.' );
-
-	}
-
-	/**
-	 * Frees the GPU-related resources allocated by this instance. Call this
-	 * method whenever the pass is no longer used in your app.
-	 *
-	 * @abstract
-	 */
-	dispose() {}
-
-}
-
-// Helper for passes that need to fill the viewport with a single quad.
-
-const _camera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-
-// https://github.com/mrdoob/three.js/pull/21358
-
-class FullscreenTriangleGeometry extends BufferGeometry {
-
-	constructor() {
-
-		super();
-
-		this.setAttribute( 'position', new Float32BufferAttribute( [ - 1, 3, 0, - 1, - 1, 0, 3, - 1, 0 ], 3 ) );
-		this.setAttribute( 'uv', new Float32BufferAttribute( [ 0, 2, 0, 0, 2, 0 ], 2 ) );
-
-	}
-
-}
-
-const _geometry = new FullscreenTriangleGeometry();
-
-
-/**
- * This module is a helper for passes which need to render a full
- * screen effect which is quite common in context of post processing.
- *
- * The intended usage is to reuse a single full screen quad for rendering
- * subsequent passes by just reassigning the `material` reference.
- *
- * This module can only be used with {@link WebGLRenderer}.
- *
- * @augments Mesh
- * @three_import import { FullScreenQuad } from 'three/addons/postprocessing/Pass.js';
- */
-class FullScreenQuad {
-
-	/**
-	 * Constructs a new full screen quad.
-	 *
-	 * @param {?Material} material - The material to render te full screen quad with.
-	 */
-	constructor( material ) {
-
-		this._mesh = new Mesh( _geometry, material );
-
-	}
-
-	/**
-	 * Frees the GPU-related resources allocated by this instance. Call this
-	 * method whenever the instance is no longer used in your app.
-	 */
-	dispose() {
-
-		this._mesh.geometry.dispose();
-
-	}
-
-	/**
-	 * Renders the full screen quad.
-	 *
-	 * @param {WebGLRenderer} renderer - The renderer.
-	 */
-	render( renderer ) {
-
-		renderer.render( this._mesh, _camera );
-
-	}
-
-	/**
-	 * The quad's material.
-	 *
-	 * @type {?Material}
-	 */
-	get material() {
-
-		return this._mesh.material;
-
-	}
-
-	set material( value ) {
-
-		this._mesh.material = value;
-
-	}
-
-}
-
-/**
  * This pass can be used to create a post processing effect
  * with a raw GLSL shader object. Useful for implementing custom
  * effects.
@@ -52431,763 +52438,6 @@ class RenderPass extends Pass {
 	}
 
 }
-
-/**
- * A pass for rendering outlines around selected objects.
- *
- * ```js
- * const resolution = new THREE.Vector2( window.innerWidth, window.innerHeight );
- * const outlinePass = new OutlinePass( resolution, scene, camera );
- * composer.addPass( outlinePass );
- * ```
- *
- * @augments Pass
- * @three_import import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js';
- */
-class OutlinePass extends Pass {
-
-	/**
-	 * Constructs a new outline pass.
-	 *
-	 * @param {Vector2} [resolution] - The effect's resolution.
-	 * @param {Scene} scene - The scene to render.
-	 * @param {Camera} camera - The camera.
-	 * @param {Array<Object3D>} [selectedObjects] - The selected 3D objects that should receive an outline.
-	 *
-	 */
-	constructor( resolution, scene, camera, selectedObjects ) {
-
-		super();
-
-		/**
-		 * The scene to render.
-		 *
-		 * @type {Object}
-		 */
-		this.renderScene = scene;
-
-		/**
-		 * The camera.
-		 *
-		 * @type {Object}
-		 */
-		this.renderCamera = camera;
-
-		/**
-		 * The selected 3D objects that should receive an outline.
-		 *
-		 * @type {Array<Object3D>}
-		 */
-		this.selectedObjects = selectedObjects !== undefined ? selectedObjects : [];
-
-		/**
-		 * The visible edge color.
-		 *
-		 * @type {Color}
-		 * @default (1,1,1)
-		 */
-		this.visibleEdgeColor = new Color( 1, 1, 1 );
-
-		/**
-		 * The hidden edge color.
-		 *
-		 * @type {Color}
-		 * @default (0.1,0.04,0.02)
-		 */
-		this.hiddenEdgeColor = new Color( 0.1, 0.04, 0.02 );
-
-		/**
-		 * Can be used for an animated glow/pulse effect.
-		 *
-		 * @type {number}
-		 * @default 0
-		 */
-		this.edgeGlow = 0.0;
-
-		/**
-		 * Whether to use a pattern texture for to highlight selected
-		 * 3D objects or not.
-		 *
-		 * @type {boolean}
-		 * @default false
-		 */
-		this.usePatternTexture = false;
-
-		/**
-		 * Can be used to highlight selected 3D objects. Requires to set
-		 * {@link OutlinePass#usePatternTexture} to `true`.
-		 *
-		 * @type {?Texture}
-		 * @default null
-		 */
-		this.patternTexture = null;
-
-		/**
-		 * The edge thickness.
-		 *
-		 * @type {number}
-		 * @default 1
-		 */
-		this.edgeThickness = 1.0;
-
-		/**
-		 * The edge strength.
-		 *
-		 * @type {number}
-		 * @default 3
-		 */
-		this.edgeStrength = 3.0;
-
-		/**
-		 * The downsample ratio. The effect can be rendered in a much
-		 * lower resolution than the beauty pass.
-		 *
-		 * @type {number}
-		 * @default 2
-		 */
-		this.downSampleRatio = 2;
-
-		/**
-		 * The pulse period.
-		 *
-		 * @type {number}
-		 * @default 0
-		 */
-		this.pulsePeriod = 0;
-
-		this._visibilityCache = new Map();
-		this._selectionCache = new Set();
-
-		/**
-		 * The effect's resolution.
-		 *
-		 * @type {Vector2}
-		 * @default (256,256)
-		 */
-		this.resolution = ( resolution !== undefined ) ? new Vector2( resolution.x, resolution.y ) : new Vector2( 256, 256 );
-
-		const resx = Math.round( this.resolution.x / this.downSampleRatio );
-		const resy = Math.round( this.resolution.y / this.downSampleRatio );
-
-		this.renderTargetMaskBuffer = new WebGLRenderTarget( this.resolution.x, this.resolution.y );
-		this.renderTargetMaskBuffer.texture.name = 'OutlinePass.mask';
-		this.renderTargetMaskBuffer.texture.generateMipmaps = false;
-
-		this.depthMaterial = new MeshDepthMaterial();
-		this.depthMaterial.side = DoubleSide;
-		this.depthMaterial.depthPacking = RGBADepthPacking;
-		this.depthMaterial.blending = NoBlending;
-
-		this.prepareMaskMaterial = this._getPrepareMaskMaterial();
-		this.prepareMaskMaterial.side = DoubleSide;
-		this.prepareMaskMaterial.fragmentShader = replaceDepthToViewZ( this.prepareMaskMaterial.fragmentShader, this.renderCamera );
-
-		this.renderTargetDepthBuffer = new WebGLRenderTarget( this.resolution.x, this.resolution.y, { type: HalfFloatType } );
-		this.renderTargetDepthBuffer.texture.name = 'OutlinePass.depth';
-		this.renderTargetDepthBuffer.texture.generateMipmaps = false;
-
-		this.renderTargetMaskDownSampleBuffer = new WebGLRenderTarget( resx, resy, { type: HalfFloatType } );
-		this.renderTargetMaskDownSampleBuffer.texture.name = 'OutlinePass.depthDownSample';
-		this.renderTargetMaskDownSampleBuffer.texture.generateMipmaps = false;
-
-		this.renderTargetBlurBuffer1 = new WebGLRenderTarget( resx, resy, { type: HalfFloatType } );
-		this.renderTargetBlurBuffer1.texture.name = 'OutlinePass.blur1';
-		this.renderTargetBlurBuffer1.texture.generateMipmaps = false;
-		this.renderTargetBlurBuffer2 = new WebGLRenderTarget( Math.round( resx / 2 ), Math.round( resy / 2 ), { type: HalfFloatType } );
-		this.renderTargetBlurBuffer2.texture.name = 'OutlinePass.blur2';
-		this.renderTargetBlurBuffer2.texture.generateMipmaps = false;
-
-		this.edgeDetectionMaterial = this._getEdgeDetectionMaterial();
-		this.renderTargetEdgeBuffer1 = new WebGLRenderTarget( resx, resy, { type: HalfFloatType } );
-		this.renderTargetEdgeBuffer1.texture.name = 'OutlinePass.edge1';
-		this.renderTargetEdgeBuffer1.texture.generateMipmaps = false;
-		this.renderTargetEdgeBuffer2 = new WebGLRenderTarget( Math.round( resx / 2 ), Math.round( resy / 2 ), { type: HalfFloatType } );
-		this.renderTargetEdgeBuffer2.texture.name = 'OutlinePass.edge2';
-		this.renderTargetEdgeBuffer2.texture.generateMipmaps = false;
-
-		const MAX_EDGE_THICKNESS = 4;
-		const MAX_EDGE_GLOW = 4;
-
-		this.separableBlurMaterial1 = this._getSeparableBlurMaterial( MAX_EDGE_THICKNESS );
-		this.separableBlurMaterial1.uniforms[ 'texSize' ].value.set( resx, resy );
-		this.separableBlurMaterial1.uniforms[ 'kernelRadius' ].value = 1;
-		this.separableBlurMaterial2 = this._getSeparableBlurMaterial( MAX_EDGE_GLOW );
-		this.separableBlurMaterial2.uniforms[ 'texSize' ].value.set( Math.round( resx / 2 ), Math.round( resy / 2 ) );
-		this.separableBlurMaterial2.uniforms[ 'kernelRadius' ].value = MAX_EDGE_GLOW;
-
-		// Overlay material
-		this.overlayMaterial = this._getOverlayMaterial();
-
-		// copy material
-
-		const copyShader = CopyShader;
-
-		this.copyUniforms = UniformsUtils.clone( copyShader.uniforms );
-
-		this.materialCopy = new ShaderMaterial( {
-			uniforms: this.copyUniforms,
-			vertexShader: copyShader.vertexShader,
-			fragmentShader: copyShader.fragmentShader,
-			blending: NoBlending,
-			depthTest: false,
-			depthWrite: false
-		} );
-
-		this.enabled = true;
-		this.needsSwap = false;
-
-		this._oldClearColor = new Color();
-		this.oldClearAlpha = 1;
-
-		this._fsQuad = new FullScreenQuad( null );
-
-		this.tempPulseColor1 = new Color();
-		this.tempPulseColor2 = new Color();
-		this.textureMatrix = new Matrix4();
-
-		function replaceDepthToViewZ( string, camera ) {
-
-			const type = camera.isPerspectiveCamera ? 'perspective' : 'orthographic';
-
-			return string.replace( /DEPTH_TO_VIEW_Z/g, type + 'DepthToViewZ' );
-
-		}
-
-	}
-
-	/**
-	 * Frees the GPU-related resources allocated by this instance. Call this
-	 * method whenever the pass is no longer used in your app.
-	 */
-	dispose() {
-
-		this.renderTargetMaskBuffer.dispose();
-		this.renderTargetDepthBuffer.dispose();
-		this.renderTargetMaskDownSampleBuffer.dispose();
-		this.renderTargetBlurBuffer1.dispose();
-		this.renderTargetBlurBuffer2.dispose();
-		this.renderTargetEdgeBuffer1.dispose();
-		this.renderTargetEdgeBuffer2.dispose();
-
-		this.depthMaterial.dispose();
-		this.prepareMaskMaterial.dispose();
-		this.edgeDetectionMaterial.dispose();
-		this.separableBlurMaterial1.dispose();
-		this.separableBlurMaterial2.dispose();
-		this.overlayMaterial.dispose();
-		this.materialCopy.dispose();
-
-		this._fsQuad.dispose();
-
-	}
-
-	/**
-	 * Sets the size of the pass.
-	 *
-	 * @param {number} width - The width to set.
-	 * @param {number} height - The height to set.
-	 */
-	setSize( width, height ) {
-
-		this.renderTargetMaskBuffer.setSize( width, height );
-		this.renderTargetDepthBuffer.setSize( width, height );
-
-		let resx = Math.round( width / this.downSampleRatio );
-		let resy = Math.round( height / this.downSampleRatio );
-		this.renderTargetMaskDownSampleBuffer.setSize( resx, resy );
-		this.renderTargetBlurBuffer1.setSize( resx, resy );
-		this.renderTargetEdgeBuffer1.setSize( resx, resy );
-		this.separableBlurMaterial1.uniforms[ 'texSize' ].value.set( resx, resy );
-
-		resx = Math.round( resx / 2 );
-		resy = Math.round( resy / 2 );
-
-		this.renderTargetBlurBuffer2.setSize( resx, resy );
-		this.renderTargetEdgeBuffer2.setSize( resx, resy );
-
-		this.separableBlurMaterial2.uniforms[ 'texSize' ].value.set( resx, resy );
-
-	}
-
-	/**
-	 * Performs the Outline pass.
-	 *
-	 * @param {WebGLRenderer} renderer - The renderer.
-	 * @param {WebGLRenderTarget} writeBuffer - The write buffer. This buffer is intended as the rendering
-	 * destination for the pass.
-	 * @param {WebGLRenderTarget} readBuffer - The read buffer. The pass can access the result from the
-	 * previous pass from this buffer.
-	 * @param {number} deltaTime - The delta time in seconds.
-	 * @param {boolean} maskActive - Whether masking is active or not.
-	 */
-	render( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
-
-		if ( this.selectedObjects.length > 0 ) {
-
-			renderer.getClearColor( this._oldClearColor );
-			this.oldClearAlpha = renderer.getClearAlpha();
-			const oldAutoClear = renderer.autoClear;
-
-			renderer.autoClear = false;
-
-			if ( maskActive ) renderer.state.buffers.stencil.setTest( false );
-
-			renderer.setClearColor( 0xffffff, 1 );
-
-			this._updateSelectionCache();
-
-			// Make selected objects invisible
-			this._changeVisibilityOfSelectedObjects( false );
-
-			const currentBackground = this.renderScene.background;
-			const currentOverrideMaterial = this.renderScene.overrideMaterial;
-			this.renderScene.background = null;
-
-			// 1. Draw Non Selected objects in the depth buffer
-			this.renderScene.overrideMaterial = this.depthMaterial;
-			renderer.setRenderTarget( this.renderTargetDepthBuffer );
-			renderer.clear();
-			renderer.render( this.renderScene, this.renderCamera );
-
-			// Make selected objects visible
-			this._changeVisibilityOfSelectedObjects( true );
-			this._visibilityCache.clear();
-
-			// Update Texture Matrix for Depth compare
-			this._updateTextureMatrix();
-
-			// Make non selected objects invisible, and draw only the selected objects, by comparing the depth buffer of non selected objects
-			this._changeVisibilityOfNonSelectedObjects( false );
-			this.renderScene.overrideMaterial = this.prepareMaskMaterial;
-			this.prepareMaskMaterial.uniforms[ 'cameraNearFar' ].value.set( this.renderCamera.near, this.renderCamera.far );
-			this.prepareMaskMaterial.uniforms[ 'depthTexture' ].value = this.renderTargetDepthBuffer.texture;
-			this.prepareMaskMaterial.uniforms[ 'textureMatrix' ].value = this.textureMatrix;
-			renderer.setRenderTarget( this.renderTargetMaskBuffer );
-			renderer.clear();
-			renderer.render( this.renderScene, this.renderCamera );
-			this._changeVisibilityOfNonSelectedObjects( true );
-			this._visibilityCache.clear();
-			this._selectionCache.clear();
-
-			this.renderScene.background = currentBackground;
-			this.renderScene.overrideMaterial = currentOverrideMaterial;
-
-			// 2. Downsample to Half resolution
-			this._fsQuad.material = this.materialCopy;
-			this.copyUniforms[ 'tDiffuse' ].value = this.renderTargetMaskBuffer.texture;
-			renderer.setRenderTarget( this.renderTargetMaskDownSampleBuffer );
-			renderer.clear();
-			this._fsQuad.render( renderer );
-
-			this.tempPulseColor1.copy( this.visibleEdgeColor );
-			this.tempPulseColor2.copy( this.hiddenEdgeColor );
-
-			if ( this.pulsePeriod > 0 ) {
-
-				const scalar = ( 1 + 0.25 ) / 2 + Math.cos( performance.now() * 0.01 / this.pulsePeriod ) * ( 1.0 - 0.25 ) / 2;
-				this.tempPulseColor1.multiplyScalar( scalar );
-				this.tempPulseColor2.multiplyScalar( scalar );
-
-			}
-
-			// 3. Apply Edge Detection Pass
-			this._fsQuad.material = this.edgeDetectionMaterial;
-			this.edgeDetectionMaterial.uniforms[ 'maskTexture' ].value = this.renderTargetMaskDownSampleBuffer.texture;
-			this.edgeDetectionMaterial.uniforms[ 'texSize' ].value.set( this.renderTargetMaskDownSampleBuffer.width, this.renderTargetMaskDownSampleBuffer.height );
-			this.edgeDetectionMaterial.uniforms[ 'visibleEdgeColor' ].value = this.tempPulseColor1;
-			this.edgeDetectionMaterial.uniforms[ 'hiddenEdgeColor' ].value = this.tempPulseColor2;
-			renderer.setRenderTarget( this.renderTargetEdgeBuffer1 );
-			renderer.clear();
-			this._fsQuad.render( renderer );
-
-			// 4. Apply Blur on Half res
-			this._fsQuad.material = this.separableBlurMaterial1;
-			this.separableBlurMaterial1.uniforms[ 'colorTexture' ].value = this.renderTargetEdgeBuffer1.texture;
-			this.separableBlurMaterial1.uniforms[ 'direction' ].value = OutlinePass.BlurDirectionX;
-			this.separableBlurMaterial1.uniforms[ 'kernelRadius' ].value = this.edgeThickness;
-			renderer.setRenderTarget( this.renderTargetBlurBuffer1 );
-			renderer.clear();
-			this._fsQuad.render( renderer );
-			this.separableBlurMaterial1.uniforms[ 'colorTexture' ].value = this.renderTargetBlurBuffer1.texture;
-			this.separableBlurMaterial1.uniforms[ 'direction' ].value = OutlinePass.BlurDirectionY;
-			renderer.setRenderTarget( this.renderTargetEdgeBuffer1 );
-			renderer.clear();
-			this._fsQuad.render( renderer );
-
-			// Apply Blur on quarter res
-			this._fsQuad.material = this.separableBlurMaterial2;
-			this.separableBlurMaterial2.uniforms[ 'colorTexture' ].value = this.renderTargetEdgeBuffer1.texture;
-			this.separableBlurMaterial2.uniforms[ 'direction' ].value = OutlinePass.BlurDirectionX;
-			renderer.setRenderTarget( this.renderTargetBlurBuffer2 );
-			renderer.clear();
-			this._fsQuad.render( renderer );
-			this.separableBlurMaterial2.uniforms[ 'colorTexture' ].value = this.renderTargetBlurBuffer2.texture;
-			this.separableBlurMaterial2.uniforms[ 'direction' ].value = OutlinePass.BlurDirectionY;
-			renderer.setRenderTarget( this.renderTargetEdgeBuffer2 );
-			renderer.clear();
-			this._fsQuad.render( renderer );
-
-			// Blend it additively over the input texture
-			this._fsQuad.material = this.overlayMaterial;
-			this.overlayMaterial.uniforms[ 'maskTexture' ].value = this.renderTargetMaskBuffer.texture;
-			this.overlayMaterial.uniforms[ 'edgeTexture1' ].value = this.renderTargetEdgeBuffer1.texture;
-			this.overlayMaterial.uniforms[ 'edgeTexture2' ].value = this.renderTargetEdgeBuffer2.texture;
-			this.overlayMaterial.uniforms[ 'patternTexture' ].value = this.patternTexture;
-			this.overlayMaterial.uniforms[ 'edgeStrength' ].value = this.edgeStrength;
-			this.overlayMaterial.uniforms[ 'edgeGlow' ].value = this.edgeGlow;
-			this.overlayMaterial.uniforms[ 'usePatternTexture' ].value = this.usePatternTexture;
-
-
-			if ( maskActive ) renderer.state.buffers.stencil.setTest( true );
-
-			renderer.setRenderTarget( readBuffer );
-			this._fsQuad.render( renderer );
-
-			renderer.setClearColor( this._oldClearColor, this.oldClearAlpha );
-			renderer.autoClear = oldAutoClear;
-
-		}
-
-		if ( this.renderToScreen ) {
-
-			this._fsQuad.material = this.materialCopy;
-			this.copyUniforms[ 'tDiffuse' ].value = readBuffer.texture;
-			renderer.setRenderTarget( null );
-			this._fsQuad.render( renderer );
-
-		}
-
-	}
-
-	// internals
-
-	_updateSelectionCache() {
-
-		const cache = this._selectionCache;
-
-		function gatherSelectedMeshesCallBack( object ) {
-
-			if ( object.isMesh ) cache.add( object );
-
-		}
-
-		cache.clear();
-
-		for ( let i = 0; i < this.selectedObjects.length; i ++ ) {
-
-			const selectedObject = this.selectedObjects[ i ];
-			selectedObject.traverse( gatherSelectedMeshesCallBack );
-
-		}
-
-	}
-
-	_changeVisibilityOfSelectedObjects( bVisible ) {
-
-		const cache = this._visibilityCache;
-
-		for ( const mesh of this._selectionCache ) {
-
-			if ( bVisible === true ) {
-
-				mesh.visible = cache.get( mesh );
-
-			} else {
-
-				cache.set( mesh, mesh.visible );
-				mesh.visible = bVisible;
-
-			}
-
-		}
-
-	}
-
-	_changeVisibilityOfNonSelectedObjects( bVisible ) {
-
-		const visibilityCache = this._visibilityCache;
-		const selectionCache = this._selectionCache;
-
-		function VisibilityChangeCallBack( object ) {
-
-			if ( object.isPoints || object.isLine || object.isLine2 ) {
-
-				// the visibility of points and lines is always set to false in order to
-				// not affect the outline computation
-
-				if ( bVisible === true ) {
-
-					object.visible = visibilityCache.get( object ); // restore
-
-				} else {
-
-					visibilityCache.set( object, object.visible );
-					object.visible = bVisible;
-
-				}
-
-			} else if ( object.isMesh || object.isSprite ) {
-
-				// only meshes and sprites are supported by OutlinePass
-
-				if ( ! selectionCache.has( object ) ) {
-
-					const visibility = object.visible;
-
-					if ( bVisible === false || visibilityCache.get( object ) === true ) {
-
-						object.visible = bVisible;
-
-					}
-
-					visibilityCache.set( object, visibility );
-
-				}
-
-			}
-
-		}
-
-		this.renderScene.traverse( VisibilityChangeCallBack );
-
-	}
-
-	_updateTextureMatrix() {
-
-		this.textureMatrix.set( 0.5, 0.0, 0.0, 0.5,
-			0.0, 0.5, 0.0, 0.5,
-			0.0, 0.0, 0.5, 0.5,
-			0.0, 0.0, 0.0, 1.0 );
-		this.textureMatrix.multiply( this.renderCamera.projectionMatrix );
-		this.textureMatrix.multiply( this.renderCamera.matrixWorldInverse );
-
-	}
-
-	_getPrepareMaskMaterial() {
-
-		return new ShaderMaterial( {
-
-			uniforms: {
-				'depthTexture': { value: null },
-				'cameraNearFar': { value: new Vector2( 0.5, 0.5 ) },
-				'textureMatrix': { value: null }
-			},
-
-			vertexShader:
-				`#include <batching_pars_vertex>
-				#include <morphtarget_pars_vertex>
-				#include <skinning_pars_vertex>
-
-				varying vec4 projTexCoord;
-				varying vec4 vPosition;
-				uniform mat4 textureMatrix;
-
-				void main() {
-
-					#include <batching_vertex>
-					#include <skinbase_vertex>
-					#include <begin_vertex>
-					#include <morphtarget_vertex>
-					#include <skinning_vertex>
-					#include <project_vertex>
-
-					vPosition = mvPosition;
-
-					vec4 worldPosition = vec4( transformed, 1.0 );
-
-					#ifdef USE_INSTANCING
-
-						worldPosition = instanceMatrix * worldPosition;
-
-					#endif
-
-					worldPosition = modelMatrix * worldPosition;
-
-					projTexCoord = textureMatrix * worldPosition;
-
-				}`,
-
-			fragmentShader:
-				`#include <packing>
-				varying vec4 vPosition;
-				varying vec4 projTexCoord;
-				uniform sampler2D depthTexture;
-				uniform vec2 cameraNearFar;
-
-				void main() {
-
-					float depth = unpackRGBAToDepth(texture2DProj( depthTexture, projTexCoord ));
-					float viewZ = - DEPTH_TO_VIEW_Z( depth, cameraNearFar.x, cameraNearFar.y );
-					float depthTest = (-vPosition.z > viewZ) ? 1.0 : 0.0;
-					gl_FragColor = vec4(0.0, depthTest, 1.0, 1.0);
-
-				}`
-
-		} );
-
-	}
-
-	_getEdgeDetectionMaterial() {
-
-		return new ShaderMaterial( {
-
-			uniforms: {
-				'maskTexture': { value: null },
-				'texSize': { value: new Vector2( 0.5, 0.5 ) },
-				'visibleEdgeColor': { value: new Vector3( 1.0, 1.0, 1.0 ) },
-				'hiddenEdgeColor': { value: new Vector3( 1.0, 1.0, 1.0 ) },
-			},
-
-			vertexShader:
-				`varying vec2 vUv;
-
-				void main() {
-					vUv = uv;
-					gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-				}`,
-
-			fragmentShader:
-				`varying vec2 vUv;
-
-				uniform sampler2D maskTexture;
-				uniform vec2 texSize;
-				uniform vec3 visibleEdgeColor;
-				uniform vec3 hiddenEdgeColor;
-
-				void main() {
-					vec2 invSize = 1.0 / texSize;
-					vec4 uvOffset = vec4(1.0, 0.0, 0.0, 1.0) * vec4(invSize, invSize);
-					vec4 c1 = texture2D( maskTexture, vUv + uvOffset.xy);
-					vec4 c2 = texture2D( maskTexture, vUv - uvOffset.xy);
-					vec4 c3 = texture2D( maskTexture, vUv + uvOffset.yw);
-					vec4 c4 = texture2D( maskTexture, vUv - uvOffset.yw);
-					float diff1 = (c1.r - c2.r)*0.5;
-					float diff2 = (c3.r - c4.r)*0.5;
-					float d = length( vec2(diff1, diff2) );
-					float a1 = min(c1.g, c2.g);
-					float a2 = min(c3.g, c4.g);
-					float visibilityFactor = min(a1, a2);
-					vec3 edgeColor = 1.0 - visibilityFactor > 0.001 ? visibleEdgeColor : hiddenEdgeColor;
-					gl_FragColor = vec4(edgeColor, 1.0) * vec4(d);
-				}`
-		} );
-
-	}
-
-	_getSeparableBlurMaterial( maxRadius ) {
-
-		return new ShaderMaterial( {
-
-			defines: {
-				'MAX_RADIUS': maxRadius,
-			},
-
-			uniforms: {
-				'colorTexture': { value: null },
-				'texSize': { value: new Vector2( 0.5, 0.5 ) },
-				'direction': { value: new Vector2( 0.5, 0.5 ) },
-				'kernelRadius': { value: 1.0 }
-			},
-
-			vertexShader:
-				`varying vec2 vUv;
-
-				void main() {
-					vUv = uv;
-					gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-				}`,
-
-			fragmentShader:
-				`#include <common>
-				varying vec2 vUv;
-				uniform sampler2D colorTexture;
-				uniform vec2 texSize;
-				uniform vec2 direction;
-				uniform float kernelRadius;
-
-				float gaussianPdf(in float x, in float sigma) {
-					return 0.39894 * exp( -0.5 * x * x/( sigma * sigma))/sigma;
-				}
-
-				void main() {
-					vec2 invSize = 1.0 / texSize;
-					float sigma = kernelRadius/2.0;
-					float weightSum = gaussianPdf(0.0, sigma);
-					vec4 diffuseSum = texture2D( colorTexture, vUv) * weightSum;
-					vec2 delta = direction * invSize * kernelRadius/float(MAX_RADIUS);
-					vec2 uvOffset = delta;
-					for( int i = 1; i <= MAX_RADIUS; i ++ ) {
-						float x = kernelRadius * float(i) / float(MAX_RADIUS);
-						float w = gaussianPdf(x, sigma);
-						vec4 sample1 = texture2D( colorTexture, vUv + uvOffset);
-						vec4 sample2 = texture2D( colorTexture, vUv - uvOffset);
-						diffuseSum += ((sample1 + sample2) * w);
-						weightSum += (2.0 * w);
-						uvOffset += delta;
-					}
-					gl_FragColor = diffuseSum/weightSum;
-				}`
-		} );
-
-	}
-
-	_getOverlayMaterial() {
-
-		return new ShaderMaterial( {
-
-			uniforms: {
-				'maskTexture': { value: null },
-				'edgeTexture1': { value: null },
-				'edgeTexture2': { value: null },
-				'patternTexture': { value: null },
-				'edgeStrength': { value: 1.0 },
-				'edgeGlow': { value: 1.0 },
-				'usePatternTexture': { value: 0.0 }
-			},
-
-			vertexShader:
-				`varying vec2 vUv;
-
-				void main() {
-					vUv = uv;
-					gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-				}`,
-
-			fragmentShader:
-				`varying vec2 vUv;
-
-				uniform sampler2D maskTexture;
-				uniform sampler2D edgeTexture1;
-				uniform sampler2D edgeTexture2;
-				uniform sampler2D patternTexture;
-				uniform float edgeStrength;
-				uniform float edgeGlow;
-				uniform bool usePatternTexture;
-
-				void main() {
-					vec4 edgeValue1 = texture2D(edgeTexture1, vUv);
-					vec4 edgeValue2 = texture2D(edgeTexture2, vUv);
-					vec4 maskColor = texture2D(maskTexture, vUv);
-					vec4 patternColor = texture2D(patternTexture, 6.0 * vUv);
-					float visibilityFactor = 1.0 - maskColor.g > 0.0 ? 1.0 : 0.5;
-					vec4 edgeValue = edgeValue1 + edgeValue2 * edgeGlow;
-					vec4 finalColor = edgeStrength * maskColor.r * edgeValue;
-					if(usePatternTexture)
-						finalColor += + visibilityFactor * (1.0 - maskColor.r) * (1.0 - patternColor.r);
-					gl_FragColor = finalColor;
-				}`,
-			blending: AdditiveBlending,
-			depthTest: false,
-			depthWrite: false,
-			transparent: true
-		} );
-
-	}
-
-}
-
-OutlinePass.BlurDirectionX = new Vector2( 1.0, 0.0 );
-OutlinePass.BlurDirectionY = new Vector2( 0.0, 1.0 );
 
 /**
  * @module FXAAShader
@@ -56274,9 +55524,8 @@ module.exports = {
 	THREE,
 	THREE_dispose,
 
-	ToIndexed,
-	OutlineMaterial,
-	OutlineMesh,
+	FindSurfaces,
+	CustomOutlinePass,
 	ColoredShadowMaterial,
 
 	CSG,
@@ -56284,7 +55533,6 @@ module.exports = {
 	EffectComposer,
 	RenderPass,
 	ShaderPass,
-	OutlinePass,
 	FXAAShader,
 
 	OBJLoader,
