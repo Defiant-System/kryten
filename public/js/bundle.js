@@ -50609,15 +50609,21 @@ class CustomOutlinePass extends Pass {
 
 			float getSufaceIdDiff(vec3 surfaceValue) {
 				float surfaceIdDiff = 0.0;
+				
 				surfaceIdDiff += distance(surfaceValue, getSurfaceValue(1, 0));
 				surfaceIdDiff += distance(surfaceValue, getSurfaceValue(0, 1));
-				surfaceIdDiff += distance(surfaceValue, getSurfaceValue(0, 1));
+				surfaceIdDiff += distance(surfaceValue, getSurfaceValue(-1, 0));
 				surfaceIdDiff += distance(surfaceValue, getSurfaceValue(0, -1));
 
-				surfaceIdDiff += distance(surfaceValue, getSurfaceValue(1, 1));
-				surfaceIdDiff += distance(surfaceValue, getSurfaceValue(1, -1));
-				surfaceIdDiff += distance(surfaceValue, getSurfaceValue(-1, 1));
-				surfaceIdDiff += distance(surfaceValue, getSurfaceValue(-1, -1));
+				// surfaceIdDiff += distance(surfaceValue, getSurfaceValue(1, 0));
+				// surfaceIdDiff += distance(surfaceValue, getSurfaceValue(0, 1));
+				// surfaceIdDiff += distance(surfaceValue, getSurfaceValue(0, 1));
+				// surfaceIdDiff += distance(surfaceValue, getSurfaceValue(0, -1));
+
+				// surfaceIdDiff += distance(surfaceValue, getSurfaceValue(1, 1));
+				// surfaceIdDiff += distance(surfaceValue, getSurfaceValue(1, -1));
+				// surfaceIdDiff += distance(surfaceValue, getSurfaceValue(-1, 1));
+				// surfaceIdDiff += distance(surfaceValue, getSurfaceValue(-1, -1));
 				return surfaceIdDiff;
 			}
 

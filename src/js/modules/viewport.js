@@ -102,8 +102,9 @@ let Viewport = (() => {
 					);
 					// uniforms
 					uniforms = customOutline.fsQuad.material.uniforms;
-					uniforms.outlineColor.value.set("#555");
-					uniforms.debugVisualize.value = 7;
+					uniforms.outlineColor.value.set("#aaa");
+					uniforms.debugVisualize.value = 1;
+					// uniforms.multiplierParameters.value.w = .3;
 
 					composer.addPass(customOutline);
 
@@ -231,6 +232,20 @@ let Viewport = (() => {
 					// add object to original model
 					originalModel.add(object);
 					break;
+				case "insert-compound-geometry":
+				case "insert-OBJ-geometry":
+					object = loader.parse(event.geo.str);
+					object.traverse(c => {
+						if (!c.isMesh) return;
+						c.geometry.computeBoundingBox();
+						let pivot = new THREE.Vector3();
+						c.geometry.boundingBox.getCenter(pivot);
+						c.geometry.center();
+						c.position.add(pivot);
+						Self.pivots[c.name] = pivot.clone();
+					});
+					originalModel.add(object);
+					break;
 				case "update-models":
 				// case "add-surface-id-attribute-to-mesh":
 					surfaceFinder.surfaceId = 0;
@@ -260,11 +275,12 @@ let Viewport = (() => {
 						Self.objects[c.name] = oGroup;
 						// insert in to scene
 						objectGroup.add(oGroup);
-						
-						let colorsTypedArray = surfaceFinder.getSurfaceIdAttribute(c),
-							bufferAttr = new THREE.BufferAttribute(colorsTypedArray, 4);
-						c.geometry.setAttribute("color", bufferAttr);
 
+						let colorsTypedArray = surfaceFinder.getSurfaceIdAttribute(c);
+						c.geometry.setAttribute(
+							"color",
+							new THREE.BufferAttribute(colorsTypedArray, 4)
+						);
 					});
 
 					customOutline.updateMaxSurfaceId(surfaceFinder.surfaceId + 1);
