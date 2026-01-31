@@ -4,19 +4,12 @@ let {
 	THREE,
 	THREE_dispose,
 
-	CSG,
 	ToIndexed,
 	OutlineMaterial,
 	OutlineMesh,
 	ColoredShadowMaterial,
 
-	EffectComposer,
-	RenderPass,
-	ShaderPass,
-	OutlinePass,
-	FXAAShader,
-
-	OBJLoader,
+	GLTFLoader,
 	OrbitControls,
 } = await window.fetch("~/js/bundle.js");
 

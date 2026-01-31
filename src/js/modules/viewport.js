@@ -4,7 +4,7 @@ let Viewport = (() => {
 	let width = window.innerWidth,
 		height = window.innerHeight,
 		ratio = width / height,
-		loader = new OBJLoader(),
+		loader = new GLTFLoader(),
 		mtlLine = new OutlineMaterial(179, true, "#888"),
 		mtlShadow = new ColoredShadowMaterial({
 			color: 0xffffff,
@@ -278,7 +278,10 @@ let Viewport = (() => {
 						oGroup.add(sMesh);
 						// outlines
 						let lGeo = sGeo.clone();
-						if (!lGeo.index) lGeo = lGeo.toIndexed(false);
+						if (!lGeo.index) {
+							console.log("using toIndexed");
+							lGeo = lGeo.toIndexed(false);
+						}
 						let lMesh = new THREE.Mesh(lGeo);
 						let lObj = new OutlineMesh(lMesh, mtlLine);
 						oGroup.add(lObj);

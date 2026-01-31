@@ -6,15 +6,7 @@ import { OutlineMaterial } from './modules/outlines/OutlineMaterial.js';
 import { OutlineMesh } from './modules/outlines/OutlineMesh.js';
 import { ColoredShadowMaterial } from './modules/outlines/ColoredShadowMaterial.js';
 
-import { CSG } from './modules/csg/CSG.js';
-
-import { EffectComposer } from './modules/threejs/examples/jsm/postprocessing/EffectComposer.js';
-import { RenderPass } from './modules/threejs/examples/jsm/postprocessing/RenderPass.js';
-import { ShaderPass } from './modules/threejs/examples/jsm/postprocessing/ShaderPass.js';
-import { OutlinePass } from './modules/threejs/examples/jsm/postprocessing/OutlinePass.js';
-import { FXAAShader } from './modules/threejs/examples/jsm/shaders/FXAAShader.js';
-
-import { OBJLoader } from "./modules/threejs/examples/jsm/loaders/OBJLoader.js";
+import { GLTFLoader } from "./modules/threejs/examples/jsm/loaders/GLTFLoader.js";
 import { OrbitControls } from "./modules/threejs/examples/jsm/controls/OrbitControls.js";
 
 
@@ -34,14 +26,6 @@ module.exports = {
 	OutlineMesh,
 	ColoredShadowMaterial,
 
-	CSG,
-
-	EffectComposer,
-	RenderPass,
-	ShaderPass,
-	OutlinePass,
-	FXAAShader,
-
-	OBJLoader,
+	GLTFLoader,
 	OrbitControls,
 };
