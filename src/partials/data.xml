@@ -1,7 +1,7 @@
 <Data>
 	<Samples>
 		<i name="Lack" img="lack.webp" file="lack/lack.xml"/>
-		<i name="Pyramid" img="pyramid.webp" file="lack/pyramid.xml"/>
+		<i name="Pyramid" img="pyramid.webp" file="pyramid/pyramid.xml"/>
 		<i name="Monkey" img="monkey.webp" file="monkey/monkey.xml"/>
 		<i name="Basic" img="basic.webp" file="basic.xml"/>
 		<i name="Torus Knot" img="torus-knot.webp" file="torus-knot.xml"/>

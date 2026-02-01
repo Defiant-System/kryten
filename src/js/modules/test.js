@@ -4,6 +4,7 @@ let Test = {
 		// return;
 		
 		setTimeout(() => APP.els.content.find(`.sample .name`).get(0).trigger("click"), 300);
+		setTimeout(() => APP.showcase.dispatch({ type: "goto-start" }), 800);
 
 		return;
 

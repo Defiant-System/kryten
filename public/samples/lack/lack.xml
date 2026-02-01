@@ -14,82 +14,82 @@
 		<Start num="0" duration=".8" autoNext="1">
 			<Item object="camera" position="[-9,6,10]" lookAt="[-2,3,1.5]"/>
 			<Item object="root" position="[0,7,0]" rotation="[0,-180,180]"/>
-			<Item object="Screw.001" hidden="true" position="[0,-1.5,0]" state="save"/>
+			<Item object="Screw001" hidden="true" position="[0,-1.5,0]" state="save"/>
 
-			<Item object="Leg.001" position="[0,-1.5,0]" hidden="true" state="save"/>
-			<Item object="Leg.002" position="[0,-1.5,0]" hidden="true" state="save"/>
-			<Item object="Leg.003" position="[0,-1.5,0]" hidden="true" state="save"/>
-			<Item object="Leg.004" position="[0,-1.5,0]" hidden="true" state="save"/>
+			<Item object="Leg001" position="[0,-1.5,0]" hidden="true" state="save"/>
+			<Item object="Leg002" position="[0,-1.5,0]" hidden="true" state="save"/>
+			<Item object="Leg003" position="[0,-1.5,0]" hidden="true" state="save"/>
+			<Item object="Leg004" position="[0,-1.5,0]" hidden="true" state="save"/>
 
-			<Item object="--Arrow.001" hidden="true"/>
+			<Item object="Arrow001" hidden="true"/>
 		</Start>
 		<Step num="1">
-			<Item object="Screw.001" name="Screw-001-show" position="[0,0,0]" hidden="false"/>
-			<Item object="--Arrow.001" name="Arrow.001-rotate" rotation="[0,-360,0]" times="[0,4]" repeat="9" hidden="false"/>
+			<Item object="Screw001" name="Screw-001-show" position="[0,0,0]" hidden="false"/>
+			<Item object="Arrow001" name="Arrow.001-rotate" rotation="[0,-360,0]" times="[0,4]" repeat="9" hidden="false"/>
 		</Step>
 		<Step num="2" autoNext="1.5">
-			<Item object="Screw.001" name="Screw-001-show" position="[0,1.5,0]"/>
-			<Item object="--Arrow.001" name="Arrow.001-hide" position="[8,0,0]" hidden="true"/>
+			<Item object="Screw001" name="Screw-001-show" position="[0,1.5,0]"/>
+			<Item object="Arrow001" name="Arrow.001-hide" position="[8,0,0]" hidden="true"/>
 		</Step>
 		<Step num="3">
-			<Item object="Leg.001" name="Leg.001-show" rotation="[0,360,0]" times="[0,4]" repeat="1" hidden="false"/>
+			<Item object="Leg001" name="Leg001-show" rotation="[0,360,0]" times="[0,4]" repeat="1" hidden="false"/>
 		</Step>
 		<Step num="4" autoNext="1">
-			<Item object="Leg.001" name="Leg.001-restore" state="restore"/>
+			<Item object="Leg001" name="Leg001-restore" state="restore"/>
 		</Step>
 		<Step num="5" autoNext="1">
 			<Item object="root" rotation="[0,-90,0]"/>
-			<Item object="Screw.001" name="Screw-001-hidden" position="[8,-1.5,0]" hidden="true"/>
+			<Item object="Screw001" name="Screw-001-hidden" position="[8,-1.5,0]" hidden="true"/>
 		</Step>
 		<Step num="6">
-			<Item object="Screw.001" name="Screw-001-show" hidden="false"/>
-			<Item object="--Arrow.001" name="Arrow.001-rotate" rotation="[0,-360,0]" times="[0,4]" repeat="9" hidden="false"/>
+			<Item object="Screw001" name="Screw-001-show" hidden="false"/>
+			<Item object="Arrow001" name="Arrow.001-rotate" rotation="[0,-360,0]" times="[0,4]" repeat="9" hidden="false"/>
 		</Step>
 		<Step num="7" autoNext="1.5">
-			<Item object="Screw.001" name="Screw-001-down" position="[0,1.5,0]"/>
-			<Item object="--Arrow.001" name="Arrow.001-hide" position="[0,0,8]" hidden="true"/>
+			<Item object="Screw001" name="Screw-001-down" position="[0,1.5,0]"/>
+			<Item object="Arrow001" name="Arrow.001-hide" position="[0,0,8]" hidden="true"/>
 		</Step>
 		<Step num="8">
-			<Item object="Leg.004" name="Leg.004-show" rotation="[0,360,0]" times="[0,4]" repeat="1" hidden="false"/>
+			<Item object="Leg004" name="Leg004-show" rotation="[0,360,0]" times="[0,4]" repeat="1" hidden="false"/>
 		</Step>
 		<Step num="9" autoNext="1">
-			<Item object="Leg.004" name="Leg.004-restore" state="restore"/>
+			<Item object="Leg004" name="Leg004-restore" state="restore"/>
 		</Step>
 		<Step num="10" autoNext="1">
 			<Item object="root" rotation="[0,-90,0]"/>
-			<Item object="Screw.001" name="Screw-001-hidden" position="[0,-1.5,8]" hidden="true"/>
+			<Item object="Screw001" name="Screw-001-hidden" position="[0,-1.5,8]" hidden="true"/>
 		</Step>
 		<Step num="11">
-			<Item object="Screw.001" name="Screw-001-show" hidden="false"/>
-			<Item object="--Arrow.001" name="Arrow.001-rotate" rotation="[0,-360,0]" times="[0,4]" repeat="9" hidden="false"/>
+			<Item object="Screw001" name="Screw-001-show" hidden="false"/>
+			<Item object="Arrow001" name="Arrow.001-rotate" rotation="[0,-360,0]" times="[0,4]" repeat="9" hidden="false"/>
 		</Step>
 		<Step num="12" autoNext="1.5">
-			<Item object="Screw.001" name="Screw-001-down" position="[0,1.5,0]"/>
-			<Item object="--Arrow.001" name="Arrow.001-hide" position="[-8,0,0]" hidden="true"/>
+			<Item object="Screw001" name="Screw-001-down" position="[0,1.5,0]"/>
+			<Item object="Arrow001" name="Arrow.001-hide" position="[-8,0,0]" hidden="true"/>
 		</Step>
 		<Step num="13">
-			<Item object="Leg.003" name="Leg.003-show" rotation="[0,360,0]" times="[0,4]" repeat="1" hidden="false"/>
+			<Item object="Leg003" name="Leg003-show" rotation="[0,360,0]" times="[0,4]" repeat="1" hidden="false"/>
 		</Step>
 		<Step num="14" autoNext="1">
-			<Item object="Leg.003" name="Leg.003-restore" state="restore"/>
+			<Item object="Leg003" name="Leg003-restore" state="restore"/>
 		</Step>
 		<Step num="15" autoNext="1">
 			<Item object="root" rotation="[0,-90,0]"/>
-			<Item object="Screw.001" name="Screw-001-hidden" position="[-8,-1.5,0]" hidden="true"/>
+			<Item object="Screw001" name="Screw-001-hidden" position="[-8,-1.5,0]" hidden="true"/>
 		</Step>
 		<Step num="16">
-			<Item object="Screw.001" name="Screw-001-show" hidden="false"/>
-			<Item object="--Arrow.001" name="Arrow.001-rotate" rotation="[0,-360,0]" times="[0,4]" repeat="9" hidden="false"/>
+			<Item object="Screw001" name="Screw-001-show" hidden="false"/>
+			<Item object="Arrow001" name="Arrow.001-rotate" rotation="[0,-360,0]" times="[0,4]" repeat="9" hidden="false"/>
 		</Step>
 		<Step num="17" autoNext="1.5">
-			<Item object="Screw.001" name="Screw-001-down" position="[0,1.5,0]"/>
-			<Item object="--Arrow.001" name="Arrow.001-hide" position="[-8,0,0]" hidden="true"/>
+			<Item object="Screw001" name="Screw-001-down" position="[0,1.5,0]"/>
+			<Item object="Arrow001" name="Arrow.001-hide" position="[-8,0,0]" hidden="true"/>
 		</Step>
 		<Step num="18">
-			<Item object="Leg.002" name="Leg.002-show" rotation="[0,360,0]" times="[0,4]" repeat="1" hidden="false"/>
+			<Item object="Leg002" name="Leg002-show" rotation="[0,360,0]" times="[0,4]" repeat="1" hidden="false"/>
 		</Step>
 		<Step num="19" autoNext="1">
-			<Item object="Leg.002" name="Leg.002-restore" state="restore"/>
+			<Item object="Leg002" name="Leg002-restore" state="restore"/>
 		</Step>
 		<Step num="20" autoNext="1">
 			<Item object="root" rotation="[0,45,0]"/>

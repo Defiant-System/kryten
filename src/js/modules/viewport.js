@@ -36,7 +36,6 @@ let Viewport = (() => {
 			this.APP = APP;
 			// memory records
 			this.objects = {};
-			this.pivots = {};
 			this.states = {};
 
 			this.dispatch({ type: "refresh-theme-values" });
@@ -47,7 +46,7 @@ let Viewport = (() => {
 			let Self = vp,
 				APP = Self.APP,
 				x, y, z,
-				meshes,
+				mesh,
 				object;
 			switch (event.type) {
 				case "init-viewport":
@@ -200,21 +199,30 @@ let Viewport = (() => {
 					// add object to original model
 					originalModel.add(object);
 					break;
-				case "insert-compound-geometry":
-				case "insert-OBJ-geometry":
-					object = Self.loader.parse(event.geo.str);
-					object.traverse(c => {
-						if (!c.isMesh) return;
-						c.geometry.computeBoundingBox();
-						let pivot = new THREE.Vector3();
-						c.geometry.boundingBox.getCenter(pivot);
-						c.geometry.center();
-						c.position.add(pivot);
-						Self.pivots[c.name] = pivot.clone();
-					});
-					originalModel.add(object);
-
-					Self.pivots.root = new THREE.Vector3();
+				case "insert-GLB-scene":
+					originalModel = event.scene;
+					break;
+				case "insert-GLB-mesh-":
+					let oGroup = new THREE.Group();
+					mesh = event.mesh;
+					oGroup.position.set(...mesh.position.toArray());
+					oGroup.rotation.set(...mesh.rotation.toArray());
+					// shadow material
+					let sGeo = mesh.geometry.clone();
+					let sMesh = new THREE.Mesh(sGeo, mtlShadow);
+					sMesh.receiveShadow = true;
+					sMesh.castShadow = true;
+					oGroup.add(sMesh);
+					// outlines
+					let lGeo = sGeo.clone();
+					if (!lGeo.index) lGeo = lGeo.toIndexed(false);
+					let lMesh = new THREE.Mesh(lGeo);
+					let lObj = new OutlineMesh(lMesh, mtlLine);
+					oGroup.add(lObj);
+					// name of item as group name
+					oGroup.name = mesh.name;
+					// insert in to scene
+					originalModel.add(oGroup);
 					break;
 				case "save-item-state":
 					if (!Self.states[event.state.object]) {
@@ -244,7 +252,7 @@ let Viewport = (() => {
 						// outlines
 						let lGeo = sGeo.clone();
 						if (!lGeo.index) {
-							console.log("using toIndexed");
+							console.log("*** using toIndexed");
 							lGeo = lGeo.toIndexed(false);
 						}
 						let lMesh = new THREE.Mesh(lGeo);
@@ -252,10 +260,6 @@ let Viewport = (() => {
 						oGroup.add(lObj);
 						// name of item as group name
 						oGroup.name = c.name;
-						// hide "helper" meshes
-						if (oGroup.name.startsWith("--")) {
-							oGroup.visible = false;
-						}
 						// save references to objects
 						Self.objects[c.name] = oGroup;
 						// insert in to scene
