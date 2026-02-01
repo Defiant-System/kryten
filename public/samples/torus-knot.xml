@@ -1,7 +1,8 @@
 <Data>
 	<Meta>
+		<i id="kind" value="xml"/>
 		<i id="name" value="Torus Knot"/>
-		<i id="description"><![CDATA[Byrå med 2 lådor, vitbets. 54 x 66 x 113 cm]]></i>
+		<i id="description"><![CDATA[Dessa är test modeller.]]></i>
 		<i id="assembly" value="7"/>
 		<i id="steps" value="21"/>
 		<i id="parts" value="13"/>

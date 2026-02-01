@@ -9,9 +9,6 @@ let Viewport = (() => {
 		mtlShadow = new ColoredShadowMaterial({
 			color: 0xffffff,
 			shadowColor: 0xdddddd,
-			// shininess: 1.0,
-			// transparent: true,
-			// opacity: 0.95,
 			polygonOffset: true,
 			polygonOffsetFactor: 1,
 			polygonOffsetUnits: 1,
@@ -29,25 +26,11 @@ let Viewport = (() => {
 		dirLight,
 		shadowCam,
 		floor,
-		orbit,
-		// postprocessing
-		postprocess = 0,
-		param = { 
-			minFilter: THREE.LinearFilter,
-			magFilter: THREE.LinearFilter,
-			format: THREE.RGBAFormat,
-			type: THREE.HalfFloatType,
-			stencilBuffer: false,
-			samples: 4,
-		},
-		renderTarget = new THREE.WebGLRenderTarget(width, height, param),
-		composer,
-		renderPass,
-		outlinePass,
-		effectFXAA;
+		orbit;
 
 
 	let vp = {
+		loader, // expose GLTF loader
 		init(APP) {
 			// save reference to app
 			this.APP = APP;
@@ -98,22 +81,6 @@ let Viewport = (() => {
 					shadowCam.right = shadowCam.top = 5;
 					scene.add(dirLight);
 					
-					/* postprocessing
-					composer = new EffectComposer(renderer, renderTarget);
-					renderPass = new RenderPass(scene, camera);
-					composer.addPass(renderPass);
-					outlinePass = new OutlinePass(new THREE.Vector2(width, height), scene, camera);
-					composer.addPass(outlinePass);
-					outlinePass.edgeStrength = 5.0,
-					outlinePass.edgeThickness = 0.5;
-					// outlinePass.edgeGlow = 0.0,
-					outlinePass.visibleEdgeColor.set('#ff3300');
-					outlinePass.hiddenEdgeColor.set('#002255');
-					// outlinePass.selectedObjects = [objectGroup];
-					effectFXAA = new ShaderPass(FXAAShader);
-					composer.addPass(effectFXAA);
-					*/
-
 					// floor setup
 					floor = new THREE.Mesh(
 						new THREE.PlaneGeometry(),
@@ -148,13 +115,11 @@ let Viewport = (() => {
 								objectGroup.rotation.y -= 0.0025;
 							} else Timeline.tick(time, delta);
 
-							if (postprocess) composer.render();
-							else renderer.render(scene, camera);
+							renderer.render(scene, camera);
 						}
 					});
 					break;
 				case "reset-scene":
-					
 					Timeline.paused = true;
 					// Self.fpsControl.stop();
 					scene.remove(objectGroup);
@@ -237,7 +202,7 @@ let Viewport = (() => {
 					break;
 				case "insert-compound-geometry":
 				case "insert-OBJ-geometry":
-					object = loader.parse(event.geo.str);
+					object = Self.loader.parse(event.geo.str);
 					object.traverse(c => {
 						if (!c.isMesh) return;
 						c.geometry.computeBoundingBox();
