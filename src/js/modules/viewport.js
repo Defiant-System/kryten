@@ -239,6 +239,7 @@ let Viewport = (() => {
 					originalModel.traverse(c => {
 						if (!c.isMesh) return;
 						let oGroup = new THREE.Group();
+						oGroup.scale.set(...c.scale.toArray());
 						oGroup.position.set(...c.position.toArray());
 						oGroup.rotation.set(...c.rotation.toArray());
 						// find out where floor should be
