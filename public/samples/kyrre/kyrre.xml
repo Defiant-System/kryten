@@ -1,0 +1,23 @@
+<Data>
+	<Meta>
+		<i id="kind" value="glb"/>
+		<i id="name" value="Kyrre"/>
+		<i id="description"><![CDATA[Allroundpall med tre böjda ben kommer till din räddning när oväntade gäster dyker upp. 42 x 48 x 45 cm]]></i>
+		<i id="assembly" value="3-4"/>
+		<i id="parts" value="9"/>
+		<i id="floorY" value="0.01"/>
+		<i id="camera" position="[0,10,12]" lookAt="[0,3,0]"/>
+		<i id="shadowCam" top="10" left="-10" bottom="-10" right="10"/>
+		<i id="light" position="[7,6,-1]" color="#fff"/>
+	</Meta>
+	<Timeline>
+		<Start num="0" duration=".8" autoNext="1">
+			<Item object="camera" position="[-9,6,10]" lookAt="[-2,3,1.5]"/>
+			<Item object="root" position="[0,7,0]" rotation="[0,-180,180]"/>
+			<Item object="Screw.001" hidden="true" position="[0,-1.5,0]" state="save"/>
+		</Start>
+		<Step num="1">
+			<Item object="Screw.001" name="Screw-001-show" position="[0,0,0]" hidden="false"/>
+		</Step>
+	</Timeline>
+</Data>

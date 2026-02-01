@@ -1,9 +1,9 @@
 
 let Test = {
 	init(APP) {
-		return;
+		// return;
 		
-		setTimeout(() => APP.els.content.find(`.sample .name`).get(4).trigger("click"), 300);
+		setTimeout(() => APP.els.content.find(`.sample .name`).get(0).trigger("click"), 300);
 
 		return;
 
