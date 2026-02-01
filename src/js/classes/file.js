@@ -18,6 +18,7 @@ class File {
 			el.html(value +" "+ suffix);
 		});
 
+
 		switch (this.getMeta("kind")) {
 			case "glb":
 				Viewport.loader.load(`~/samples/${fsFile.name}/${fsFile.name}.glb`, gltf => {
@@ -50,8 +51,14 @@ class File {
 	}
 
 	initScene() {
+		// automatically hide items
+		let hidden = {};
+		this._file.data.selectNodes(`./Reset/*`).map(xItem => {
+			hidden[xItem.getAttribute("object")] = xItem.getAttribute("hidden") !== "true";
+		});
+
 		// update viewport & start player
-		Viewport.dispatch({ type: "update-models", file: this });
+		Viewport.dispatch({ type: "update-models", file: this, hidden });
 
 		let xShadowCam = this._file.data.selectSingleNode(`./Meta/*[@id="shadowCam"]`),
 			values = { top: 2, left: -2, bottom: -2, right: 2 };

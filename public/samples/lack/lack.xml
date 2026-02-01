@@ -10,6 +10,9 @@
 		<i id="shadowCam" top="10" left="-10" bottom="-10" right="10"/>
 		<i id="light" position="[7,6,-1]" color="#fff"/>
 	</Meta>
+	<Reset>
+		<i object="Arrow001" hidden="true"/>
+	</Reset>
 	<Timeline>
 		<Start num="0" duration=".8" autoNext="1">
 			<Item object="camera" position="[-9,6,10]" lookAt="[-2,3,1.5]"/>

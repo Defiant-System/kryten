@@ -266,6 +266,11 @@ let Viewport = (() => {
 						// insert in to scene
 						objectGroup.add(oGroup);
 					});
+
+					Object.keys(event.hidden).map(key => {
+						Self.objects[key].visible = false;
+					});
+
 					// regerence to root group
 					Self.objects.root = objectGroup;
 					// update floor
