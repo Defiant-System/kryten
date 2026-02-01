@@ -6,7 +6,7 @@
 		<i id="assembly" value="3-4"/>
 		<i id="parts" value="9"/>
 		<i id="floorY" value="0.01"/>
-		<i id="camera" position="[0,5,12]" lookAt="[0,3,0]"/>
+		<i id="camera" position="[5,5,9]" lookAt="[0,3,0]"/>
 		<i id="shadowCam" top="10" left="-10" bottom="-10" right="10"/>
 		<i id="light" position="[7,6,-1]" color="#fff"/>
 	</Meta>
